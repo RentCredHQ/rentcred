@@ -77,7 +77,7 @@ useSeoMeta({
         <span class="font-mono text-[11px] font-semibold text-[#FF8400] tracking-[2px] uppercase">
           HOW IT WORKS
         </span>
-        <h2 class="font-mono text-[32px] font-medium text-foreground tracking-tight text-center">
+        <h2 class="font-mono text-2xl sm:text-[28px] lg:text-[32px] font-medium text-foreground tracking-tight text-center">
           Three steps to a verified tenant
         </h2>
       </div>
@@ -128,7 +128,7 @@ useSeoMeta({
         <span class="font-mono text-[11px] font-semibold text-[#FF8400] tracking-[2px] uppercase">
           AGENT PRICING
         </span>
-        <h2 class="font-mono text-[32px] font-medium text-foreground tracking-tight text-center">
+        <h2 class="font-mono text-2xl sm:text-[28px] lg:text-[32px] font-medium text-foreground tracking-tight text-center">
           Buy in bundles. Save more.
         </h2>
         <p class="font-sans text-base text-muted-foreground text-center">

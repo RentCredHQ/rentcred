@@ -33,7 +33,7 @@ useSeoMeta({ title: 'For Landlords — RentCred', description: 'Know who you\'re
       <div class="flex flex-col items-center gap-12">
         <div class="flex flex-col items-center gap-3">
           <span class="font-mono text-[11px] font-semibold text-[#FF8400] tracking-[2px]">WHAT YOU GET</span>
-          <h2 class="font-mono text-4xl font-bold text-foreground text-center">Every report covers what matters</h2>
+          <h2 class="font-mono text-2xl sm:text-3xl lg:text-4xl font-bold text-foreground text-center">Every report covers what matters</h2>
         </div>
 
         <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 w-full">
@@ -72,7 +72,7 @@ useSeoMeta({ title: 'For Landlords — RentCred', description: 'Know who you\'re
       <div class="flex flex-col items-center gap-12">
         <div class="flex flex-col items-center gap-3">
           <span class="font-mono text-[11px] font-semibold text-[#FF8400] tracking-[2px]">HOW IT WORKS</span>
-          <h2 class="font-mono text-4xl font-bold text-foreground text-center">Three steps to a verified tenant</h2>
+          <h2 class="font-mono text-2xl sm:text-3xl lg:text-4xl font-bold text-foreground text-center">Three steps to a verified tenant</h2>
         </div>
 
         <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8 w-full">
@@ -111,7 +111,7 @@ useSeoMeta({ title: 'For Landlords — RentCred', description: 'Know who you\'re
       <div class="flex flex-col items-center gap-12">
         <div class="flex flex-col items-center gap-3">
           <span class="font-mono text-[11px] font-semibold text-[#FF8400] tracking-[2px]">SAMPLE REPORT</span>
-          <h2 class="font-mono text-4xl font-bold text-white text-center">What your report looks like</h2>
+          <h2 class="font-mono text-2xl sm:text-3xl lg:text-4xl font-bold text-white text-center">What your report looks like</h2>
         </div>
 
         <!-- Report Card -->
@@ -160,7 +160,7 @@ useSeoMeta({ title: 'For Landlords — RentCred', description: 'Know who you\'re
     <!-- ============================================ -->
     <section class="bg-[#0D0D0D] px-5 sm:px-8 lg:px-[120px] py-10 lg:py-20 border-t border-[#2E2E2E]">
       <div class="flex flex-col items-center justify-center gap-6">
-        <h2 class="font-mono text-4xl font-bold text-white text-center">Ask your agent about RentCred</h2>
+        <h2 class="font-mono text-2xl sm:text-3xl lg:text-4xl font-bold text-white text-center">Ask your agent about RentCred</h2>
         <p class="font-sans text-lg text-[#7A7A7A] text-center max-w-[600px]">
           Get peace of mind before signing the lease. Your agent can request a report in minutes.
         </p>

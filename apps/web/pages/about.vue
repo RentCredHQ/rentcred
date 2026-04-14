@@ -24,7 +24,7 @@ useSeoMeta({ title: 'About — RentCred', description: 'Building trust in Nigeri
     <section class="bg-background px-5 sm:px-8 lg:px-[120px] py-10 lg:py-20">
       <div class="flex flex-col items-center gap-8">
         <span class="font-mono text-[11px] font-semibold text-[#FF8400] tracking-[2px]">OUR MISSION</span>
-        <h2 class="font-mono text-4xl font-bold text-foreground text-center">Why RentCred exists</h2>
+        <h2 class="font-mono text-2xl sm:text-3xl lg:text-4xl font-bold text-foreground text-center">Why RentCred exists</h2>
         <div class="max-w-[800px] text-center font-sans text-base text-muted-foreground" style="line-height: 1.7">
           <p class="mb-6">
             Nigeria's rental market relies on verbal references and personal connections. Landlords can't verify who they're renting to. Tenants have no portable proof of credibility. Agents are caught in the middle with no reliable tools.
@@ -42,7 +42,7 @@ useSeoMeta({ title: 'About — RentCred', description: 'Building trust in Nigeri
     <section class="bg-background px-5 sm:px-8 lg:px-[120px] py-10 lg:py-20 border-t border-border">
       <div class="flex flex-col items-center gap-8">
         <span class="font-mono text-[11px] font-semibold text-[#FF8400] tracking-[2px]">HOW WE WORK</span>
-        <h2 class="font-mono text-4xl font-bold text-foreground text-center max-w-[800px]">
+        <h2 class="font-mono text-2xl sm:text-3xl lg:text-4xl font-bold text-foreground text-center max-w-[800px]">
           Tech-enabled verification meets field operations
         </h2>
         <div class="grid grid-cols-1 lg:grid-cols-2 gap-8 lg:gap-12 w-full mt-4">
@@ -73,7 +73,7 @@ useSeoMeta({ title: 'About — RentCred', description: 'Building trust in Nigeri
       <div class="flex flex-col items-center gap-12">
         <div class="flex flex-col items-center gap-3">
           <span class="font-mono text-[11px] font-semibold text-[#FF8400] tracking-[2px]">OUR VALUES</span>
-          <h2 class="font-mono text-4xl font-bold text-foreground text-center">What we stand for</h2>
+          <h2 class="font-mono text-2xl sm:text-3xl lg:text-4xl font-bold text-foreground text-center">What we stand for</h2>
         </div>
 
         <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 w-full">
@@ -106,7 +106,7 @@ useSeoMeta({ title: 'About — RentCred', description: 'Building trust in Nigeri
     <!-- ============================================ -->
     <section class="bg-[#0D0D0D] px-5 sm:px-8 lg:px-[120px] py-10 lg:py-20">
       <div class="flex flex-col items-center justify-center gap-6">
-        <h2 class="font-mono text-4xl font-bold text-white text-center">Partner with us</h2>
+        <h2 class="font-mono text-2xl sm:text-3xl lg:text-4xl font-bold text-white text-center">Partner with us</h2>
         <p class="font-sans text-lg text-[#7A7A7A] text-center max-w-[650px]">
           Whether you're an agent, a property manager, or a corporate landlord — we'd love to work with you.
         </p>

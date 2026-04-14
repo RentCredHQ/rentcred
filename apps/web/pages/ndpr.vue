@@ -8,7 +8,7 @@ useSeoMeta({ title: 'NDPR Compliance — RentCred' })
     <!-- Hero -->
     <section class="bg-[#0D0D0D] px-5 sm:px-8 lg:px-20 py-10 lg:py-16 flex flex-col items-center gap-4">
       <span class="font-mono text-[11px] font-semibold text-[#FF8400] tracking-[2px]">DATA PROTECTION</span>
-      <h1 class="font-mono text-[40px] font-medium text-white text-center" style="letter-spacing: -1px">NDPR Compliance</h1>
+      <h1 class="font-mono text-[28px] sm:text-[34px] lg:text-[40px] font-medium text-white text-center" style="letter-spacing: -1px">NDPR Compliance</h1>
       <p class="font-sans text-base text-[#7A7A7A] text-center max-w-[600px]">How RentCred meets the Nigeria Data Protection Regulation (NDPR) 2019</p>
     </section>
 

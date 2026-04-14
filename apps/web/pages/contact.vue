@@ -134,7 +134,7 @@ function handleSubmit() {
       <div class="flex flex-col items-center gap-12">
         <div class="flex flex-col items-center gap-3">
           <span class="font-mono text-[11px] font-semibold text-[#FF8400] tracking-[2px]">FAQ</span>
-          <h2 class="font-mono text-4xl font-bold text-foreground text-center">Frequently asked questions</h2>
+          <h2 class="font-mono text-2xl sm:text-3xl lg:text-4xl font-bold text-foreground text-center">Frequently asked questions</h2>
         </div>
 
         <div class="w-full max-w-[800px] flex flex-col">
