@@ -65,7 +65,7 @@ async function handleSave() {
       <div v-if="modelValue" class="fixed inset-0 z-50 flex items-center justify-center">
         <div class="absolute inset-0 bg-black/40" @click="close" />
 
-        <div class="relative w-full mx-4 max-w-[520px] bg-white rounded-2xl border border-border shadow-2xl flex flex-col overflow-hidden">
+        <div class="relative w-full mx-4 max-w-[520px] max-h-[90vh] bg-white rounded-2xl border border-border shadow-2xl flex flex-col overflow-hidden">
           <!-- Header -->
           <div class="flex items-center justify-between px-6 py-5 border-b border-border">
             <h2 class="font-mono text-base font-bold text-foreground">Edit Profile</h2>
@@ -75,7 +75,7 @@ async function handleSave() {
           </div>
 
           <!-- Body -->
-          <div class="flex flex-col gap-6 p-6">
+          <div class="flex flex-col gap-6 p-6 overflow-y-auto">
             <!-- Success Toast -->
             <div v-if="saved" class="flex items-center gap-2.5 px-4 py-3 rounded-lg bg-[#DFE6E1]">
               <span class="material-symbols-rounded text-[20px] text-[#004D1A]">check_circle</span>
@@ -101,7 +101,7 @@ async function handleSave() {
             <div class="h-px bg-border" />
 
             <!-- Name Row -->
-            <div class="flex gap-4">
+            <div class="flex flex-col sm:flex-row gap-4">
               <div class="flex-1 flex flex-col gap-1.5">
                 <label class="font-mono text-[11px] font-semibold text-muted-foreground tracking-wider">FIRST NAME</label>
                 <input v-model="form.firstName" type="text" class="w-full h-[44px] px-3.5 bg-white border border-border rounded-lg text-sm font-sans text-foreground focus:outline-none focus:border-primary transition-colors" />
@@ -125,7 +125,7 @@ async function handleSave() {
             </div>
 
             <!-- Company / Role -->
-            <div class="flex gap-4">
+            <div class="flex flex-col sm:flex-row gap-4">
               <div class="flex-1 flex flex-col gap-1.5">
                 <label class="font-mono text-[11px] font-semibold text-muted-foreground tracking-wider">COMPANY NAME</label>
                 <input v-model="form.company" type="text" class="w-full h-[44px] px-3.5 bg-white border border-border rounded-lg text-sm font-sans text-foreground focus:outline-none focus:border-primary transition-colors" />
@@ -141,7 +141,7 @@ async function handleSave() {
           </div>
 
           <!-- Footer -->
-          <div class="flex items-center justify-end gap-3 px-6 py-4 border-t border-border">
+          <div class="flex flex-col-reverse sm:flex-row items-center justify-end gap-3 px-6 py-4 border-t border-border">
             <button @click="close" class="px-5 py-2.5 rounded-lg border border-border font-mono text-[13px] font-medium text-foreground hover:bg-background transition-colors">
               Cancel
             </button>

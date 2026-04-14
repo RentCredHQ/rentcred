@@ -71,7 +71,7 @@ function toggleNotification(id: string) {
 <template>
   <div class="flex flex-col gap-6">
     <!-- Header -->
-    <h1 class="font-mono text-2xl font-semibold text-foreground" style="letter-spacing: -0.5px">Account Settings</h1>
+    <h1 class="font-mono text-xl sm:text-2xl font-semibold text-foreground" style="letter-spacing: -0.5px">Account Settings</h1>
 
     <!-- Two-column layout -->
     <div class="flex flex-col lg:flex-row gap-6">
@@ -81,7 +81,7 @@ function toggleNotification(id: string) {
         <div class="bg-white border border-border rounded-lg p-7 flex flex-col gap-6">
           <h2 class="font-mono text-base font-semibold text-foreground">Profile</h2>
 
-          <div class="flex gap-6">
+          <div class="flex flex-col sm:flex-row gap-4 sm:gap-6">
             <!-- Avatar -->
             <div class="w-[72px] h-[72px] rounded-full bg-primary flex items-center justify-center flex-shrink-0">
               <span class="font-mono text-2xl font-semibold text-white">AO</span>

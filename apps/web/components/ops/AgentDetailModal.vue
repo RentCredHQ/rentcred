@@ -69,7 +69,7 @@ watch(() => show.value, async (open) => {
 
           <div v-if="agent" class="flex flex-col gap-5 p-6">
             <!-- Status & Rating -->
-            <div class="flex items-center gap-3">
+            <div class="flex flex-wrap items-center gap-3">
               <span class="inline-flex px-2.5 py-0.5 rounded-full text-[11px] font-semibold bg-[#DFE6E1] text-[#004D1A]">{{ agent.status === 'active' ? 'Active' : agent.status === 'suspended' ? 'Suspended' : 'Inactive' }}</span>
               <div class="flex items-center gap-1">
                 <span class="material-symbols-rounded text-[16px] text-primary">star</span>
@@ -140,7 +140,7 @@ watch(() => show.value, async (open) => {
             </div>
 
             <!-- Actions -->
-            <div class="flex items-center gap-3 pt-2">
+            <div class="flex flex-col sm:flex-row items-center gap-3 pt-2">
               <button class="flex-1 px-4 py-2.5 bg-[#8C1C00] text-white rounded-lg text-[13px] font-mono font-semibold hover:opacity-90 transition-opacity">
                 Suspend Agent
               </button>

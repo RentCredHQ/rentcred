@@ -177,7 +177,7 @@ onMounted(async () => {
           <span class="inline-flex px-3 py-1 rounded-full bg-[#DFE6E1] text-[#004D1A] text-[12px] font-semibold">{{ report.status }}</span>
         </div>
       </div>
-      <div class="flex items-center gap-3">
+      <div class="flex flex-wrap items-center gap-3">
         <button class="flex items-center gap-2 px-5 py-2.5 bg-primary text-foreground font-mono text-[13px] font-medium hover:opacity-90 transition-opacity">
           <span class="material-symbols-rounded text-[16px]">share</span>
           Share Report

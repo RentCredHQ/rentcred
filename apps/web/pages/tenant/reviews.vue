@@ -87,7 +87,7 @@ onMounted(async () => {
         <div
           v-for="sub in completedSubmissions"
           :key="sub.id"
-          class="flex items-center justify-between px-5 py-4"
+          class="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 px-5 py-4"
         >
           <div class="flex flex-col gap-0.5">
             <span class="font-sans text-[14px] font-medium text-foreground">{{ sub.propertyAddress }}</span>

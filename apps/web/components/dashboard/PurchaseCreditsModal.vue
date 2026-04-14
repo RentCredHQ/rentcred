@@ -64,7 +64,7 @@ async function handlePurchase() {
       <div v-if="modelValue" class="fixed inset-0 z-50 flex items-center justify-center">
         <div class="absolute inset-0 bg-black/40" @click="close" />
 
-        <div class="relative w-full mx-4 max-w-[560px] bg-white rounded-2xl border border-border shadow-2xl flex flex-col overflow-hidden">
+        <div class="relative w-full mx-4 max-w-[560px] max-h-[90vh] bg-white rounded-2xl border border-border shadow-2xl flex flex-col overflow-hidden">
           <!-- Header -->
           <div class="flex items-center justify-between px-6 py-5 border-b border-border">
             <h2 class="font-mono text-base font-bold text-foreground">Purchase Verification Credits</h2>
@@ -74,14 +74,14 @@ async function handlePurchase() {
           </div>
 
           <!-- Body -->
-          <div class="flex flex-col gap-5 p-6">
+          <div class="flex flex-col gap-5 p-6 overflow-y-auto">
             <!-- Loading -->
             <div v-if="loadingBundles" class="flex items-center justify-center py-10">
               <span class="material-symbols-rounded text-[24px] text-muted-foreground animate-spin">progress_activity</span>
             </div>
 
             <!-- Credit packages -->
-            <div v-else class="flex gap-3">
+            <div v-else class="flex flex-col sm:flex-row gap-3">
               <button
                 v-for="(pkg, i) in packages"
                 :key="pkg.name"

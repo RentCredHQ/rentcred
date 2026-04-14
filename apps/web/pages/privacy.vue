@@ -13,7 +13,7 @@ useSeoMeta({ title: 'Privacy Policy — RentCred' })
     </section>
 
     <!-- Body -->
-    <section class="bg-background px-5 sm:px-8 lg:px-[280px] py-10 lg:py-16">
+    <section class="bg-background px-5 sm:px-8 lg:px-[120px] xl:px-[280px] py-10 lg:py-16">
       <div class="flex flex-col gap-10">
         <p class="font-sans text-[15px] text-foreground" style="line-height: 1.7">
           RentCred Technologies Ltd. ('RentCred', 'we', 'us', or 'our') is committed to protecting your personal data. This Privacy Policy explains how we collect, use, store, and share your information when you use our platform at rentcred.ng.

@@ -102,7 +102,7 @@ onMounted(async () => {
     <!-- Search & Filters -->
     <UiFilterBar>
       <UiFilterTabs v-model="activeFilter" :tabs="statusTabs" />
-      <UiFilterSearch v-model="searchQuery" placeholder="Search by tenant name or case ID..." width="w-[280px]" />
+      <UiFilterSearch v-model="searchQuery" placeholder="Search by tenant name or case ID..." width="w-full sm:w-[280px]" />
     </UiFilterBar>
 
     <!-- Desktop Table -->

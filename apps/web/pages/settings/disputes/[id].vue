@@ -76,7 +76,7 @@ const newComment = ref('')
         <!-- Description Card -->
         <div class="bg-white border border-border rounded-xl p-5 flex flex-col gap-3">
           <h2 class="font-mono text-[15px] font-semibold text-foreground">{{ dispute.subject }}</h2>
-          <div class="flex items-center gap-4 text-[12px] font-sans text-muted-foreground">
+          <div class="flex flex-wrap items-center gap-2 sm:gap-4 text-[12px] font-sans text-muted-foreground">
             <span>Filed by {{ dispute.filedBy }}</span>
             <span>{{ dispute.filedDate }}</span>
             <span class="inline-flex px-2 py-0.5 rounded bg-[#E7E8E5] text-[11px] font-medium text-foreground">{{ dispute.category }}</span>

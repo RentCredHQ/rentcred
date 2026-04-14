@@ -75,7 +75,7 @@ onMounted(async () => {
           <span class="font-sans text-sm text-muted-foreground">{{ stat.label }}</span>
           <span class="material-symbols-rounded text-[20px] text-muted-foreground">{{ stat.icon }}</span>
         </div>
-        <span class="font-mono text-3xl font-bold" :class="stat.color || 'text-foreground'">{{ stat.value }}</span>
+        <span class="font-mono text-2xl sm:text-3xl font-bold" :class="stat.color || 'text-foreground'">{{ stat.value }}</span>
         <span v-if="stat.change" class="font-sans text-xs text-muted-foreground">{{ stat.change }}</span>
       </div>
     </div>

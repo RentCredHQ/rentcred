@@ -79,7 +79,7 @@ onMounted(async () => {
       <div class="bg-white border border-border rounded-xl p-5 flex flex-col gap-2">
         <span class="font-sans text-[13px] text-muted-foreground">Credits Remaining</span>
         <div class="flex items-end gap-2">
-          <span class="font-mono text-4xl font-bold text-foreground leading-none">{{ kpis.remaining.value }}</span>
+          <span class="font-mono text-2xl sm:text-4xl font-bold text-foreground leading-none">{{ kpis.remaining.value }}</span>
           <span class="font-sans text-[13px] text-muted-foreground pb-1">of {{ kpis.remaining.total }}</span>
         </div>
         <div class="w-full h-2 bg-background rounded-full mt-1">
@@ -88,7 +88,7 @@ onMounted(async () => {
       </div>
       <div class="bg-white border border-border rounded-xl p-5 flex flex-col gap-2">
         <span class="font-sans text-[13px] text-muted-foreground">Credits Used</span>
-        <span class="font-mono text-4xl font-bold text-foreground leading-none">{{ kpis.used }}</span>
+        <span class="font-mono text-2xl sm:text-4xl font-bold text-foreground leading-none">{{ kpis.used }}</span>
         <span class="inline-block w-fit px-2.5 py-1 rounded-full bg-[#DFDFE6] text-[#000066] text-[11px] font-medium mt-1">This billing cycle</span>
       </div>
       <div class="bg-white border border-border rounded-xl p-5 flex flex-col gap-2">
@@ -115,7 +115,7 @@ onMounted(async () => {
           <h3 class="font-mono text-lg font-semibold text-foreground">{{ bundle.name }}</h3>
           <span class="font-sans text-[13px] text-muted-foreground">{{ bundle.credits }} verification credits</span>
           <div class="flex items-baseline gap-1">
-            <span class="font-mono text-3xl font-bold text-foreground">₦{{ bundle.price.toLocaleString() }}</span>
+            <span class="font-mono text-xl sm:text-3xl font-bold text-foreground">₦{{ bundle.price.toLocaleString() }}</span>
           </div>
           <span class="font-sans text-[12px] text-muted-foreground">{{ bundle.perCheck }}</span>
           <button

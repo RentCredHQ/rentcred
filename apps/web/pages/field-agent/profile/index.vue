@@ -42,7 +42,7 @@ const menuItems = [
       <span class="bg-[#E9E3D8] text-[#804200] rounded-full px-3 py-1 text-[11px] font-semibold">{{ user?.role ?? 'Field Agent' }}</span>
       <span class="font-sans text-[13px] text-muted-foreground">{{ user?.email ?? '—' }}</span>
     </div>
-    <div class="grid grid-cols-3 gap-3">
+    <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
       <div class="bg-card border border-border rounded-xl p-3.5 flex flex-col items-center gap-1">
         <span class="font-mono text-[10px] text-muted-foreground tracking-wider uppercase">Completed</span>
         <span class="font-mono text-xl font-bold text-[#004D1A]">{{ stats?.completed ?? '—' }}</span>

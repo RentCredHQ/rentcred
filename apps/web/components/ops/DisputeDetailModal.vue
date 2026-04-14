@@ -128,7 +128,7 @@ watch(show, (val) => {
               <div v-if="error" class="font-sans text-[13px] text-error">{{ error }}</div>
 
               <!-- Actions -->
-              <div class="flex items-center gap-3">
+              <div class="flex flex-wrap items-center gap-3">
                 <button
                   v-if="dispute.status === 'open'"
                   class="flex-1 px-4 py-2.5 bg-blue-600 text-white rounded-lg text-[13px] font-mono font-semibold hover:opacity-90 transition-opacity disabled:opacity-50"

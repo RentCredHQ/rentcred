@@ -171,7 +171,7 @@ async function handleSubmit() {
     </div>
 
     <!-- Actions -->
-    <div class="flex items-center gap-3">
+    <div class="flex flex-col-reverse sm:flex-row items-center gap-3">
       <button class="px-6 py-2.5 border border-border font-sans text-sm font-medium text-foreground hover:bg-surface transition-colors" @click="emit('cancel')">Cancel</button>
       <button
         class="flex-1 py-2.5 bg-primary font-sans text-sm font-medium text-foreground hover:opacity-90 transition-opacity disabled:opacity-50"

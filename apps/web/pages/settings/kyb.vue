@@ -73,11 +73,11 @@ async function handleUpload(doc: any) {
       <NuxtLink to="/settings" class="lg:hidden">
         <span class="material-symbols-rounded text-[20px] text-foreground">arrow_back</span>
       </NuxtLink>
-      <h1 class="font-mono text-2xl font-semibold text-foreground" style="letter-spacing: -0.5px">KYB Business Verification</h1>
+      <h1 class="font-mono text-xl sm:text-2xl font-semibold text-foreground" style="letter-spacing: -0.5px">KYB Business Verification</h1>
     </div>
 
     <!-- Stepper -->
-    <div class="flex items-center gap-0">
+    <div class="flex items-center gap-0 overflow-x-auto">
       <template v-for="(step, i) in steps" :key="step.label">
         <div class="flex items-center gap-2.5">
           <div
@@ -102,7 +102,7 @@ async function handleUpload(doc: any) {
           <p class="font-sans text-[13px] text-muted-foreground">Upload the following documents to verify your business identity.</p>
 
           <div class="flex flex-col gap-4">
-            <div v-for="doc in documents" :key="doc.name" class="flex items-center justify-between py-3.5 border-b border-border last:border-0">
+            <div v-for="doc in documents" :key="doc.name" class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 py-3.5 border-b border-border last:border-0">
               <div class="flex flex-col gap-0.5 flex-1 min-w-0">
                 <span class="font-sans text-sm font-medium text-foreground">{{ doc.name }}</span>
                 <span class="font-sans text-[12px] text-muted-foreground">{{ doc.desc }}</span>

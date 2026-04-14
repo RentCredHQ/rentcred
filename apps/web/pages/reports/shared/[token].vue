@@ -34,7 +34,7 @@ function formatDate(dateStr: string) {
 <template>
   <div>
     <!-- Hero Banner -->
-    <section class="bg-[#0D0D0D] px-5 lg:px-20 py-10 lg:py-12">
+    <section class="bg-[#0D0D0D] px-5 sm:px-8 lg:px-20 py-10 lg:py-12">
       <div class="max-w-[1440px] mx-auto flex flex-col items-center gap-3">
         <span class="font-mono text-[11px] font-semibold text-primary uppercase tracking-wider">VERIFICATION REPORT</span>
         <h1 class="font-mono text-2xl lg:text-[32px] font-bold text-white">
@@ -47,7 +47,7 @@ function formatDate(dateStr: string) {
     </section>
 
     <!-- Loading -->
-    <section v-if="loading" class="bg-background px-5 lg:px-20 py-20 flex justify-center">
+    <section v-if="loading" class="bg-background px-5 sm:px-8 lg:px-20 py-20 flex justify-center">
       <div class="flex flex-col items-center gap-3">
         <span class="material-symbols-rounded text-[40px] text-muted-foreground animate-spin">progress_activity</span>
         <p class="font-sans text-sm text-muted-foreground">Loading report…</p>
@@ -55,7 +55,7 @@ function formatDate(dateStr: string) {
     </section>
 
     <!-- Error -->
-    <section v-else-if="error" class="bg-background px-5 lg:px-20 py-20 flex justify-center">
+    <section v-else-if="error" class="bg-background px-5 sm:px-8 lg:px-20 py-20 flex justify-center">
       <div class="bg-white border border-border rounded-xl p-8 max-w-[480px] flex flex-col items-center gap-4 text-center">
         <span class="material-symbols-rounded text-[48px] text-muted-foreground">link_off</span>
         <h2 class="font-mono text-lg font-semibold text-foreground">Report Not Found</h2>
@@ -67,7 +67,7 @@ function formatDate(dateStr: string) {
     </section>
 
     <!-- Report Content -->
-    <section v-else-if="report" class="bg-background px-5 lg:px-20 py-8 lg:py-12">
+    <section v-else-if="report" class="bg-background px-5 sm:px-8 lg:px-20 py-8 lg:py-12">
       <div class="max-w-[900px] mx-auto flex flex-col gap-6">
 
         <!-- Verified Badge -->

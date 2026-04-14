@@ -40,7 +40,7 @@ const { searchQuery, activeFilter, filtered, resultCount } = useFilter({
         <NuxtLink to="/settings" class="lg:hidden">
           <span class="material-symbols-rounded text-[20px] text-foreground">arrow_back</span>
         </NuxtLink>
-        <h1 class="font-mono text-2xl font-semibold text-foreground" style="letter-spacing: -0.5px">Dispute Resolution</h1>
+        <h1 class="font-mono text-xl sm:text-2xl font-semibold text-foreground" style="letter-spacing: -0.5px">Dispute Resolution</h1>
       </div>
       <button @click="showNewDispute = true" class="hidden lg:flex items-center gap-2 px-4 py-2.5 bg-primary text-foreground font-mono text-[13px] font-medium hover:opacity-90 transition-opacity">
         <span class="material-symbols-rounded text-[16px]">add</span>

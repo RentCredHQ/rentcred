@@ -50,7 +50,7 @@ const selectedDate = ref('all')
     <!-- Filters -->
     <UiFilterBar>
       <UiFilterTabs v-model="activeFilter" :tabs="statusTabs" />
-      <UiFilterSearch v-model="searchQuery" placeholder="Search by user, action or IP..." width="w-[260px]" />
+      <UiFilterSearch v-model="searchQuery" placeholder="Search by user, action or IP..." width="w-full sm:w-[260px]" />
       <UiFilterDropdown v-model="selectedDate" :options="dateOptions" icon="calendar_today" />
     </UiFilterBar>
 

@@ -62,7 +62,7 @@ const { searchQuery, activeFilter, filtered, resultCount } = useFilter({
       <NuxtLink to="/settings" class="lg:hidden">
         <span class="material-symbols-rounded text-[20px] text-foreground">arrow_back</span>
       </NuxtLink>
-      <h1 class="font-mono text-2xl font-semibold text-foreground" style="letter-spacing: -0.5px">Audit Log</h1>
+      <h1 class="font-mono text-xl sm:text-2xl font-semibold text-foreground" style="letter-spacing: -0.5px">Audit Log</h1>
     </div>
 
     <!-- Summary Row -->
@@ -76,7 +76,7 @@ const { searchQuery, activeFilter, filtered, resultCount } = useFilter({
     <!-- Filters -->
     <div class="flex flex-col lg:flex-row items-start lg:items-center justify-between gap-3">
       <UiFilterTabs v-model="activeFilter" :tabs="categoryTabs" variant="pill" />
-      <UiFilterSearch v-model="searchQuery" placeholder="Search by user, action or IP..." width="w-[280px]" />
+      <UiFilterSearch v-model="searchQuery" placeholder="Search by user, action or IP..." width="w-full sm:w-[280px]" />
     </div>
 
     <!-- Log Table -->

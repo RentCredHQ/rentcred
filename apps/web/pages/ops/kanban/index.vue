@@ -53,7 +53,7 @@ const columns = ref([
 <template>
   <div class="flex flex-col gap-6">
     <!-- Header -->
-    <div class="flex items-center justify-between">
+    <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
       <div>
         <h1 class="font-mono text-xl font-bold text-foreground">Kanban Board</h1>
         <span class="font-sans text-sm text-muted-foreground">Visual case pipeline overview</span>
@@ -68,7 +68,7 @@ const columns = ref([
 
     <!-- Kanban Columns -->
     <div class="flex gap-4 overflow-x-auto pb-4">
-      <div v-for="col in columns" :key="col.title" class="flex-shrink-0 w-[280px] flex flex-col gap-3">
+      <div v-for="col in columns" :key="col.title" class="flex-shrink-0 w-[260px] sm:w-[280px] flex flex-col gap-3">
         <!-- Column Header -->
         <div class="flex items-center justify-between px-1">
           <div class="flex items-center gap-2">

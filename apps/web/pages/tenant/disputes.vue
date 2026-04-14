@@ -69,7 +69,7 @@ onMounted(loadData)
 
 <template>
   <div class="flex flex-col gap-6">
-    <div class="flex items-start justify-between">
+    <div class="flex flex-col sm:flex-row items-start sm:justify-between gap-3">
       <div class="flex flex-col gap-1">
         <h1 class="font-mono text-xl lg:text-2xl font-bold text-foreground">Disputes</h1>
         <p class="font-sans text-sm text-muted-foreground">Challenge verification findings</p>

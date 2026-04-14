@@ -64,7 +64,7 @@ async function handleMarkAllAsRead() {
         <NuxtLink to="/settings" class="lg:hidden">
           <span class="material-symbols-rounded text-[20px] text-foreground">arrow_back</span>
         </NuxtLink>
-        <h1 class="font-mono text-2xl font-semibold text-foreground" style="letter-spacing: -0.5px">Notifications</h1>
+        <h1 class="font-mono text-xl sm:text-2xl font-semibold text-foreground" style="letter-spacing: -0.5px">Notifications</h1>
       </div>
       <button @click="handleMarkAllAsRead" class="font-sans text-[12px] font-medium text-primary hover:underline">Mark all read</button>
     </div>

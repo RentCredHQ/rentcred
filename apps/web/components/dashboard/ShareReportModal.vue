@@ -48,7 +48,7 @@ async function sendEmail() {
       <div v-if="modelValue" class="fixed inset-0 z-50 flex items-center justify-center">
         <div class="absolute inset-0 bg-black/40" @click="close" />
 
-        <div class="relative w-full mx-4 max-w-[480px] bg-white rounded-2xl border border-border shadow-2xl flex flex-col overflow-hidden">
+        <div class="relative w-full mx-4 max-w-[480px] max-h-[90vh] bg-white rounded-2xl border border-border shadow-2xl flex flex-col overflow-hidden">
           <!-- Header -->
           <div class="flex items-center justify-between px-6 py-5 border-b border-border">
             <h2 class="font-mono text-lg font-bold text-foreground">Share Report</h2>
@@ -58,7 +58,7 @@ async function sendEmail() {
           </div>
 
           <!-- Body -->
-          <div class="flex flex-col gap-6 p-6">
+          <div class="flex flex-col gap-6 p-6 overflow-y-auto">
             <!-- Share via link -->
             <div class="flex flex-col gap-2.5">
               <label class="font-sans text-sm font-semibold text-foreground">Share via link</label>

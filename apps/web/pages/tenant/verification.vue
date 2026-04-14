@@ -55,7 +55,7 @@ onMounted(async () => {
       </div>
 
       <!-- Progress Timeline -->
-      <div v-if="sub.status !== 'rejected'" class="flex items-center gap-0">
+      <div v-if="sub.status !== 'rejected'" class="flex items-center gap-0 overflow-x-auto">
         <template v-for="(step, i) in statusSteps" :key="step">
           <div class="flex flex-col items-center gap-1">
             <div class="w-8 h-8 rounded-full flex items-center justify-center text-[14px]"
@@ -67,7 +67,7 @@ onMounted(async () => {
                 {{ stepIndex(sub.status) > i ? 'check' : stepIndex(sub.status) === i ? 'pending' : 'circle' }}
               </span>
             </div>
-            <span class="font-sans text-[10px] text-muted-foreground text-center w-16 leading-tight">
+            <span class="font-sans text-[10px] text-muted-foreground text-center w-12 sm:w-16 leading-tight">
               {{ SUBMISSION_STATUS_LABELS[step] || step }}
             </span>
           </div>

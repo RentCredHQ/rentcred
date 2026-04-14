@@ -59,7 +59,7 @@ const show = defineModel<boolean>({ default: false })
             </div>
 
             <!-- Actions -->
-            <div class="flex items-center gap-3 pt-2">
+            <div class="flex flex-col sm:flex-row items-center gap-3 pt-2">
               <button class="flex-1 px-4 py-2.5 border border-border rounded-lg text-[13px] font-sans text-foreground hover:bg-surface transition-colors flex items-center justify-center gap-2">
                 <span class="material-symbols-rounded text-[16px]">receipt_long</span>
                 Download Receipt

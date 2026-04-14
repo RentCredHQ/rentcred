@@ -252,7 +252,7 @@ async function handleSubmit() {
           </div>
         </div>
 
-        <div class="flex items-center justify-between pt-2">
+        <div class="flex flex-col-reverse sm:flex-row items-stretch sm:items-center sm:justify-between gap-3 pt-2">
           <NuxtLink to="/dashboard" class="px-6 py-2.5 border border-border font-sans text-sm font-medium text-foreground hover:bg-surface transition-colors">Cancel</NuxtLink>
           <button class="px-6 py-2.5 bg-primary font-sans text-sm font-medium text-foreground hover:opacity-90 transition-opacity" @click="nextStep">Continue to Property</button>
         </div>
@@ -370,7 +370,7 @@ async function handleSubmit() {
             <p v-if="uploadError" class="font-sans text-[13px] text-error">{{ uploadError }}</p>
 
             <!-- Image previews -->
-            <div v-if="step2.propertyImages.length > 0" class="grid grid-cols-3 sm:grid-cols-5 gap-2 mt-1">
+            <div v-if="step2.propertyImages.length > 0" class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-5 gap-2 mt-1">
               <div v-for="(img, i) in step2.propertyImages" :key="img.key" class="relative group aspect-square rounded-lg overflow-hidden border border-border">
                 <img :src="img.preview || img.publicUrl" class="w-full h-full object-cover" />
                 <button
@@ -394,7 +394,7 @@ async function handleSubmit() {
           </div>
         </div>
 
-        <div class="flex items-center justify-between pt-2">
+        <div class="flex flex-col-reverse sm:flex-row items-stretch sm:items-center sm:justify-between gap-3 pt-2">
           <button class="px-6 py-2.5 border border-border font-sans text-sm font-medium text-foreground hover:bg-surface transition-colors" @click="prevStep">Back</button>
           <button class="px-6 py-2.5 bg-primary font-sans text-sm font-medium text-foreground hover:opacity-90 transition-opacity" @click="nextStep">Continue to Package</button>
         </div>
@@ -444,7 +444,7 @@ async function handleSubmit() {
           <span class="font-sans text-[13px] text-muted-foreground">6 credits remaining</span>
         </div>
 
-        <div class="flex items-center justify-between pt-2">
+        <div class="flex flex-col-reverse sm:flex-row items-stretch sm:items-center sm:justify-between gap-3 pt-2">
           <button class="px-6 py-2.5 border border-border font-sans text-sm font-medium text-foreground hover:bg-surface transition-colors" @click="prevStep">Back</button>
           <button class="px-6 py-2.5 bg-primary font-sans text-sm font-medium text-foreground hover:opacity-90 transition-opacity" @click="nextStep">Continue to Review</button>
         </div>
@@ -489,7 +489,7 @@ async function handleSubmit() {
           <span class="font-sans text-[13px] text-error">{{ submitError }}</span>
         </div>
 
-        <div class="flex items-center justify-between pt-2">
+        <div class="flex flex-col-reverse sm:flex-row items-stretch sm:items-center sm:justify-between gap-3 pt-2">
           <button class="px-6 py-2.5 border border-border font-sans text-sm font-medium text-foreground hover:bg-surface transition-colors" @click="prevStep">Back</button>
           <button
             class="flex items-center gap-2 px-6 py-2.5 bg-primary font-sans text-sm font-medium text-foreground hover:opacity-90 transition-opacity disabled:opacity-50"

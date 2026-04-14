@@ -13,7 +13,7 @@ useSeoMeta({ title: 'Terms of Service — RentCred' })
     </section>
 
     <!-- Body -->
-    <section class="bg-background px-5 sm:px-8 lg:px-[280px] py-10 lg:py-16">
+    <section class="bg-background px-5 sm:px-8 lg:px-[120px] xl:px-[280px] py-10 lg:py-16">
       <div class="flex flex-col gap-10">
         <p class="font-sans text-[15px] text-foreground" style="line-height: 1.7">
           These Terms of Service ('Terms') govern your use of the RentCred platform operated by RentCred Technologies Ltd. By accessing or using our platform, you agree to be bound by these Terms. If you do not agree, do not use the platform.

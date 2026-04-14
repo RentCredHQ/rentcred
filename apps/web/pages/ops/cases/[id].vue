@@ -133,7 +133,7 @@ onMounted(async () => {
         <span class="text-foreground">{{ caseId }}</span>
       </div>
 
-      <div class="flex items-center justify-between">
+      <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
         <div class="flex items-center gap-4">
           <h1 class="font-mono text-xl font-bold text-foreground">{{ caseData.id }}</h1>
           <span class="inline-flex px-2.5 py-0.5 rounded-full text-[11px] font-semibold" :class="[caseData.statusBg, caseData.statusText]">{{ caseData.status }}</span>
@@ -153,7 +153,7 @@ onMounted(async () => {
     </div>
 
     <!-- Meta Row -->
-    <div class="flex items-center gap-6 text-[13px] font-sans text-muted-foreground">
+    <div class="flex flex-wrap items-center gap-x-6 gap-y-2 text-[13px] font-sans text-muted-foreground">
       <div class="flex items-center gap-1.5">
         <span class="material-symbols-rounded text-[16px]">person</span>
         Assigned: <span class="text-foreground font-medium">{{ caseData.assignee }}</span>
@@ -175,13 +175,13 @@ onMounted(async () => {
     <!-- Main Content Grid -->
     <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
       <!-- Left Column (2/3) -->
-      <div class="lg:col-span-2 flex flex-col gap-6">
+      <div class="lg:sm:col-span-2 flex flex-col gap-6">
         <!-- Tenant Info -->
         <div class="bg-card border border-border rounded-xl overflow-hidden">
           <div class="px-6 py-4 border-b border-border">
             <span class="font-mono text-sm font-semibold text-foreground">Tenant Information</span>
           </div>
-          <div class="p-6 grid grid-cols-2 gap-4">
+          <div class="p-6 grid grid-cols-1 sm:grid-cols-2 gap-4">
             <div class="flex flex-col gap-1">
               <span class="font-mono text-[11px] text-muted-foreground tracking-wider">NAME</span>
               <span class="font-sans text-[13px] text-foreground">{{ caseData.tenant.name }}</span>
@@ -198,7 +198,7 @@ onMounted(async () => {
               <span class="font-mono text-[11px] text-muted-foreground tracking-wider">NIN</span>
               <span class="font-mono text-[13px] text-foreground">{{ caseData.tenant.nin }}</span>
             </div>
-            <div class="col-span-2 flex flex-col gap-1">
+            <div class="sm:col-span-2 flex flex-col gap-1">
               <span class="font-mono text-[11px] text-muted-foreground tracking-wider">ADDRESS</span>
               <span class="font-sans text-[13px] text-foreground">{{ caseData.tenant.address }}</span>
             </div>
@@ -210,7 +210,7 @@ onMounted(async () => {
           <div class="px-6 py-4 border-b border-border">
             <span class="font-mono text-sm font-semibold text-foreground">Property Details</span>
           </div>
-          <div class="p-6 grid grid-cols-2 gap-4">
+          <div class="p-6 grid grid-cols-1 sm:grid-cols-2 gap-4">
             <div class="flex flex-col gap-1">
               <span class="font-mono text-[11px] text-muted-foreground tracking-wider">TYPE</span>
               <span class="font-sans text-[13px] text-foreground">{{ caseData.property.type }}</span>
@@ -227,7 +227,7 @@ onMounted(async () => {
               <span class="font-mono text-[11px] text-muted-foreground tracking-wider">CONDITION</span>
               <span class="font-sans text-[13px] text-foreground">{{ caseData.property.condition || '—' }}</span>
             </div>
-            <div class="col-span-2 flex flex-col gap-1">
+            <div class="sm:col-span-2 flex flex-col gap-1">
               <span class="font-mono text-[11px] text-muted-foreground tracking-wider">LOCATION</span>
               <span class="font-sans text-[13px] text-foreground">{{ caseData.property.neighborhood }}, {{ caseData.property.lga }}, {{ caseData.property.state }}</span>
             </div>
@@ -239,7 +239,7 @@ onMounted(async () => {
               <span class="font-mono text-[11px] text-muted-foreground tracking-wider">LANDLORD PHONE</span>
               <span class="font-sans text-[13px] text-foreground">{{ caseData.property.landlordPhone }}</span>
             </div>
-            <div v-if="caseData.property.images.length > 0" class="col-span-2 flex flex-col gap-1.5">
+            <div v-if="caseData.property.images.length > 0" class="sm:col-span-2 flex flex-col gap-1.5">
               <span class="font-mono text-[11px] text-muted-foreground tracking-wider">PHOTOS</span>
               <div class="flex gap-2 overflow-x-auto">
                 <div v-for="(img, i) in caseData.property.images" :key="i" class="w-20 h-20 rounded-lg overflow-hidden border border-border flex-shrink-0">
