@@ -14,7 +14,7 @@
     </div>
 
     <!-- Right: Auth Form -->
-    <div class="flex-1 flex items-center justify-center bg-card p-8">
+    <div class="flex-1 flex items-center justify-center bg-card p-5 sm:p-8">
       <div class="w-full max-w-[420px]">
         <slot />
       </div>

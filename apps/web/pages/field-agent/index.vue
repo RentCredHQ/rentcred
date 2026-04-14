@@ -31,7 +31,7 @@ function statusClasses(status: string) {
 
 <template>
   <div class="flex flex-col gap-5">
-    <div class="grid grid-cols-3 gap-3">
+    <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
       <div class="bg-card border border-border rounded-xl p-3.5 flex flex-col gap-1">
         <span class="font-mono text-[10px] font-semibold text-muted-foreground tracking-wider uppercase">Today's Visits</span>
         <span class="font-mono text-2xl font-bold text-primary">{{ stats?.todaysVisits ?? '—' }}</span>

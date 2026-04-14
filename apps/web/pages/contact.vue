@@ -15,9 +15,9 @@ function handleSubmit() {
     <!-- ============================================ -->
     <!-- HERO                                         -->
     <!-- ============================================ -->
-    <section class="bg-[#0D0D0D] px-20 py-16 min-h-[400px] flex flex-col items-center justify-center gap-6">
+    <section class="bg-[#0D0D0D] px-5 sm:px-8 lg:px-20 py-10 lg:py-16 min-h-[auto] lg:min-h-[400px] flex flex-col items-center justify-center gap-6">
       <span class="font-mono text-[11px] font-semibold text-[#FF8400] tracking-[2px]">CONTACT</span>
-      <h1 class="font-mono text-5xl font-bold text-white text-center">Get in touch</h1>
+      <h1 class="font-mono text-3xl sm:text-4xl lg:text-5xl font-bold text-white text-center">Get in touch</h1>
       <p class="font-sans text-lg text-[#7A7A7A] text-center max-w-[600px]">
         Have questions about RentCred? We'd love to hear from you.
       </p>
@@ -26,8 +26,8 @@ function handleSubmit() {
     <!-- ============================================ -->
     <!-- CONTACT FORM + INFO                          -->
     <!-- ============================================ -->
-    <section class="bg-background px-[120px] py-20">
-      <div class="flex gap-12">
+    <section class="bg-background px-5 sm:px-8 lg:px-[120px] py-10 lg:py-20">
+      <div class="flex flex-col lg:flex-row gap-8 lg:gap-12">
         <!-- Form -->
         <div class="flex-1">
           <div v-if="!submitted">
@@ -89,7 +89,7 @@ function handleSubmit() {
         </div>
 
         <!-- Contact Info Cards -->
-        <div class="w-[400px] flex flex-col gap-6">
+        <div class="w-full lg:w-[400px] flex flex-col gap-6">
           <h2 class="font-mono text-2xl font-bold text-foreground">Contact information</h2>
 
           <div class="bg-card border border-border p-6 flex items-start gap-4">
@@ -130,7 +130,7 @@ function handleSubmit() {
     <!-- ============================================ -->
     <!-- FAQ                                          -->
     <!-- ============================================ -->
-    <section class="bg-background px-[120px] py-20 border-t border-border">
+    <section class="bg-background px-5 sm:px-8 lg:px-[120px] py-10 lg:py-20 border-t border-border">
       <div class="flex flex-col items-center gap-12">
         <div class="flex flex-col items-center gap-3">
           <span class="font-mono text-[11px] font-semibold text-[#FF8400] tracking-[2px]">FAQ</span>

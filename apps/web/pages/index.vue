@@ -12,7 +12,7 @@ useSeoMeta({
     <!-- ============================================ -->
     <!-- HERO SECTION                                 -->
     <!-- ============================================ -->
-    <section class="bg-[#0D0D0D] px-20 py-16 min-h-[700px] flex flex-col gap-12">
+    <section class="bg-[#0D0D0D] px-5 sm:px-8 lg:px-20 py-10 lg:py-16 min-h-[auto] lg:min-h-[700px] flex flex-col gap-12">
       <!-- Hero Content -->
       <div class="flex-1 flex flex-col items-center justify-center gap-8">
         <!-- Badge -->
@@ -22,7 +22,7 @@ useSeoMeta({
 
         <!-- Headline -->
         <h1
-          class="font-mono text-5xl font-medium text-white text-center leading-[1.15] tracking-tight max-w-[800px]"
+          class="font-mono text-3xl sm:text-4xl lg:text-5xl font-medium text-white text-center leading-[1.15] tracking-tight max-w-[800px]"
         >
           Screen tenants faster.<br />
           Close deals with confidence.
@@ -35,16 +35,16 @@ useSeoMeta({
         </p>
 
         <!-- CTA Buttons -->
-        <div class="flex items-center gap-4">
+        <div class="flex flex-col sm:flex-row items-center gap-4 w-full sm:w-auto">
           <NuxtLink
             to="/auth/register"
-            class="bg-[#FF8400] text-[#0D0D0D] font-semibold text-base px-8 py-4 hover:opacity-90 transition-opacity"
+            class="bg-[#FF8400] text-[#0D0D0D] font-semibold text-base px-8 py-4 hover:opacity-90 transition-opacity w-full sm:w-auto text-center"
           >
             Start Screening Tenants
           </NuxtLink>
           <a
             href="#pricing"
-            class="text-white text-base px-8 py-4 border border-white hover:bg-white/10 transition-colors"
+            class="text-white text-base px-8 py-4 border border-white hover:bg-white/10 transition-colors w-full sm:w-auto text-center"
           >
             See Pricing
           </a>
@@ -52,7 +52,7 @@ useSeoMeta({
       </div>
 
       <!-- Trust Bar / Stats -->
-      <div class="flex justify-center gap-16">
+      <div class="flex flex-col sm:flex-row justify-center gap-6 sm:gap-10 lg:gap-16">
         <div class="flex flex-col items-center gap-1">
           <span class="font-mono text-2xl font-bold text-[#FF8400]">200+</span>
           <span class="font-sans text-[13px] text-[#7A7A7A]">Agents Registered</span>
@@ -71,7 +71,7 @@ useSeoMeta({
     <!-- ============================================ -->
     <!-- HOW IT WORKS                                 -->
     <!-- ============================================ -->
-    <section id="how-it-works" class="bg-background px-20 py-16 flex flex-col items-center gap-12">
+    <section id="how-it-works" class="bg-background px-5 sm:px-8 lg:px-20 py-10 lg:py-16 flex flex-col items-center gap-12">
       <!-- Header -->
       <div class="flex flex-col items-center gap-3">
         <span class="font-mono text-[11px] font-semibold text-[#FF8400] tracking-[2px] uppercase">
@@ -83,7 +83,7 @@ useSeoMeta({
       </div>
 
       <!-- Cards Row -->
-      <div class="grid grid-cols-3 gap-6 w-full">
+      <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 w-full">
         <!-- Card 1 -->
         <div class="border border-border p-7 flex flex-col gap-5">
           <div class="w-12 h-12 rounded-3xl bg-[#FF840018] flex items-center justify-center">
@@ -122,7 +122,7 @@ useSeoMeta({
     <!-- ============================================ -->
     <!-- PRICING SECTION                              -->
     <!-- ============================================ -->
-    <section id="pricing" class="bg-card px-[120px] py-20 flex flex-col items-center gap-12">
+    <section id="pricing" class="bg-card px-5 sm:px-8 lg:px-[120px] py-10 lg:py-20 flex flex-col items-center gap-12">
       <!-- Pricing Header -->
       <div class="flex flex-col items-center gap-3">
         <span class="font-mono text-[11px] font-semibold text-[#FF8400] tracking-[2px] uppercase">
@@ -137,7 +137,7 @@ useSeoMeta({
       </div>
 
       <!-- Pricing Cards -->
-      <div class="grid grid-cols-3 gap-6 w-full">
+      <div class="grid grid-cols-1 lg:grid-cols-3 gap-6 w-full">
         <!-- 5-Check Bundle -->
         <div class="bg-card border border-border p-7 flex flex-col gap-5">
           <h3 class="font-mono text-lg font-semibold text-foreground">5-Check Bundle</h3>
@@ -218,23 +218,23 @@ useSeoMeta({
     <!-- ============================================ -->
     <!-- FINAL CTA                                    -->
     <!-- ============================================ -->
-    <section class="bg-[#0D0D0D] px-[120px] py-20 flex flex-col items-center justify-center gap-6">
-      <h2 class="font-mono text-4xl font-bold text-white text-center max-w-[800px]">
+    <section class="bg-[#0D0D0D] px-5 sm:px-8 lg:px-[120px] py-10 lg:py-20 flex flex-col items-center justify-center gap-6">
+      <h2 class="font-mono text-2xl sm:text-3xl lg:text-4xl font-bold text-white text-center max-w-[800px]">
         Join 200+ agents already screening with RentCred
       </h2>
       <p class="font-sans text-lg text-[#7A7A7A] text-center max-w-[700px]">
         Stop relying on verbal references. Start closing deals with verified tenants.
       </p>
-      <div class="flex items-center gap-4">
+      <div class="flex flex-col sm:flex-row items-center gap-4 w-full sm:w-auto">
         <NuxtLink
           to="/auth/register"
-          class="bg-[#FF8400] text-[#0D0D0D] font-semibold text-base px-8 py-4 hover:opacity-90 transition-opacity"
+          class="bg-[#FF8400] text-[#0D0D0D] font-semibold text-base px-8 py-4 hover:opacity-90 transition-opacity w-full sm:w-auto text-center"
         >
           Create Your Agent Account
         </NuxtLink>
         <NuxtLink
           to="/contact"
-          class="text-white text-base px-8 py-4 border border-[#7A7A7A] hover:border-white transition-colors"
+          class="text-white text-base px-8 py-4 border border-[#7A7A7A] hover:border-white transition-colors w-full sm:w-auto text-center"
         >
           Talk to Sales
         </NuxtLink>

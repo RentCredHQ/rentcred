@@ -8,10 +8,10 @@ useSeoMeta({ title: 'For Landlords — RentCred', description: 'Know who you\'re
     <!-- ============================================ -->
     <!-- HERO SECTION                                 -->
     <!-- ============================================ -->
-    <section class="bg-[#0D0D0D] px-20 py-16 min-h-[600px] flex flex-col items-center justify-center gap-12">
+    <section class="bg-[#0D0D0D] px-5 sm:px-8 lg:px-20 py-10 lg:py-16 min-h-[auto] lg:min-h-[600px] flex flex-col items-center justify-center gap-12">
       <div class="flex flex-col items-center gap-8">
         <span class="font-mono text-[11px] font-semibold text-[#FF8400] tracking-[2px]">FOR LANDLORDS</span>
-        <h1 class="font-mono text-5xl font-bold text-white text-center max-w-[900px]">
+        <h1 class="font-mono text-3xl sm:text-4xl lg:text-5xl font-bold text-white text-center max-w-[900px]">
           Know who you're renting to
         </h1>
         <p class="font-sans text-lg text-[#7A7A7A] text-center max-w-[700px] leading-relaxed">
@@ -29,14 +29,14 @@ useSeoMeta({ title: 'For Landlords — RentCred', description: 'Know who you\'re
     <!-- ============================================ -->
     <!-- WHAT YOU GET — 4 cards                       -->
     <!-- ============================================ -->
-    <section class="bg-background px-[120px] py-20">
+    <section class="bg-background px-5 sm:px-8 lg:px-[120px] py-10 lg:py-20">
       <div class="flex flex-col items-center gap-12">
         <div class="flex flex-col items-center gap-3">
           <span class="font-mono text-[11px] font-semibold text-[#FF8400] tracking-[2px]">WHAT YOU GET</span>
           <h2 class="font-mono text-4xl font-bold text-foreground text-center">Every report covers what matters</h2>
         </div>
 
-        <div class="grid grid-cols-4 gap-6 w-full">
+        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 w-full">
           <!-- Card 1 -->
           <div class="bg-card border border-border p-8 flex flex-col gap-4">
             <span class="material-symbols-rounded text-[#FF8400] text-[32px]">fingerprint</span>
@@ -68,14 +68,14 @@ useSeoMeta({ title: 'For Landlords — RentCred', description: 'Know who you\'re
     <!-- ============================================ -->
     <!-- HOW IT WORKS — 3 steps                      -->
     <!-- ============================================ -->
-    <section class="bg-background px-[120px] py-20 border-t border-border">
+    <section class="bg-background px-5 sm:px-8 lg:px-[120px] py-10 lg:py-20 border-t border-border">
       <div class="flex flex-col items-center gap-12">
         <div class="flex flex-col items-center gap-3">
           <span class="font-mono text-[11px] font-semibold text-[#FF8400] tracking-[2px]">HOW IT WORKS</span>
           <h2 class="font-mono text-4xl font-bold text-foreground text-center">Three steps to a verified tenant</h2>
         </div>
 
-        <div class="grid grid-cols-3 gap-8 w-full">
+        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8 w-full">
           <!-- Step 1 -->
           <div class="bg-card border border-border p-8 flex flex-col items-center gap-4">
             <div class="w-12 h-12 rounded-full bg-[#FF8400] flex items-center justify-center">
@@ -107,7 +107,7 @@ useSeoMeta({ title: 'For Landlords — RentCred', description: 'Know who you\'re
     <!-- ============================================ -->
     <!-- SAMPLE REPORT PREVIEW                        -->
     <!-- ============================================ -->
-    <section class="bg-[#0D0D0D] px-[120px] py-20">
+    <section class="bg-[#0D0D0D] px-5 sm:px-8 lg:px-[120px] py-10 lg:py-20">
       <div class="flex flex-col items-center gap-12">
         <div class="flex flex-col items-center gap-3">
           <span class="font-mono text-[11px] font-semibold text-[#FF8400] tracking-[2px]">SAMPLE REPORT</span>
@@ -115,7 +115,7 @@ useSeoMeta({ title: 'For Landlords — RentCred', description: 'Know who you\'re
         </div>
 
         <!-- Report Card -->
-        <div class="w-[500px] bg-[#1A1A1A] border border-[#2E2E2E] overflow-hidden">
+        <div class="w-full sm:w-[500px] bg-[#1A1A1A] border border-[#2E2E2E] overflow-hidden">
           <!-- Top -->
           <div class="p-8 flex flex-col gap-3">
             <h3 class="font-mono text-[22px] font-bold text-white">Adebayo Ogundimu</h3>
@@ -158,22 +158,22 @@ useSeoMeta({ title: 'For Landlords — RentCred', description: 'Know who you\'re
     <!-- ============================================ -->
     <!-- FINAL CTA                                    -->
     <!-- ============================================ -->
-    <section class="bg-[#0D0D0D] px-[120px] py-20 border-t border-[#2E2E2E]">
+    <section class="bg-[#0D0D0D] px-5 sm:px-8 lg:px-[120px] py-10 lg:py-20 border-t border-[#2E2E2E]">
       <div class="flex flex-col items-center justify-center gap-6">
         <h2 class="font-mono text-4xl font-bold text-white text-center">Ask your agent about RentCred</h2>
         <p class="font-sans text-lg text-[#7A7A7A] text-center max-w-[600px]">
           Get peace of mind before signing the lease. Your agent can request a report in minutes.
         </p>
-        <div class="flex items-center gap-4">
+        <div class="flex flex-col sm:flex-row items-center gap-4 w-full sm:w-auto">
           <NuxtLink
             to="/auth/register"
-            class="bg-[#FF8400] text-[#0D0D0D] font-semibold text-base px-8 py-3.5 hover:opacity-90 transition-opacity font-sans"
+            class="bg-[#FF8400] text-[#0D0D0D] font-semibold text-base px-8 py-3.5 hover:opacity-90 transition-opacity font-sans w-full sm:w-auto text-center"
           >
             Start Screening
           </NuxtLink>
           <NuxtLink
             to="/auth/register"
-            class="text-white text-base px-8 py-3.5 border border-[#7A7A7A] hover:bg-white/10 transition-colors font-sans"
+            class="text-white text-base px-8 py-3.5 border border-[#7A7A7A] hover:bg-white/10 transition-colors font-sans w-full sm:w-auto text-center"
           >
             Or Register Directly
           </NuxtLink>

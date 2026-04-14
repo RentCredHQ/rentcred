@@ -6,14 +6,14 @@ useSeoMeta({ title: 'NDPR Compliance — RentCred' })
 <template>
   <div>
     <!-- Hero -->
-    <section class="bg-[#0D0D0D] px-20 py-16 flex flex-col items-center gap-4">
+    <section class="bg-[#0D0D0D] px-5 sm:px-8 lg:px-20 py-10 lg:py-16 flex flex-col items-center gap-4">
       <span class="font-mono text-[11px] font-semibold text-[#FF8400] tracking-[2px]">DATA PROTECTION</span>
       <h1 class="font-mono text-[40px] font-medium text-white text-center" style="letter-spacing: -1px">NDPR Compliance</h1>
       <p class="font-sans text-base text-[#7A7A7A] text-center max-w-[600px]">How RentCred meets the Nigeria Data Protection Regulation (NDPR) 2019</p>
     </section>
 
     <!-- Body -->
-    <section class="bg-background px-[120px] py-16">
+    <section class="bg-background px-5 sm:px-8 lg:px-[120px] py-10 lg:py-16">
       <div class="flex flex-col gap-12">
         <!-- Intro -->
         <div class="flex flex-col items-center gap-4">
@@ -24,7 +24,7 @@ useSeoMeta({ title: 'NDPR Compliance — RentCred' })
         </div>
 
         <!-- Cards Row 1 -->
-        <div class="grid grid-cols-3 gap-6">
+        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
           <div class="bg-white border border-border rounded-lg p-7 flex flex-col gap-4">
             <span class="material-symbols-rounded text-[#FF8400] text-[32px]">verified_user</span>
             <h3 class="font-mono text-base font-semibold text-foreground">NITDA Registration</h3>
@@ -43,7 +43,7 @@ useSeoMeta({ title: 'NDPR Compliance — RentCred' })
         </div>
 
         <!-- Cards Row 2 -->
-        <div class="grid grid-cols-3 gap-6">
+        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
           <div class="bg-white border border-border rounded-lg p-7 flex flex-col gap-4">
             <span class="material-symbols-rounded text-[#FF8400] text-[32px]">lock</span>
             <h3 class="font-mono text-base font-semibold text-foreground">Data Security</h3>

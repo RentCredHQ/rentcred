@@ -8,9 +8,9 @@ useSeoMeta({ title: 'About — RentCred', description: 'Building trust in Nigeri
     <!-- ============================================ -->
     <!-- HERO                                         -->
     <!-- ============================================ -->
-    <section class="bg-[#0D0D0D] px-20 py-16 min-h-[500px] flex flex-col items-center justify-center gap-8">
+    <section class="bg-[#0D0D0D] px-5 sm:px-8 lg:px-20 py-10 lg:py-16 min-h-[auto] lg:min-h-[500px] flex flex-col items-center justify-center gap-8">
       <span class="font-mono text-[11px] font-semibold text-[#FF8400] tracking-[2px]">ABOUT US</span>
-      <h1 class="font-mono text-5xl font-bold text-white text-center max-w-[900px]">
+      <h1 class="font-mono text-3xl sm:text-4xl lg:text-5xl font-bold text-white text-center max-w-[900px]">
         Building trust in Nigerian rentals
       </h1>
       <p class="font-sans text-lg text-[#7A7A7A] text-center max-w-[700px] leading-relaxed">
@@ -21,7 +21,7 @@ useSeoMeta({ title: 'About — RentCred', description: 'Building trust in Nigeri
     <!-- ============================================ -->
     <!-- OUR MISSION                                  -->
     <!-- ============================================ -->
-    <section class="bg-background px-[120px] py-20">
+    <section class="bg-background px-5 sm:px-8 lg:px-[120px] py-10 lg:py-20">
       <div class="flex flex-col items-center gap-8">
         <span class="font-mono text-[11px] font-semibold text-[#FF8400] tracking-[2px]">OUR MISSION</span>
         <h2 class="font-mono text-4xl font-bold text-foreground text-center">Why RentCred exists</h2>
@@ -39,13 +39,13 @@ useSeoMeta({ title: 'About — RentCred', description: 'Building trust in Nigeri
     <!-- ============================================ -->
     <!-- HOW WE WORK                                  -->
     <!-- ============================================ -->
-    <section class="bg-background px-[120px] py-20 border-t border-border">
+    <section class="bg-background px-5 sm:px-8 lg:px-[120px] py-10 lg:py-20 border-t border-border">
       <div class="flex flex-col items-center gap-8">
         <span class="font-mono text-[11px] font-semibold text-[#FF8400] tracking-[2px]">HOW WE WORK</span>
         <h2 class="font-mono text-4xl font-bold text-foreground text-center max-w-[800px]">
           Tech-enabled verification meets field operations
         </h2>
-        <div class="grid grid-cols-2 gap-12 w-full mt-4">
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-8 lg:gap-12 w-full mt-4">
           <!-- Left -->
           <div class="flex flex-col gap-4">
             <span class="material-symbols-rounded text-[#FF8400] text-[40px]">devices</span>
@@ -69,14 +69,14 @@ useSeoMeta({ title: 'About — RentCred', description: 'Building trust in Nigeri
     <!-- ============================================ -->
     <!-- OUR VALUES — 4 cards                        -->
     <!-- ============================================ -->
-    <section class="bg-background px-[120px] py-20 border-t border-border">
+    <section class="bg-background px-5 sm:px-8 lg:px-[120px] py-10 lg:py-20 border-t border-border">
       <div class="flex flex-col items-center gap-12">
         <div class="flex flex-col items-center gap-3">
           <span class="font-mono text-[11px] font-semibold text-[#FF8400] tracking-[2px]">OUR VALUES</span>
           <h2 class="font-mono text-4xl font-bold text-foreground text-center">What we stand for</h2>
         </div>
 
-        <div class="grid grid-cols-4 gap-6 w-full">
+        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 w-full">
           <div class="bg-card border border-border p-8 flex flex-col gap-4">
             <span class="material-symbols-rounded text-[#FF8400] text-[32px]">visibility</span>
             <h3 class="font-mono text-lg font-bold text-foreground">Transparency</h3>
@@ -104,17 +104,17 @@ useSeoMeta({ title: 'About — RentCred', description: 'Building trust in Nigeri
     <!-- ============================================ -->
     <!-- PARTNER CTA                                  -->
     <!-- ============================================ -->
-    <section class="bg-[#0D0D0D] px-[120px] py-20">
+    <section class="bg-[#0D0D0D] px-5 sm:px-8 lg:px-[120px] py-10 lg:py-20">
       <div class="flex flex-col items-center justify-center gap-6">
         <h2 class="font-mono text-4xl font-bold text-white text-center">Partner with us</h2>
         <p class="font-sans text-lg text-[#7A7A7A] text-center max-w-[650px]">
           Whether you're an agent, a property manager, or a corporate landlord — we'd love to work with you.
         </p>
-        <div class="flex items-center gap-4">
-          <NuxtLink to="/auth/register" class="bg-[#FF8400] text-[#0D0D0D] font-semibold text-base px-8 py-3.5 hover:opacity-90 transition-opacity font-sans">
+        <div class="flex flex-col sm:flex-row items-center gap-4 w-full sm:w-auto">
+          <NuxtLink to="/auth/register" class="bg-[#FF8400] text-[#0D0D0D] font-semibold text-base px-8 py-3.5 hover:opacity-90 transition-opacity font-sans w-full sm:w-auto text-center">
             Start Screening
           </NuxtLink>
-          <NuxtLink to="/contact" class="text-white text-base px-8 py-3.5 border border-[#7A7A7A] hover:bg-white/10 transition-colors font-sans">
+          <NuxtLink to="/contact" class="text-white text-base px-8 py-3.5 border border-[#7A7A7A] hover:bg-white/10 transition-colors font-sans w-full sm:w-auto text-center">
             Contact Us
           </NuxtLink>
         </div>

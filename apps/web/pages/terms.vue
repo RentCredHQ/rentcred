@@ -6,14 +6,14 @@ useSeoMeta({ title: 'Terms of Service — RentCred' })
 <template>
   <div>
     <!-- Hero -->
-    <section class="bg-[#0D0D0D] px-20 py-16 flex flex-col items-center gap-4">
+    <section class="bg-[#0D0D0D] px-5 sm:px-8 lg:px-20 py-10 lg:py-16 flex flex-col items-center gap-4">
       <span class="font-mono text-[11px] font-semibold text-[#FF8400] tracking-[2px]">LEGAL</span>
       <h1 class="font-mono text-[40px] font-medium text-white text-center" style="letter-spacing: -1px">Terms of Service</h1>
       <p class="font-sans text-sm text-[#7A7A7A] text-center">Last updated: March 2026  •  Effective date: March 2026</p>
     </section>
 
     <!-- Body -->
-    <section class="bg-background px-[280px] py-16">
+    <section class="bg-background px-5 sm:px-8 lg:px-[280px] py-10 lg:py-16">
       <div class="flex flex-col gap-10">
         <p class="font-sans text-[15px] text-foreground" style="line-height: 1.7">
           These Terms of Service ('Terms') govern your use of the RentCred platform operated by RentCred Technologies Ltd. By accessing or using our platform, you agree to be bound by these Terms. If you do not agree, do not use the platform.
