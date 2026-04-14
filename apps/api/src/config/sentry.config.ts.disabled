@@ -1,0 +1,115 @@
+import * as Sentry from '@sentry/node';
+import { nodeProfilingIntegration } from '@sentry/profiling-node';
+
+export function initializeSentry() {
+  const dsn = process.env.SENTRY_DSN;
+
+  if (!dsn) {
+    console.log('⚠️  Sentry DSN not configured - error tracking disabled');
+    return;
+  }
+
+  Sentry.init({
+    dsn,
+    environment: process.env.NODE_ENV || 'development',
+
+    // Set sample rate for performance monitoring
+    tracesSampleRate: process.env.NODE_ENV === 'production' ? 0.1 : 1.0,
+
+    // Set sample rate for profiling
+    profilesSampleRate: process.env.NODE_ENV === 'production' ? 0.1 : 1.0,
+
+    integrations: [
+      // Profiling integration
+      nodeProfilingIntegration(),
+
+      // HTTP integration for tracing
+      new Sentry.Integrations.Http({ tracing: true }),
+
+      // Express integration
+      new Sentry.Integrations.Express({ app: undefined as any }),
+    ],
+
+    // Ignore specific errors
+    ignoreErrors: [
+      // Browser/network errors
+      'Network request failed',
+      'NetworkError',
+      'Non-Error promise rejection captured',
+
+      // Common user errors
+      'Invalid email or password',
+      'Email already registered',
+      'Unauthorized',
+
+      // Rate limiting
+      'ThrottlerException',
+    ],
+
+    // Before sending to Sentry, filter sensitive data
+    beforeSend(event, hint) {
+      // Remove sensitive data from request body
+      if (event.request?.data) {
+        const data = event.request.data;
+        if (typeof data === 'object') {
+          // Redact password fields
+          const sanitized = JSON.parse(JSON.stringify(data));
+          ['password', 'passwordHash', 'token', 'secret'].forEach((key) => {
+            if (sanitized[key]) {
+              sanitized[key] = '[REDACTED]';
+            }
+          });
+          event.request.data = sanitized;
+        }
+      }
+
+      // Remove sensitive headers
+      if (event.request?.headers) {
+        delete event.request.headers['authorization'];
+        delete event.request.headers['cookie'];
+      }
+
+      return event;
+    },
+
+    // Release tracking (if using CI/CD)
+    release: process.env.SENTRY_RELEASE || undefined,
+  });
+
+  console.log('✅ Sentry initialized for error tracking');
+}
+
+// Helper to manually capture errors
+export function captureError(error: Error, context?: Record<string, any>) {
+  Sentry.withScope((scope) => {
+    if (context) {
+      Object.entries(context).forEach(([key, value]) => {
+        scope.setContext(key, value);
+      });
+    }
+    Sentry.captureException(error);
+  });
+}
+
+// Helper to capture messages
+export function captureMessage(message: string, level: Sentry.SeverityLevel = 'info') {
+  Sentry.captureMessage(message, level);
+}
+
+// Helper to set user context
+export function setUserContext(user: { id: string; email?: string; role?: string }) {
+  Sentry.setUser({
+    id: user.id,
+    email: user.email,
+    role: user.role,
+  });
+}
+
+// Helper to add breadcrumb
+export function addBreadcrumb(message: string, data?: Record<string, any>) {
+  Sentry.addBreadcrumb({
+    message,
+    data,
+    timestamp: Date.now() / 1000,
+  });
+}

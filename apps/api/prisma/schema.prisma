@@ -1,0 +1,406 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+// ============================================
+// AUTH & USERS
+// ============================================
+
+enum UserRole {
+  admin
+  agent
+  tenant
+  ops
+  field_agent
+}
+
+model User {
+  id           String   @id @default(cuid())
+  email        String   @unique
+  name         String
+  passwordHash String   @map("password_hash")
+  role         UserRole
+  phone        String?
+  avatarUrl    String?  @map("avatar_url")
+  isVerified          Boolean   @default(false) @map("is_verified")
+  emailVerifyToken    String?   @map("email_verify_token")
+  emailVerifyExpires  DateTime? @map("email_verify_expires")
+  resetToken          String?   @map("reset_token")
+  resetTokenExpires   DateTime? @map("reset_token_expires")
+  createdAt           DateTime  @default(now()) @map("created_at")
+  updatedAt           DateTime  @updatedAt @map("updated_at")
+
+  agentProfile  AgentProfile?
+  tenantProfile TenantProfile?
+  opsProfile    OpsProfile?
+
+  submissions    Submission[]     @relation("AgentSubmissions")
+  notifications  Notification[]
+  auditLogs      AuditLog[]
+  disputesRaised Dispute[]        @relation("DisputeRaisedBy")
+  fieldVisits    FieldVisit[]     @relation("FieldAgentVisits")
+  assignments    FieldAssignment[] @relation("AssignedFieldAgent")
+  reviews        Review[]         @relation("TenantReviews")
+
+  @@map("users")
+}
+
+// ============================================
+// AGENT PROFILES
+// ============================================
+
+model AgentProfile {
+  id            String   @id @default(cuid())
+  userId        String   @unique @map("user_id")
+  companyName   String?  @map("company_name")
+  companyAddress String? @map("company_address")
+  rcNumber      String?  @map("rc_number")
+  kybStatus     String   @default("pending") @map("kyb_status") // pending, submitted, approved, rejected
+  creditBalance Int      @default(0) @map("credit_balance")
+  createdAt     DateTime @default(now()) @map("created_at")
+
+  user         User          @relation(fields: [userId], references: [id], onDelete: Cascade)
+  kybApplication KybApplication?
+  transactions Transaction[]
+
+  @@map("agent_profiles")
+}
+
+// ============================================
+// TENANT PROFILES
+// ============================================
+
+model TenantProfile {
+  id              String   @id @default(cuid())
+  userId          String   @unique @map("user_id")
+
+  // Personal Info (Step 1)
+  dateOfBirth     DateTime? @map("date_of_birth")
+  gender          String?
+  maritalStatus   String?   @map("marital_status")
+  stateOfOrigin   String?   @map("state_of_origin")
+  currentAddress  String?   @map("current_address")
+  ninNumber       String?   @map("nin_number")
+
+  // Employment (Step 2)
+  employerName    String?   @map("employer_name")
+  employerAddress String?   @map("employer_address")
+  jobTitle        String?   @map("job_title")
+  monthlyIncome   Float?    @map("monthly_income")
+  employmentType  String?   @map("employment_type") // full_time, part_time, self_employed, unemployed
+
+  // References (Step 3)
+  ref1Name        String?   @map("ref1_name")
+  ref1Phone       String?   @map("ref1_phone")
+  ref1Relationship String?  @map("ref1_relationship")
+  ref2Name        String?   @map("ref2_name")
+  ref2Phone       String?   @map("ref2_phone")
+  ref2Relationship String?  @map("ref2_relationship")
+
+  // Documents (Step 4)
+  idDocumentUrl   String?   @map("id_document_url")
+  proofOfIncomeUrl String?  @map("proof_of_income_url")
+  utilityBillUrl  String?   @map("utility_bill_url")
+
+  consentGiven    Boolean   @default(false) @map("consent_given")
+  consentDate     DateTime? @map("consent_date")
+  profileComplete Boolean   @default(false) @map("profile_complete")
+  createdAt       DateTime  @default(now()) @map("created_at")
+  updatedAt       DateTime  @updatedAt @map("updated_at")
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@map("tenant_profiles")
+}
+
+// ============================================
+// OPS PROFILES
+// ============================================
+
+model OpsProfile {
+  id          String  @id @default(cuid())
+  userId      String  @unique @map("user_id")
+  department  String?
+  permissions String[] @default([])
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@map("ops_profiles")
+}
+
+// ============================================
+// SUBMISSIONS & VERIFICATION
+// ============================================
+
+model Submission {
+  id              String   @id @default(cuid())
+  agentId         String   @map("agent_id")
+  tenantName      String   @map("tenant_name")
+  tenantEmail     String   @map("tenant_email")
+  tenantPhone     String   @map("tenant_phone")
+  propertyAddress String   @map("property_address")
+  annualRent      Float    @default(0) @map("annual_rent")
+  monthlyRent     Float    @map("monthly_rent")
+  propertyType    String   @default("Apartment") @map("property_type")
+  bedrooms        Int      @default(1)
+  state           String   @default("")
+  lga             String   @default("")
+  neighborhood    String   @default("")
+  landlordName    String   @default("") @map("landlord_name")
+  landlordPhone   String   @default("") @map("landlord_phone")
+  propertyCondition String? @map("property_condition")
+  propertyImages  String[] @default([]) @map("property_images")
+
+  // Additional details
+  employerName    String?  @map("employer_name")
+  employerAddress String?  @map("employer_address")
+  monthlyIncome   Float?   @map("monthly_income")
+  previousAddress String?  @map("previous_address")
+  reasonForMoving String?  @map("reason_for_moving")
+  notes           String?
+  consentObtained Boolean  @default(false) @map("consent_obtained")
+
+  // Status tracking
+  status          String   @default("pending") // pending, in_progress, field_visit, report_building, completed, rejected
+  assignedOpsId   String?  @map("assigned_ops_id")
+  createdAt       DateTime @default(now()) @map("created_at")
+  updatedAt       DateTime @updatedAt @map("updated_at")
+
+  agent           User               @relation("AgentSubmissions", fields: [agentId], references: [id])
+  verificationChecklist VerificationChecklist?
+  fieldAssignments FieldAssignment[]
+  fieldVisits     FieldVisit[]
+  report          Report?
+  disputes        Dispute[]
+  review          Review?
+
+  @@map("submissions")
+}
+
+model VerificationChecklist {
+  id              String   @id @default(cuid())
+  submissionId    String   @unique @map("submission_id")
+
+  identityVerified      Boolean @default(false) @map("identity_verified")
+  employmentVerified    Boolean @default(false) @map("employment_verified")
+  referencesVerified    Boolean @default(false) @map("references_verified")
+  addressVerified       Boolean @default(false) @map("address_verified")
+  criminalCheckDone     Boolean @default(false) @map("criminal_check_done")
+  fieldVisitCompleted   Boolean @default(false) @map("field_visit_completed")
+
+  notes           String?
+  completedAt     DateTime? @map("completed_at")
+  createdAt       DateTime  @default(now()) @map("created_at")
+  updatedAt       DateTime  @updatedAt @map("updated_at")
+
+  submission Submission @relation(fields: [submissionId], references: [id], onDelete: Cascade)
+
+  @@map("verification_checklists")
+}
+
+// ============================================
+// FIELD AGENTS & VISITS
+// ============================================
+
+model FieldAssignment {
+  id              String   @id @default(cuid())
+  submissionId    String   @map("submission_id")
+  fieldAgentId    String   @map("field_agent_id")
+  status          String   @default("assigned") // assigned, in_progress, completed
+  scheduledDate   DateTime? @map("scheduled_date")
+  completedAt     DateTime? @map("completed_at")
+  createdAt       DateTime  @default(now()) @map("created_at")
+
+  submission Submission @relation(fields: [submissionId], references: [id])
+  fieldAgent User       @relation("AssignedFieldAgent", fields: [fieldAgentId], references: [id])
+
+  @@map("field_assignments")
+}
+
+model FieldVisit {
+  id              String   @id @default(cuid())
+  submissionId    String   @map("submission_id")
+  fieldAgentId    String   @map("field_agent_id")
+
+  visitDate       DateTime @map("visit_date")
+  gpsLatitude     Float?   @map("gps_latitude")
+  gpsLongitude    Float?   @map("gps_longitude")
+  photos          String[] @default([])
+  notes           String?
+  checklistItems  Json?    @map("checklist_items")
+  summary         String?
+
+  createdAt       DateTime @default(now()) @map("created_at")
+
+  submission Submission @relation(fields: [submissionId], references: [id])
+  fieldAgent User       @relation("FieldAgentVisits", fields: [fieldAgentId], references: [id])
+
+  @@map("field_visits")
+}
+
+// ============================================
+// REPORTS
+// ============================================
+
+model Report {
+  id              String   @id @default(cuid())
+  submissionId    String   @unique @map("submission_id")
+  content         Json
+  status          String   @default("draft") // draft, pending_approval, approved, rejected
+  approvedBy      String?  @map("approved_by")
+  approvedAt      DateTime? @map("approved_at")
+  shareToken      String?  @unique @map("share_token")
+  sharedAt        DateTime? @map("shared_at")
+  createdAt       DateTime @default(now()) @map("created_at")
+  updatedAt       DateTime @updatedAt @map("updated_at")
+
+  submission Submission @relation(fields: [submissionId], references: [id])
+
+  @@map("reports")
+}
+
+// ============================================
+// PAYMENTS & CREDITS
+// ============================================
+
+model CreditBundle {
+  id        String @id @default(cuid())
+  name      String
+  credits   Int
+  priceNgn  Float  @map("price_ngn")
+  active    Boolean @default(true)
+
+  @@map("credit_bundles")
+}
+
+model Transaction {
+  id          String   @id @default(cuid())
+  agentId     String   @map("agent_id")
+  type        String   // purchase, deduction, refund
+  amount      Int
+  description String?
+  paystackRef String?  @map("paystack_ref")
+  status      String   @default("completed") // pending, completed, failed
+  createdAt   DateTime @default(now()) @map("created_at")
+
+  agent AgentProfile @relation(fields: [agentId], references: [userId])
+
+  @@map("transactions")
+}
+
+// ============================================
+// KYB (Know Your Business)
+// ============================================
+
+model KybApplication {
+  id              String   @id @default(cuid())
+  agentProfileId  String   @unique @map("agent_profile_id")
+  companyName     String   @map("company_name")
+  rcNumber        String   @map("rc_number")
+  cacDocument     String?  @map("cac_document_url")
+  directorIdUrl   String?  @map("director_id_url")
+  utilityBillUrl  String?  @map("utility_bill_url")
+  status          String   @default("pending") // pending, under_review, approved, rejected
+  reviewedBy      String?  @map("reviewed_by")
+  reviewNotes     String?  @map("review_notes")
+  createdAt       DateTime @default(now()) @map("created_at")
+  updatedAt       DateTime @updatedAt @map("updated_at")
+
+  agentProfile AgentProfile @relation(fields: [agentProfileId], references: [id])
+
+  @@map("kyb_applications")
+}
+
+// ============================================
+// NOTIFICATIONS
+// ============================================
+
+model Notification {
+  id        String   @id @default(cuid())
+  userId    String   @map("user_id")
+  type      String   // submission_update, report_ready, payment_confirmed, kyb_update, etc.
+  title     String
+  message   String
+  data      Json?
+  readAt    DateTime? @map("read_at")
+  createdAt DateTime @default(now()) @map("created_at")
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@map("notifications")
+}
+
+// ============================================
+// DISPUTES
+// ============================================
+
+model Dispute {
+  id            String   @id @default(cuid())
+  submissionId  String   @map("submission_id")
+  raisedById    String   @map("raised_by_id")
+  reason        String
+  description   String
+  status        String   @default("open") // open, under_review, resolved, closed
+  resolution    String?
+  resolvedBy    String?  @map("resolved_by")
+  resolvedAt    DateTime? @map("resolved_at")
+  createdAt     DateTime @default(now()) @map("created_at")
+  updatedAt     DateTime @updatedAt @map("updated_at")
+
+  submission Submission @relation(fields: [submissionId], references: [id])
+  raisedBy   User       @relation("DisputeRaisedBy", fields: [raisedById], references: [id])
+
+  @@map("disputes")
+}
+
+// ============================================
+// AUDIT LOG
+// ============================================
+
+model AuditLog {
+  id         String   @id @default(cuid())
+  userId     String   @map("user_id")
+  action     String
+  entityType String   @map("entity_type")
+  entityId   String   @map("entity_id")
+  metadata   Json?
+  ipAddress  String?  @map("ip_address")
+  createdAt  DateTime @default(now()) @map("created_at")
+
+  user User @relation(fields: [userId], references: [id])
+
+  @@map("audit_logs")
+}
+
+// ============================================
+// REVIEWS
+// ============================================
+
+model Review {
+  id              String   @id @default(cuid())
+  submissionId    String   @unique @map("submission_id")
+  tenantId        String   @map("tenant_id")
+
+  agentRating     Int      @map("agent_rating")
+  agentComment    String?  @map("agent_comment")
+  landlordRating  Int      @map("landlord_rating")
+  landlordComment String?  @map("landlord_comment")
+  propertyRating  Int      @map("property_rating")
+  propertyComment String?  @map("property_comment")
+
+  isAnonymous     Boolean  @default(false) @map("is_anonymous")
+  status          String   @default("published") // published, flagged, removed
+
+  createdAt       DateTime @default(now()) @map("created_at")
+  updatedAt       DateTime @updatedAt @map("updated_at")
+
+  submission Submission @relation(fields: [submissionId], references: [id])
+  tenant     User       @relation("TenantReviews", fields: [tenantId], references: [id])
+
+  @@map("reviews")
+}

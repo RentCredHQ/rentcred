@@ -1,0 +1,74 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  /* RentCred Design Tokens — Light Mode (from design system) */
+  --color-background: #F2F3F0;
+  --color-surface: #E7E8E5;
+  --color-card: #FFFFFF;
+  --color-sidebar: #E7E8E5;
+  --color-border: #CBCCC9;
+  --color-foreground: #111111;
+  --color-font-primary: #111111;
+  --color-font-secondary: #666666;
+  --color-muted-foreground: #666666;
+  --color-primary: #FF8400;
+  --color-primary-foreground: #111111;
+  --color-accent: #FF8400;
+  --color-success: #004D1A;
+  --color-warning: #804200;
+  --color-error: #8C1C00;
+}
+
+.dark {
+  --color-background: #111111;
+  --color-surface: #2E2E2E;
+  --color-card: #1A1A1A;
+  --color-sidebar: #18181b;
+  --color-border: #2E2E2E;
+  --color-foreground: #FFFFFF;
+  --color-font-primary: #FFFFFF;
+  --color-font-secondary: #B8B9B6;
+  --color-muted-foreground: #B8B9B6;
+  --color-primary: #FF8400;
+  --color-primary-foreground: #111111;
+  --color-accent: #FF8400;
+  --color-success: #B6FFCE;
+  --color-warning: #FF8400;
+  --color-error: #FF5C33;
+}
+
+@layer base {
+  body {
+    @apply bg-background text-foreground antialiased;
+  }
+}
+
+@layer components {
+  .btn-primary {
+    @apply bg-primary text-primary-foreground px-8 py-4 font-semibold transition-all duration-200
+           hover:opacity-90 active:scale-[0.98] disabled:opacity-50 disabled:cursor-not-allowed;
+  }
+
+  .btn-secondary {
+    @apply border border-border text-foreground px-6 py-3 font-medium transition-all duration-200
+           hover:bg-surface active:scale-[0.98];
+  }
+
+  .btn-ghost {
+    @apply text-muted-foreground px-4 py-2 font-medium transition-all duration-200
+           hover:bg-surface hover:text-foreground;
+  }
+
+  .input-field {
+    @apply w-full px-4 py-3 rounded-lg border border-border bg-background text-foreground
+           placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary focus:border-primary
+           transition-all duration-200;
+    --tw-ring-opacity: 0.3;
+  }
+
+  .card {
+    @apply bg-card border border-border p-6;
+  }
+}

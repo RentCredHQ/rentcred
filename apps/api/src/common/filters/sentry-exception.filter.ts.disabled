@@ -1,0 +1,68 @@
+import { Catch, ArgumentsHost, HttpException, HttpStatus, Logger } from '@nestjs/common';
+import { BaseExceptionFilter } from '@nestjs/core';
+import * as Sentry from '@sentry/node';
+
+@Catch()
+export class SentryExceptionFilter extends BaseExceptionFilter {
+  private readonly logger = new Logger(SentryExceptionFilter.name);
+
+  catch(exception: unknown, host: ArgumentsHost) {
+    const ctx = host.switchToHttp();
+    const request = ctx.getRequest();
+    const response = ctx.getResponse();
+
+    const status =
+      exception instanceof HttpException
+        ? exception.getStatus()
+        : HttpStatus.INTERNAL_SERVER_ERROR;
+
+    const message =
+      exception instanceof HttpException
+        ? exception.message
+        : 'Internal server error';
+
+    // Log the error
+    this.logger.error(
+      `${request.method} ${request.url}`,
+      exception instanceof Error ? exception.stack : JSON.stringify(exception),
+    );
+
+    // Send to Sentry (only for 500 errors or unexpected exceptions)
+    if (status >= 500 || !(exception instanceof HttpException)) {
+      Sentry.withScope((scope) => {
+        scope.setTag('path', request.url);
+        scope.setTag('method', request.method);
+        scope.setUser({
+          id: request.user?.sub,
+          email: request.user?.email,
+        });
+        scope.setContext('request', {
+          body: request.body,
+          query: request.query,
+          params: request.params,
+          headers: {
+            'user-agent': request.headers['user-agent'],
+            'x-forwarded-for': request.headers['x-forwarded-for'],
+          },
+        });
+
+        if (exception instanceof Error) {
+          Sentry.captureException(exception);
+        } else {
+          Sentry.captureMessage(JSON.stringify(exception), 'error');
+        }
+      });
+    }
+
+    // Return error response
+    response.status(status).json({
+      statusCode: status,
+      message,
+      timestamp: new Date().toISOString(),
+      path: request.url,
+      ...(process.env.NODE_ENV === 'development' && exception instanceof Error
+        ? { stack: exception.stack }
+        : {}),
+    });
+  }
+}
