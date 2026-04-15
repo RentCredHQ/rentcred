@@ -55,130 +55,139 @@ function toggleFaq(i: number) {
 
 <template>
   <div>
-    <!-- Hero Section -->
+    <!-- HERO (dark) -->
     <section class="bg-[#0D0D0D]">
-      <div class="max-w-[1440px] mx-auto px-5 sm:px-8 lg:px-20 py-16 lg:py-24 flex flex-col items-center gap-6">
-        <h1 class="font-mono text-3xl sm:text-4xl lg:text-[40px] font-bold text-white text-center leading-tight max-w-[800px]">
-          Track Your Verification Status
-        </h1>
-        <p class="font-sans text-base lg:text-lg text-[#7A7A7A] text-center max-w-[600px]">
-          Enter your case ID to check real-time progress of your tenant verification.
-        </p>
-        <form class="flex flex-col sm:flex-row items-stretch sm:items-center gap-3 mt-4 w-full max-w-[560px]" @submit.prevent="handleSearch">
-          <input
-            v-model="caseInput"
-            type="text"
-            placeholder="Enter Case ID (e.g. RC-2026-00412)"
-            class="flex-1 px-5 py-3.5 bg-[#1A1A1A] border border-[#2E2E2E] text-white font-mono text-sm placeholder:text-[#555] focus:outline-none focus:border-[#FF8400] transition-colors"
-          />
-          <button
-            type="submit"
-            :disabled="loading"
-            class="px-6 py-3.5 bg-[#FF8400] text-[#0D0D0D] font-mono text-sm font-semibold hover:opacity-90 transition-opacity disabled:opacity-60 whitespace-nowrap"
-          >
-            {{ loading ? 'Searching...' : 'Track Status' }}
-          </button>
-        </form>
+      <div class="max-w-[1440px] mx-auto px-5 sm:px-8 lg:px-20 py-16 lg:py-28">
+        <div class="flex flex-col items-center gap-6 max-w-[680px] mx-auto">
+          <span class="font-mono text-xs font-semibold text-[#FF8400] uppercase tracking-wider">TRACK YOUR CASE</span>
+          <h1 class="font-mono text-3xl sm:text-4xl lg:text-[44px] font-bold text-white text-center leading-tight">
+            Check your verification status
+          </h1>
+          <p class="font-sans text-base lg:text-lg text-[#7A7A7A] text-center leading-relaxed">
+            Enter your case ID or the email address used during submission.
+          </p>
+          <form class="flex flex-col sm:flex-row items-stretch gap-3 mt-2 w-full max-w-[560px]" @submit.prevent="handleSearch">
+            <input
+              v-model="caseInput"
+              type="text"
+              placeholder="Enter Case ID (e.g. RC-2026-00412)"
+              class="flex-1 w-full px-4 py-3 border border-border bg-background text-foreground font-sans text-sm focus:outline-none focus:border-[#FF8400]"
+            />
+            <button
+              type="submit"
+              :disabled="loading"
+              class="bg-[#FF8400] text-[#0D0D0D] font-semibold px-8 py-3 hover:bg-[#E67700] transition-colors disabled:opacity-60 font-sans text-sm whitespace-nowrap"
+            >
+              {{ loading ? 'Searching...' : 'Track Status' }}
+            </button>
+          </form>
+        </div>
       </div>
     </section>
 
-    <!-- Result Section -->
+    <!-- RESULTS (light) -->
     <section v-if="searched" class="bg-background">
-      <div class="max-w-[1440px] mx-auto px-5 sm:px-8 lg:px-20 py-12 lg:py-16">
-      <div class="max-w-[800px] mx-auto flex flex-col items-center gap-10">
-        <div class="flex flex-col items-center gap-3">
-          <span class="font-mono text-[11px] font-semibold text-muted-foreground uppercase tracking-wider">Search Result</span>
-          <h2 class="font-mono text-xl lg:text-2xl font-bold text-foreground">
-            {{ result ? 'Sample Case Lookup' : 'No Case Found' }}
-          </h2>
-          <p v-if="!result" class="font-sans text-sm text-muted-foreground text-center">
-            We couldn't find a case matching "{{ caseInput }}". Please check the ID and try again.
-          </p>
-        </div>
-
-        <!-- Case Card -->
-        <div v-if="result" class="w-full bg-white border border-border rounded-xl p-5 lg:p-8 flex flex-col gap-6">
-          <!-- Card Header -->
-          <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
-            <div class="flex flex-col gap-1">
-              <span class="font-mono text-base font-bold text-foreground">{{ result.caseId }}</span>
-              <span class="font-sans text-sm text-muted-foreground">Tenant: {{ result.tenantName }}</span>
-            </div>
-            <span class="inline-flex self-start px-3 py-1 rounded-full bg-[#DFDFE6] text-[#000066] text-[12px] font-semibold">
-              {{ result.status }}
-            </span>
+      <div class="max-w-[1440px] mx-auto px-5 sm:px-8 lg:px-20 py-16 lg:py-28">
+        <div class="max-w-[800px] mx-auto flex flex-col items-center gap-10">
+          <!-- Not Found State -->
+          <div v-if="!result" class="flex flex-col items-center gap-4 text-center">
+            <span class="material-symbols-rounded text-[48px] text-muted-foreground">search_off</span>
+            <h2 class="font-mono text-xl lg:text-2xl font-bold text-foreground">No case found</h2>
+            <p class="font-sans text-sm text-muted-foreground max-w-[480px]">
+              We couldn't find a case matching "{{ caseInput }}". Please check the ID and try again, or use the email address associated with your submission.
+            </p>
+            <button
+              class="mt-2 font-sans text-sm font-semibold text-[#FF8400] hover:underline"
+              @click="searched = false; caseInput = ''"
+            >
+              Try another search
+            </button>
           </div>
 
-          <!-- Timeline -->
-          <div class="flex flex-col gap-0">
-            <div v-for="(step, i) in result.steps" :key="i" class="flex gap-4">
-              <!-- Timeline Indicator -->
-              <div class="flex flex-col items-center">
-                <!-- Dot -->
-                <div
-                  class="w-5 h-5 rounded-full border-2 flex items-center justify-center flex-shrink-0"
-                  :class="{
-                    'bg-[#004D1A] border-[#004D1A]': step.status === 'complete',
-                    'bg-[#FF8400] border-[#FF8400]': step.status === 'in_progress',
-                    'bg-transparent border-border': step.status === 'pending',
-                  }"
-                >
-                  <span v-if="step.status === 'complete'" class="material-symbols-rounded text-white text-[14px]">check</span>
-                </div>
-                <!-- Line -->
-                <div v-if="i < result.steps.length - 1" class="w-px h-10 bg-border" />
+          <!-- Found Case Card -->
+          <div v-if="result" class="w-full border border-border p-6 flex flex-col gap-6">
+            <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
+              <div class="flex flex-col gap-1">
+                <span class="font-mono text-base font-bold text-foreground">{{ result.caseId }}</span>
+                <span class="font-sans text-sm text-muted-foreground">Tenant: {{ result.tenantName }}</span>
               </div>
-              <!-- Content -->
-              <div class="pb-6 -mt-0.5">
-                <span
-                  class="font-mono text-[14px] font-semibold"
-                  :class="{
-                    'text-[#004D1A]': step.status === 'complete',
-                    'text-[#FF8400]': step.status === 'in_progress',
-                    'text-muted-foreground': step.status === 'pending',
-                  }"
-                >{{ step.label }}</span>
-                <p class="font-sans text-[13px] text-muted-foreground mt-0.5">{{ step.detail }}</p>
-                <span
-                  v-if="step.status !== 'pending'"
-                  class="inline-flex mt-1.5 px-2 py-0.5 rounded text-[11px] font-semibold"
-                  :class="{
-                    'bg-[#DFE6E1] text-[#004D1A]': step.status === 'complete',
-                    'bg-[#DFDFE6] text-[#000066]': step.status === 'in_progress',
-                  }"
-                >
-                  {{ step.status === 'complete' ? 'Complete' : 'In Progress' }}
+              <span class="inline-flex self-start px-3 py-1 bg-[#FF8400]/10 text-[#FF8400] text-xs font-semibold font-mono">
+                {{ result.status }}
+              </span>
+            </div>
+
+            <!-- Progress Bar -->
+            <div class="w-full">
+              <div class="flex items-center justify-between mb-2">
+                <span class="font-sans text-xs text-muted-foreground">Progress</span>
+                <span class="font-mono text-xs font-semibold text-foreground">
+                  {{ result.steps.filter(s => s.status === 'complete').length }} / {{ result.steps.length }} steps
                 </span>
               </div>
+              <div class="w-full h-1.5 bg-border">
+                <div
+                  class="h-1.5 bg-[#FF8400] transition-all"
+                  :style="{ width: `${(result.steps.filter(s => s.status === 'complete').length / result.steps.length) * 100}%` }"
+                />
+              </div>
             </div>
+
+            <!-- Timeline -->
+            <div class="flex flex-col gap-0">
+              <div v-for="(step, i) in result.steps" :key="i" class="flex gap-4">
+                <div class="flex flex-col items-center">
+                  <div
+                    class="w-5 h-5 border-2 flex items-center justify-center flex-shrink-0"
+                    :class="{
+                      'bg-[#004D1A] border-[#004D1A]': step.status === 'complete',
+                      'bg-[#FF8400] border-[#FF8400]': step.status === 'in_progress',
+                      'bg-transparent border-border': step.status === 'pending',
+                    }"
+                  >
+                    <span v-if="step.status === 'complete'" class="material-symbols-rounded text-white text-[14px]">check</span>
+                  </div>
+                  <div v-if="i < result.steps.length - 1" class="w-px h-10 bg-border" />
+                </div>
+                <div class="pb-6 -mt-0.5">
+                  <span
+                    class="font-mono text-sm font-semibold"
+                    :class="{
+                      'text-[#004D1A]': step.status === 'complete',
+                      'text-[#FF8400]': step.status === 'in_progress',
+                      'text-muted-foreground': step.status === 'pending',
+                    }"
+                  >{{ step.label }}</span>
+                  <p class="font-sans text-xs text-muted-foreground mt-0.5">{{ step.detail }}</p>
+                </div>
+              </div>
+            </div>
+
+            <NuxtLink
+              :to="`/status/${result.caseId}`"
+              class="inline-flex self-start font-sans text-sm font-semibold text-[#FF8400] hover:underline"
+            >
+              View Full Details →
+            </NuxtLink>
           </div>
         </div>
-      </div>
       </div>
     </section>
 
-    <!-- FAQ Section -->
-    <section class="bg-white">
-      <div class="max-w-[1440px] mx-auto px-5 sm:px-8 lg:px-20 py-16 lg:py-20">
-      <div class="max-w-[800px] mx-auto flex flex-col items-center gap-12">
-        <div class="flex flex-col items-center gap-3">
-          <h2 class="font-mono text-xl lg:text-2xl font-bold text-foreground">Frequently Asked Questions</h2>
+    <!-- FAQ (dark) -->
+    <section class="bg-[#0D0D0D]">
+      <div class="max-w-[1440px] mx-auto px-5 sm:px-8 lg:px-20 py-16 lg:py-28">
+        <div class="flex flex-col items-center gap-4 mb-12">
+          <span class="font-mono text-xs font-semibold text-[#FF8400] uppercase tracking-wider">COMMON QUESTIONS</span>
+          <h2 class="font-mono text-2xl lg:text-3xl font-bold text-white text-center">
+            Verification status FAQ
+          </h2>
         </div>
-        <div class="w-full flex flex-col">
-          <div v-for="(faq, i) in faqs" :key="i" class="border-b border-border">
-            <button
-              class="w-full flex items-center justify-between py-5 text-left"
-              @click="toggleFaq(i)"
-            >
-              <span class="font-sans text-[15px] font-medium text-foreground pr-4">{{ faq.q }}</span>
-              <span class="material-symbols-rounded text-[20px] text-muted-foreground transition-transform" :class="openFaq === i ? 'rotate-180' : ''">keyboard_arrow_down</span>
-            </button>
-            <div v-if="openFaq === i" class="pb-5 -mt-1">
-              <p class="font-sans text-[14px] text-muted-foreground leading-relaxed">{{ faq.a }}</p>
-            </div>
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-5 max-w-[960px] mx-auto">
+          <div v-for="(faq, i) in faqs" :key="i" class="bg-[#161616] border border-[#2A2A2A] p-6 flex flex-col gap-3">
+            <span class="font-mono text-sm font-semibold text-white">{{ faq.q }}</span>
+            <p class="font-sans text-sm text-[#7A7A7A] leading-relaxed">{{ faq.a }}</p>
           </div>
         </div>
-      </div>
       </div>
     </section>
   </div>

@@ -36,9 +36,9 @@ const completedSteps = computed(() => steps.value.filter(s => s.status === 'comp
 
 function statusBadgeClass(status: string) {
   switch (status) {
-    case 'complete': return 'bg-[#DFE6E1] text-[#004D1A]'
-    case 'in_progress': return 'bg-[#DFDFE6] text-[#000066]'
-    default: return 'bg-[#E7E8E5] text-muted-foreground'
+    case 'complete': return 'bg-[#004D1A]/10 text-[#004D1A]'
+    case 'in_progress': return 'bg-[#FF8400]/10 text-[#FF8400]'
+    default: return 'bg-card text-muted-foreground'
   }
 }
 
@@ -52,128 +52,127 @@ function statusLabel(status: string) {
 
 function circleClass(status: string) {
   switch (status) {
-    case 'complete': return 'bg-[#DFE6E1]'
-    case 'in_progress': return 'bg-primary'
-    default: return 'bg-[#E7E8E5]'
-  }
-}
-
-function iconColor(status: string) {
-  switch (status) {
-    case 'complete': return 'text-[#004D1A]'
-    case 'in_progress': return 'text-foreground'
-    default: return 'text-muted-foreground'
+    case 'complete': return 'bg-[#004D1A] border-[#004D1A]'
+    case 'in_progress': return 'bg-[#FF8400] border-[#FF8400]'
+    default: return 'bg-transparent border-border'
   }
 }
 </script>
 
 <template>
   <div>
-    <!-- Hero Banner -->
+    <!-- HERO (dark) -->
     <section class="bg-[#0D0D0D]">
-      <div class="max-w-[1440px] mx-auto px-5 sm:px-8 lg:px-20 py-10 lg:py-12 flex flex-col items-center gap-3">
-        <span class="font-mono text-[11px] font-semibold text-primary uppercase tracking-wider">VERIFICATION STATUS</span>
-        <h1 class="font-mono text-2xl lg:text-[32px] font-bold text-white">Case {{ caseData.id }}</h1>
-        <p class="font-sans text-[15px] text-[#7A7A7A]">{{ caseData.tenantName }} · Submitted {{ caseData.submitted }}</p>
-        <NuxtLink to="/status" class="mt-2 font-sans text-[13px] font-medium text-primary hover:underline">← Track another case</NuxtLink>
+      <div class="max-w-[1440px] mx-auto px-5 sm:px-8 lg:px-20 py-16 lg:py-28">
+        <div class="flex flex-col items-center gap-5">
+          <span class="font-mono text-xs font-semibold text-[#FF8400] uppercase tracking-wider">VERIFICATION PROGRESS</span>
+          <h1 class="font-mono text-2xl sm:text-3xl lg:text-[40px] font-bold text-white text-center">
+            Case {{ caseData.id }}
+          </h1>
+          <div class="flex flex-wrap items-center justify-center gap-3">
+            <span class="inline-flex px-3 py-1 bg-[#FF8400]/10 text-[#FF8400] text-xs font-semibold font-mono">
+              {{ caseData.overallStatus }}
+            </span>
+            <span class="font-sans text-sm text-[#7A7A7A]">Submitted {{ caseData.submitted }}</span>
+          </div>
+          <NuxtLink to="/status" class="mt-1 font-sans text-sm font-medium text-[#FF8400] hover:underline">
+            ← Track another case
+          </NuxtLink>
+        </div>
       </div>
     </section>
 
-    <!-- Main Content -->
+    <!-- CASE DETAILS (light) -->
     <section class="bg-background">
-      <div class="max-w-[1440px] mx-auto px-5 sm:px-8 lg:px-20 py-8 lg:py-12">
-      <div class="max-w-[1200px] mx-auto flex flex-col gap-8">
-        <!-- Summary Cards -->
-        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-          <div class="bg-white border border-border rounded-xl p-5 flex flex-col gap-1">
-            <span class="font-sans text-[12px] text-muted-foreground">Overall Status</span>
-            <span class="inline-block w-fit px-3 py-1 rounded-full text-[12px] font-semibold font-mono bg-[#DFDFE6] text-[#000066]">{{ caseData.overallStatus }}</span>
-          </div>
-          <div class="bg-white border border-border rounded-xl p-5 flex flex-col gap-1">
-            <span class="font-sans text-[12px] text-muted-foreground">Completion</span>
-            <span class="font-mono text-xl font-bold text-foreground">{{ completedSteps }} of {{ steps.length }} steps</span>
-          </div>
-          <div class="bg-white border border-border rounded-xl p-5 flex flex-col gap-1">
-            <span class="font-sans text-[12px] text-muted-foreground">Estimated Completion</span>
-            <span class="font-mono text-xl font-bold text-foreground">{{ caseData.estimatedCompletion }}</span>
-          </div>
-          <div class="bg-white border border-border rounded-xl p-5 flex flex-col gap-1">
-            <span class="font-sans text-[12px] text-muted-foreground">Assigned Agent</span>
-            <span class="font-mono text-xl font-bold text-foreground">{{ caseData.agent }}</span>
-          </div>
-        </div>
-
-        <!-- Two Column Layout -->
-        <div class="flex flex-col lg:flex-row gap-6">
-          <!-- Timeline Card -->
-          <div class="flex-1 bg-white border border-border rounded-xl overflow-hidden">
-            <div class="flex items-center justify-between px-7 py-5 border-b border-border">
-              <h2 class="font-mono text-base font-bold text-foreground">Verification Progress</h2>
-              <span class="font-sans text-[13px] text-muted-foreground">{{ completedSteps }} of {{ steps.length }} checks complete</span>
-            </div>
-            <!-- Progress Bar -->
-            <div class="px-7 pt-4">
-              <div class="w-full h-1.5 bg-[#E7E8E5] rounded-full">
-                <div class="h-1.5 bg-primary rounded-full transition-all" :style="{ width: `${(completedSteps / steps.length) * 100}%` }" />
-              </div>
-            </div>
-            <!-- Steps -->
-            <div class="flex flex-col px-7 py-4">
-              <template v-for="(step, i) in steps" :key="step.title">
-                <div v-if="i > 0" class="h-px bg-border" />
-                <div class="flex items-center gap-4 py-3">
-                  <div class="w-8 h-8 rounded-full flex items-center justify-center flex-shrink-0" :class="circleClass(step.status)">
-                    <span v-if="step.status !== 'pending'" class="material-symbols-rounded text-[18px]" :class="iconColor(step.status)">{{ step.icon }}</span>
-                    <div v-else class="w-2 h-2 rounded-full bg-muted-foreground" />
-                  </div>
-                  <div class="flex flex-col gap-0.5 flex-1 min-w-0">
-                    <span class="font-mono text-sm" :class="step.status === 'pending' ? 'font-medium text-muted-foreground' : 'font-semibold text-foreground'">{{ step.title }}</span>
-                    <span class="font-sans text-[12px] leading-snug" :class="step.status === 'in_progress' ? 'text-primary font-medium' : 'text-muted-foreground'">{{ step.detail }}</span>
-                  </div>
-                  <span class="px-3 py-1 rounded-full text-[11px] font-semibold font-mono flex-shrink-0" :class="statusBadgeClass(step.status)">{{ statusLabel(step.status) }}</span>
+      <div class="max-w-[1440px] mx-auto px-5 sm:px-8 lg:px-20 py-16 lg:py-28">
+        <div class="flex flex-col lg:flex-row gap-8 lg:gap-12">
+          <!-- Left Column -->
+          <div class="flex-1 flex flex-col gap-8">
+            <!-- Summary Cards -->
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+              <div class="bg-card border border-border p-5 flex flex-col gap-1.5">
+                <span class="font-sans text-xs text-muted-foreground">Progress</span>
+                <span class="font-mono text-xl font-bold text-foreground">{{ completedSteps }} of {{ steps.length }}</span>
+                <div class="w-full h-1.5 bg-border mt-1">
+                  <div class="h-1.5 bg-[#FF8400] transition-all" :style="{ width: `${(completedSteps / steps.length) * 100}%` }" />
                 </div>
-              </template>
+              </div>
+              <div class="bg-card border border-border p-5 flex flex-col gap-1.5">
+                <span class="font-sans text-xs text-muted-foreground">Estimated Completion</span>
+                <span class="font-mono text-xl font-bold text-foreground">{{ caseData.estimatedCompletion }}</span>
+              </div>
+              <div class="bg-card border border-border p-5 flex flex-col gap-1.5">
+                <span class="font-sans text-xs text-muted-foreground">Submitted</span>
+                <span class="font-mono text-xl font-bold text-foreground">{{ caseData.submitted }}</span>
+              </div>
+              <div class="bg-card border border-border p-5 flex flex-col gap-1.5">
+                <span class="font-sans text-xs text-muted-foreground">Agent</span>
+                <span class="font-mono text-xl font-bold text-foreground">{{ caseData.agent }}</span>
+              </div>
+            </div>
+
+            <!-- Timeline -->
+            <div class="flex flex-col gap-2">
+              <h2 class="font-mono text-lg font-bold text-foreground mb-4">Verification Timeline</h2>
+              <div class="flex flex-col">
+                <div v-for="step in steps" :key="step.title" class="border-l-2 border-border pl-5 pb-6 last:pb-0 relative">
+                  <!-- Dot Indicator -->
+                  <div
+                    class="absolute -left-[7px] top-0.5 w-3 h-3 border-2 flex-shrink-0"
+                    :class="circleClass(step.status)"
+                  >
+                    <span v-if="step.status === 'complete'" class="material-symbols-rounded text-white text-[8px] absolute inset-0 flex items-center justify-center">check</span>
+                  </div>
+                  <!-- Content -->
+                  <div class="flex flex-col gap-1">
+                    <div class="flex items-center gap-3">
+                      <span
+                        class="font-mono text-sm font-semibold"
+                        :class="{
+                          'text-foreground': step.status === 'complete',
+                          'text-[#FF8400]': step.status === 'in_progress',
+                          'text-muted-foreground': step.status === 'pending',
+                        }"
+                      >{{ step.title }}</span>
+                      <span
+                        class="px-2 py-0.5 text-[11px] font-semibold font-mono flex-shrink-0"
+                        :class="statusBadgeClass(step.status)"
+                      >{{ statusLabel(step.status) }}</span>
+                    </div>
+                    <p class="font-sans text-sm text-muted-foreground leading-relaxed">{{ step.detail }}</p>
+                  </div>
+                </div>
+              </div>
             </div>
           </div>
 
-          <!-- Sidebar -->
-          <div class="w-full lg:w-[340px] flex flex-col gap-5">
-            <!-- Case Details -->
-            <div class="bg-white border border-border rounded-xl overflow-hidden">
-              <div class="px-5 py-4 border-b border-border">
-                <h3 class="font-mono text-sm font-semibold text-foreground">Case Details</h3>
-              </div>
-              <div class="flex flex-col gap-4 p-5">
-                <div class="flex justify-between"><span class="font-sans text-[12px] text-muted-foreground">Case ID</span><span class="font-mono text-[12px] font-semibold text-foreground">{{ caseData.id }}</span></div>
-                <div class="flex justify-between"><span class="font-sans text-[12px] text-muted-foreground">Tenant Name</span><span class="font-sans text-[12px] font-medium text-foreground">{{ caseData.tenantName }}</span></div>
-                <div class="flex justify-between"><span class="font-sans text-[12px] text-muted-foreground">Submitted</span><span class="font-sans text-[12px] font-medium text-foreground">{{ caseData.submitted }}</span></div>
-                <div class="flex justify-between"><span class="font-sans text-[12px] text-muted-foreground">Property</span><span class="font-sans text-[12px] font-medium text-foreground">{{ caseData.property }}</span></div>
-                <div class="flex justify-between"><span class="font-sans text-[12px] text-muted-foreground">Landlord</span><span class="font-sans text-[12px] font-medium text-foreground">{{ caseData.landlord }}</span></div>
-              </div>
-            </div>
-
-            <!-- Help Card -->
-            <div class="bg-white border border-border rounded-xl p-5 flex flex-col gap-3">
+          <!-- Right Column -->
+          <div class="w-full lg:w-[320px] flex-shrink-0 flex flex-col gap-6">
+            <!-- Need Help Card -->
+            <div class="bg-card border border-border p-6 flex flex-col gap-4">
+              <span class="material-symbols-rounded text-[28px] text-[#FF8400]">support_agent</span>
               <h3 class="font-mono text-sm font-semibold text-foreground">Need Help?</h3>
-              <p class="font-sans text-[12px] text-muted-foreground leading-relaxed">
-                If you have questions about your verification, please contact the requesting agent or reach out to our support team.
+              <p class="font-sans text-sm text-muted-foreground leading-relaxed">
+                If you have questions about your verification, contact the requesting agent or reach out to our support team.
               </p>
-              <NuxtLink to="/contact" class="w-full py-2.5 border border-border rounded-lg font-sans text-[13px] font-medium text-foreground text-center hover:bg-background transition-colors">
+              <NuxtLink
+                to="/contact"
+                class="w-full py-3 border border-border font-sans text-sm font-semibold text-foreground text-center hover:bg-card transition-colors"
+              >
                 Contact Support
               </NuxtLink>
             </div>
 
-            <!-- Notification Card -->
-            <div class="bg-[#DFDFE6] rounded-xl p-5 flex flex-col gap-3">
-              <span class="material-symbols-rounded text-[24px] text-[#000066]">notifications_active</span>
-              <h3 class="font-mono text-sm font-semibold text-[#000066]">Get Updates</h3>
-              <p class="font-sans text-[12px] text-[#000066] leading-relaxed">
-                You will receive an email notification at each verification milestone. Check your inbox for updates.
+            <!-- Notifications Card -->
+            <div class="bg-card border border-border p-6 flex flex-col gap-4">
+              <span class="material-symbols-rounded text-[28px] text-[#FF8400]">notifications_active</span>
+              <h3 class="font-mono text-sm font-semibold text-foreground">Notifications</h3>
+              <p class="font-sans text-sm text-muted-foreground leading-relaxed">
+                Email updates are sent automatically at each verification milestone. Check your inbox for real-time progress notifications.
               </p>
             </div>
           </div>
         </div>
-      </div>
       </div>
     </section>
   </div>
