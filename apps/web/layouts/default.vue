@@ -21,7 +21,7 @@ const navLinks = [
   <div class="min-h-screen flex flex-col">
     <!-- Navigation -->
     <header class="sticky top-0 z-50 bg-[#0D0D0D]">
-      <nav class="max-w-[1440px] mx-auto px-5 lg:px-20 py-4 flex items-center justify-between">
+      <nav class="max-w-[1440px] mx-auto px-5 sm:px-8 lg:px-20 py-4 flex items-center justify-between">
         <!-- Logo -->
         <NuxtLink to="/" class="flex items-center">
           <UiRentCredLogo :size="28" variant="dark" :show-text="true" :horizontal="true" />
@@ -114,8 +114,8 @@ const navLinks = [
     </main>
 
     <!-- Footer -->
-    <footer class="bg-[#0D0D0D] border-t border-[#2E2E2E] px-5 lg:px-[120px] py-8 lg:py-12">
-      <div class="max-w-[1440px] mx-auto flex flex-col gap-8 lg:gap-12">
+    <footer class="bg-[#0D0D0D] border-t border-[#2E2E2E]">
+      <div class="max-w-[1440px] mx-auto px-5 sm:px-8 lg:px-20 py-8 lg:py-12 flex flex-col gap-8 lg:gap-12">
         <!-- Footer Top -->
         <div class="flex flex-col lg:flex-row lg:justify-between gap-8">
           <!-- Brand -->

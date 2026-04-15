@@ -104,8 +104,8 @@ function handleSubmit() {
 <template>
   <div>
     <!-- Hero -->
-    <section class="bg-[#0D0D0D] px-5 sm:px-8 lg:px-20 py-12 lg:py-16">
-      <div class="max-w-[1440px] mx-auto flex flex-col items-center gap-3">
+    <section class="bg-[#0D0D0D]">
+      <div class="max-w-[1440px] mx-auto px-5 sm:px-8 lg:px-20 py-12 lg:py-16 flex flex-col items-center gap-3">
         <span class="font-mono text-[11px] font-semibold text-primary uppercase tracking-wider">{{ job.dept }}</span>
         <h1 class="font-mono text-2xl lg:text-[36px] font-bold text-white text-center">{{ job.title }}</h1>
         <p class="font-sans text-base text-[#7A7A7A] text-center">{{ job.location }} · {{ job.type }}</p>
@@ -116,8 +116,8 @@ function handleSubmit() {
     </section>
 
     <!-- Content -->
-    <section class="bg-background px-5 sm:px-8 lg:px-20 py-10 lg:py-16">
-      <div class="max-w-[1440px] mx-auto flex flex-col lg:flex-row gap-10">
+    <section class="bg-background">
+      <div class="max-w-[1440px] mx-auto px-5 sm:px-8 lg:px-20 py-10 lg:py-16 flex flex-col lg:flex-row gap-10">
         <!-- Left Column -->
         <div class="flex-1 flex flex-col gap-10">
           <div class="flex flex-col gap-3">
@@ -210,7 +210,8 @@ function handleSubmit() {
     </section>
 
     <!-- Application Form -->
-    <section id="apply" class="bg-white px-5 sm:px-8 lg:px-20 py-12 lg:py-16 border-t border-border">
+    <section id="apply" class="bg-white border-t border-border">
+      <div class="max-w-[1440px] mx-auto px-5 sm:px-8 lg:px-20 py-12 lg:py-16">
       <div class="max-w-[720px] mx-auto flex flex-col gap-8">
         <div class="flex flex-col gap-2">
           <h2 class="font-mono text-xl lg:text-2xl font-bold text-foreground">Apply for this Role</h2>
@@ -269,6 +270,7 @@ function handleSubmit() {
             Submit Application
           </button>
         </form>
+      </div>
       </div>
     </section>
   </div>

@@ -70,8 +70,8 @@ function iconColor(status: string) {
 <template>
   <div>
     <!-- Hero Banner -->
-    <section class="bg-[#0D0D0D] px-5 sm:px-8 lg:px-20 py-10 lg:py-12">
-      <div class="max-w-[1440px] mx-auto flex flex-col items-center gap-3">
+    <section class="bg-[#0D0D0D]">
+      <div class="max-w-[1440px] mx-auto px-5 sm:px-8 lg:px-20 py-10 lg:py-12 flex flex-col items-center gap-3">
         <span class="font-mono text-[11px] font-semibold text-primary uppercase tracking-wider">VERIFICATION STATUS</span>
         <h1 class="font-mono text-2xl lg:text-[32px] font-bold text-white">Case {{ caseData.id }}</h1>
         <p class="font-sans text-[15px] text-[#7A7A7A]">{{ caseData.tenantName }} · Submitted {{ caseData.submitted }}</p>
@@ -80,7 +80,8 @@ function iconColor(status: string) {
     </section>
 
     <!-- Main Content -->
-    <section class="bg-background px-5 sm:px-8 lg:px-20 py-8 lg:py-12">
+    <section class="bg-background">
+      <div class="max-w-[1440px] mx-auto px-5 sm:px-8 lg:px-20 py-8 lg:py-12">
       <div class="max-w-[1200px] mx-auto flex flex-col gap-8">
         <!-- Summary Cards -->
         <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
@@ -172,6 +173,7 @@ function iconColor(status: string) {
             </div>
           </div>
         </div>
+      </div>
       </div>
     </section>
   </div>

@@ -56,8 +56,8 @@ function toggleFaq(i: number) {
 <template>
   <div>
     <!-- Hero Section -->
-    <section class="bg-[#0D0D0D] px-5 sm:px-8 lg:px-20 py-16 lg:py-24">
-      <div class="max-w-[1440px] mx-auto flex flex-col items-center gap-6">
+    <section class="bg-[#0D0D0D]">
+      <div class="max-w-[1440px] mx-auto px-5 sm:px-8 lg:px-20 py-16 lg:py-24 flex flex-col items-center gap-6">
         <h1 class="font-mono text-3xl sm:text-4xl lg:text-[40px] font-bold text-white text-center leading-tight max-w-[800px]">
           Track Your Verification Status
         </h1>
@@ -83,7 +83,8 @@ function toggleFaq(i: number) {
     </section>
 
     <!-- Result Section -->
-    <section v-if="searched" class="bg-background px-5 sm:px-8 lg:px-20 py-12 lg:py-16">
+    <section v-if="searched" class="bg-background">
+      <div class="max-w-[1440px] mx-auto px-5 sm:px-8 lg:px-20 py-12 lg:py-16">
       <div class="max-w-[800px] mx-auto flex flex-col items-center gap-10">
         <div class="flex flex-col items-center gap-3">
           <span class="font-mono text-[11px] font-semibold text-muted-foreground uppercase tracking-wider">Search Result</span>
@@ -153,10 +154,12 @@ function toggleFaq(i: number) {
           </div>
         </div>
       </div>
+      </div>
     </section>
 
     <!-- FAQ Section -->
-    <section class="bg-white px-5 sm:px-8 lg:px-20 py-16 lg:py-20">
+    <section class="bg-white">
+      <div class="max-w-[1440px] mx-auto px-5 sm:px-8 lg:px-20 py-16 lg:py-20">
       <div class="max-w-[800px] mx-auto flex flex-col items-center gap-12">
         <div class="flex flex-col items-center gap-3">
           <h2 class="font-mono text-xl lg:text-2xl font-bold text-foreground">Frequently Asked Questions</h2>
@@ -175,6 +178,7 @@ function toggleFaq(i: number) {
             </div>
           </div>
         </div>
+      </div>
       </div>
     </section>
   </div>

@@ -31,8 +31,8 @@ const culturePoints = [
 <template>
   <div>
     <!-- Hero Section -->
-    <section class="bg-[#0D0D0D] px-5 sm:px-8 lg:px-20 py-16 lg:py-24">
-      <div class="max-w-[1440px] mx-auto flex flex-col items-center gap-6">
+    <section class="bg-[#0D0D0D]">
+      <div class="max-w-[1440px] mx-auto px-5 sm:px-8 lg:px-20 py-16 lg:py-24 flex flex-col items-center gap-6">
         <h1 class="font-mono text-3xl sm:text-4xl lg:text-[40px] font-bold text-white text-center leading-tight max-w-[800px]">
           Join the Team Building Trust in Nigerian Real Estate
         </h1>
@@ -44,8 +44,8 @@ const culturePoints = [
     </section>
 
     <!-- Why RentCred Section -->
-    <section class="bg-background px-5 sm:px-8 lg:px-20 py-12 lg:py-16">
-      <div class="max-w-[1440px] mx-auto flex flex-col gap-10">
+    <section class="bg-background">
+      <div class="max-w-[1440px] mx-auto px-5 sm:px-8 lg:px-20 py-12 lg:py-16 flex flex-col gap-10">
         <div class="flex flex-col gap-2">
           <span class="font-mono text-[11px] font-semibold text-muted-foreground uppercase tracking-wider">WHY RENTCRED</span>
           <h2 class="font-mono text-xl lg:text-[28px] font-bold text-foreground">Why Work With Us</h2>
@@ -61,8 +61,8 @@ const culturePoints = [
     </section>
 
     <!-- Open Positions Section -->
-    <section class="bg-white px-5 sm:px-8 lg:px-20 py-16 lg:py-20">
-      <div class="max-w-[1440px] mx-auto flex flex-col gap-10">
+    <section class="bg-white">
+      <div class="max-w-[1440px] mx-auto px-5 sm:px-8 lg:px-20 py-16 lg:py-20 flex flex-col gap-10">
         <div class="flex flex-col gap-2">
           <span class="font-mono text-[11px] font-semibold text-muted-foreground uppercase tracking-wider">OPEN POSITIONS</span>
           <h2 class="font-mono text-xl lg:text-[28px] font-bold text-foreground">Current Openings</h2>
@@ -87,8 +87,8 @@ const culturePoints = [
     </section>
 
     <!-- Culture Section -->
-    <section class="bg-background px-5 sm:px-8 lg:px-20 py-12 lg:py-16">
-      <div class="max-w-[1440px] mx-auto flex flex-col lg:flex-row items-center gap-12">
+    <section class="bg-background">
+      <div class="max-w-[1440px] mx-auto px-5 sm:px-8 lg:px-20 py-12 lg:py-16 flex flex-col lg:flex-row items-center gap-12">
         <!-- Image -->
         <div class="w-full lg:w-1/2">
           <div class="aspect-[3/2] rounded-xl bg-[#E7E8E5] overflow-hidden flex items-center justify-center">
@@ -113,8 +113,8 @@ const culturePoints = [
     </section>
 
     <!-- CTA Section -->
-    <section class="bg-[#0D0D0D] px-5 sm:px-8 lg:px-20 py-16 lg:py-20">
-      <div class="max-w-[1440px] mx-auto flex flex-col items-center gap-6">
+    <section class="bg-[#0D0D0D]">
+      <div class="max-w-[1440px] mx-auto px-5 sm:px-8 lg:px-20 py-16 lg:py-20 flex flex-col items-center gap-6">
         <h2 class="font-mono text-2xl lg:text-[32px] font-bold text-white text-center">Don't See Your Role?</h2>
         <p class="font-sans text-base text-[#7A7A7A] text-center max-w-[600px]">
           We're always looking for talented people who are passionate about building for Africa. Send us your CV and tell us how you'd contribute.
