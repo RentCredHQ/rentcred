@@ -6,63 +6,216 @@ useSeoMeta({ title: 'For Landlords — RentCred', description: 'Know who you\'re
 <template>
   <div>
     <!-- ============================================ -->
-    <!-- HERO SECTION                                 -->
+    <!-- 1. HERO (dark)                               -->
     <!-- ============================================ -->
     <section class="bg-[#0D0D0D]">
-      <div class="max-w-[1440px] mx-auto px-5 sm:px-8 lg:px-20 py-10 lg:py-16 min-h-[auto] lg:min-h-[600px] flex flex-col items-center justify-center gap-12">
-        <div class="flex flex-col items-center gap-8">
-          <span class="font-mono text-[11px] font-semibold text-[#FF8400] tracking-[2px]">FOR LANDLORDS</span>
-          <h1 class="font-mono text-3xl sm:text-4xl lg:text-5xl font-bold text-white text-center max-w-[900px]">
-            Know who you're renting to
-          </h1>
-          <p class="font-sans text-lg text-[#7A7A7A] text-center max-w-[700px] leading-relaxed">
-            Get verified tenant reports — identity, employment, references, and address — before you hand over the keys.
-          </p>
-          <NuxtLink
-            to="/contact"
-            class="bg-[#FF8400] text-[#0D0D0D] font-semibold text-base px-8 py-3.5 hover:opacity-90 transition-opacity font-sans"
-          >
-            Request a Report
-          </NuxtLink>
+      <div class="max-w-[1440px] mx-auto px-5 sm:px-8 lg:px-20 py-16 lg:py-28 flex flex-col items-center gap-8">
+        <span class="font-mono text-[11px] font-semibold text-[#FF8400] tracking-[2px] uppercase">FOR LANDLORDS</span>
+        <h1 class="font-mono text-3xl sm:text-4xl lg:text-5xl font-semibold text-white text-center max-w-[900px]">
+          Know exactly who you're renting to
+        </h1>
+        <p class="font-sans text-lg text-[#7A7A7A] text-center max-w-[700px] leading-relaxed">
+          Your agent submits the tenant. We verify everything. You get a clear, color-coded report before signing the lease.
+        </p>
+        <NuxtLink
+          to="/contact"
+          class="bg-[#FF8400] text-[#0D0D0D] font-semibold text-base px-8 py-3.5 hover:opacity-90 transition-opacity font-sans"
+        >
+          Ask Your Agent About RentCred
+        </NuxtLink>
+      </div>
+    </section>
+
+    <!-- ============================================ -->
+    <!-- 2. THE PROBLEM (light)                       -->
+    <!-- ============================================ -->
+    <section class="bg-background">
+      <div class="max-w-[1440px] mx-auto px-5 sm:px-8 lg:px-20 py-16 lg:py-28">
+        <div class="flex flex-col items-center gap-12">
+          <div class="flex flex-col items-center gap-3">
+            <span class="font-mono text-[11px] font-semibold text-[#FF8400] tracking-[2px] uppercase">WHY IT MATTERS</span>
+            <h2 class="font-mono text-2xl sm:text-[28px] lg:text-[32px] font-medium tracking-tight text-center text-foreground">Verbal references aren't enough</h2>
+          </div>
+
+          <div class="grid grid-cols-1 lg:grid-cols-3 gap-6 w-full">
+            <!-- Card 1 -->
+            <div class="border border-border p-7 flex flex-col gap-4">
+              <span class="material-symbols-rounded text-[#FF8400] text-[32px]">money_off</span>
+              <h3 class="font-mono text-base font-semibold text-foreground">Rent defaults cost millions</h3>
+              <p class="font-sans text-sm text-muted-foreground leading-relaxed">Tenants who can't actually afford the rent slip through without income verification. By the time you know, it's too late.</p>
+            </div>
+            <!-- Card 2 -->
+            <div class="border border-border p-7 flex flex-col gap-4">
+              <span class="material-symbols-rounded text-[#FF8400] text-[32px]">home_repair_service</span>
+              <h3 class="font-mono text-base font-semibold text-foreground">Property damage has no recourse</h3>
+              <p class="font-sans text-sm text-muted-foreground leading-relaxed">Without verified identity and references, holding tenants accountable is nearly impossible. You're left covering the cost.</p>
+            </div>
+            <!-- Card 3 -->
+            <div class="border border-border p-7 flex flex-col gap-4">
+              <span class="material-symbols-rounded text-[#FF8400] text-[32px]">person_off</span>
+              <h3 class="font-mono text-base font-semibold text-foreground">Agents can't vouch for strangers</h3>
+              <p class="font-sans text-sm text-muted-foreground leading-relaxed">Even good agents can't verify what they don't have tools to check. They need a system, not guesswork.</p>
+            </div>
+          </div>
         </div>
       </div>
     </section>
 
     <!-- ============================================ -->
-    <!-- WHAT YOU GET — 4 cards                       -->
+    <!-- 3. WHAT'S IN A REPORT (dark)                 -->
     <!-- ============================================ -->
-    <section class="bg-background">
-      <div class="max-w-[1440px] mx-auto px-5 sm:px-8 lg:px-20 py-10 lg:py-20">
+    <section class="bg-[#0D0D0D]">
+      <div class="max-w-[1440px] mx-auto px-5 sm:px-8 lg:px-20 py-16 lg:py-28">
         <div class="flex flex-col items-center gap-12">
           <div class="flex flex-col items-center gap-3">
-            <span class="font-mono text-[11px] font-semibold text-[#FF8400] tracking-[2px]">WHAT YOU GET</span>
-            <h2 class="font-mono text-2xl sm:text-3xl lg:text-4xl font-bold text-foreground text-center">Every report covers what matters</h2>
+            <span class="font-mono text-[11px] font-semibold text-[#FF8400] tracking-[2px] uppercase">YOUR REPORT</span>
+            <h2 class="font-mono text-2xl sm:text-[28px] lg:text-[32px] font-medium tracking-tight text-center text-white">Everything you need to decide</h2>
+          </div>
+
+          <div class="flex flex-col lg:flex-row gap-12 lg:gap-16 w-full items-center lg:items-start">
+            <!-- Left: Check items -->
+            <div class="flex-1 flex flex-col gap-8">
+              <div class="flex items-start gap-4">
+                <span class="material-symbols-rounded text-[#22C55E] text-2xl mt-0.5">check_circle</span>
+                <div class="flex flex-col gap-1">
+                  <h3 class="font-mono text-base font-semibold text-white">Identity Verified</h3>
+                  <p class="font-sans text-sm text-[#7A7A7A] leading-relaxed">NIN, BVN, and government ID cross-checked against national databases to confirm the tenant is who they claim to be.</p>
+                </div>
+              </div>
+              <div class="flex items-start gap-4">
+                <span class="material-symbols-rounded text-[#22C55E] text-2xl mt-0.5">check_circle</span>
+                <div class="flex flex-col gap-1">
+                  <h3 class="font-mono text-base font-semibold text-white">Employment Confirmed</h3>
+                  <p class="font-sans text-sm text-[#7A7A7A] leading-relaxed">Employer verification, salary validation, and job tenure confirmed directly so you know the rent is affordable.</p>
+                </div>
+              </div>
+              <div class="flex items-start gap-4">
+                <span class="material-symbols-rounded text-[#22C55E] text-2xl mt-0.5">check_circle</span>
+                <div class="flex flex-col gap-1">
+                  <h3 class="font-mono text-base font-semibold text-white">References Checked</h3>
+                  <p class="font-sans text-sm text-[#7A7A7A] leading-relaxed">Previous landlords and personal references contacted and documented. You see exactly what they said.</p>
+                </div>
+              </div>
+              <div class="flex items-start gap-4">
+                <span class="material-symbols-rounded text-[#22C55E] text-2xl mt-0.5">check_circle</span>
+                <div class="flex flex-col gap-1">
+                  <h3 class="font-mono text-base font-semibold text-white">Address Validated</h3>
+                  <p class="font-sans text-sm text-[#7A7A7A] leading-relaxed">Current and previous addresses verified through utility records and physical field inspections by our agents.</p>
+                </div>
+              </div>
+            </div>
+
+            <!-- Right: Sample report card -->
+            <div class="w-full sm:w-[460px] lg:w-[440px] bg-[#161616] border border-[#2A2A2A] overflow-hidden flex-shrink-0">
+              <!-- Top -->
+              <div class="p-8 flex flex-col gap-3">
+                <h3 class="font-mono text-[22px] font-bold text-white">Adebayo Ogundimu</h3>
+                <p class="font-sans text-[13px] text-[#7A7A7A]">Submitted by: Prime Realty Lagos  &middot;  March 2026</p>
+              </div>
+              <!-- Color Band -->
+              <div class="flex h-1.5">
+                <div class="flex-1 bg-[#22C55E]" />
+                <div class="flex-1 bg-[#F59E0B]" />
+                <div class="w-[100px] bg-[#EF4444]" />
+              </div>
+              <!-- Check Items -->
+              <div class="p-8 pt-6 flex flex-col gap-4">
+                <div class="flex items-center gap-3">
+                  <span class="material-symbols-rounded text-[#22C55E] text-xl">check_circle</span>
+                  <span class="font-sans text-sm text-white">Identity — Verified</span>
+                </div>
+                <div class="flex items-center gap-3">
+                  <span class="material-symbols-rounded text-[#22C55E] text-xl">check_circle</span>
+                  <span class="font-sans text-sm text-white">Employment — Confirmed</span>
+                </div>
+                <div class="flex items-center gap-3">
+                  <span class="material-symbols-rounded text-[#F59E0B] text-xl">warning</span>
+                  <span class="font-sans text-sm text-white">References — Partially Verified</span>
+                </div>
+                <div class="flex items-center gap-3">
+                  <span class="material-symbols-rounded text-[#22C55E] text-xl">check_circle</span>
+                  <span class="font-sans text-sm text-white">Address — Validated</span>
+                </div>
+              </div>
+              <!-- Recommendation Bar -->
+              <div class="bg-[#22C55E20] px-8 py-4 flex items-center gap-2">
+                <span class="material-symbols-rounded text-[#22C55E] text-xl">thumb_up</span>
+                <span class="font-sans text-[13px] font-semibold text-[#22C55E]">Recommendation: Proceed with caution — verify references independently</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ============================================ -->
+    <!-- 4. HOW IT WORKS (light)                      -->
+    <!-- ============================================ -->
+    <section class="bg-background">
+      <div class="max-w-[1440px] mx-auto px-5 sm:px-8 lg:px-20 py-16 lg:py-28">
+        <div class="flex flex-col items-center gap-12">
+          <div class="flex flex-col items-center gap-3">
+            <span class="font-mono text-[11px] font-semibold text-[#FF8400] tracking-[2px] uppercase">YOUR EXPERIENCE</span>
+            <h2 class="font-mono text-2xl sm:text-[28px] lg:text-[32px] font-medium tracking-tight text-center text-foreground">Three steps. Zero effort on your part.</h2>
+          </div>
+
+          <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 w-full">
+            <!-- Step 1 -->
+            <div class="border border-border p-7 flex flex-col gap-5">
+              <div class="w-10 h-10 bg-[#FF8400] flex items-center justify-center">
+                <span class="font-mono text-lg font-bold text-[#0D0D0D]">1</span>
+              </div>
+              <h3 class="font-mono text-base font-semibold text-foreground">Your Agent Requests</h3>
+              <p class="font-sans text-sm text-muted-foreground leading-relaxed">Your real estate agent submits the tenant's details through RentCred. You don't need to do anything.</p>
+            </div>
+            <!-- Step 2 -->
+            <div class="border border-border p-7 flex flex-col gap-5">
+              <div class="w-10 h-10 bg-[#FF8400] flex items-center justify-center">
+                <span class="font-mono text-lg font-bold text-[#0D0D0D]">2</span>
+              </div>
+              <h3 class="font-mono text-base font-semibold text-foreground">We Verify in 48 Hours</h3>
+              <p class="font-sans text-sm text-muted-foreground leading-relaxed">Our team checks identity, employment, references, and sends field agents to inspect the address.</p>
+            </div>
+            <!-- Step 3 -->
+            <div class="border border-border p-7 flex flex-col gap-5">
+              <div class="w-10 h-10 bg-[#FF8400] flex items-center justify-center">
+                <span class="font-mono text-lg font-bold text-[#0D0D0D]">3</span>
+              </div>
+              <h3 class="font-mono text-base font-semibold text-foreground">You Review the Report</h3>
+              <p class="font-sans text-sm text-muted-foreground leading-relaxed">Receive a secure link to a color-coded report with a clear recommendation. No login required.</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ============================================ -->
+    <!-- 5. TRUST SIGNALS (dark)                      -->
+    <!-- ============================================ -->
+    <section class="bg-[#0D0D0D]">
+      <div class="max-w-[1440px] mx-auto px-5 sm:px-8 lg:px-20 py-16 lg:py-28">
+        <div class="flex flex-col items-center gap-12">
+          <div class="flex flex-col items-center gap-3">
+            <span class="font-mono text-[11px] font-semibold text-[#FF8400] tracking-[2px] uppercase">WHY TRUST RENTCRED</span>
+            <h2 class="font-mono text-2xl sm:text-[28px] lg:text-[32px] font-medium tracking-tight text-center text-white">Built for the Nigerian rental market</h2>
           </div>
 
           <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 w-full">
-            <!-- Card 1 -->
-            <div class="bg-card border border-border p-8 flex flex-col gap-4">
-              <span class="material-symbols-rounded text-[#FF8400] text-[32px]">fingerprint</span>
-              <h3 class="font-mono text-base font-bold text-foreground">Identity Verified</h3>
-              <p class="font-sans text-sm text-muted-foreground" style="line-height: 1.6">NIN, BVN and government ID cross-checked against national databases.</p>
+            <div class="bg-[#161616] border border-[#2A2A2A] p-7 flex flex-col items-center gap-2 text-center">
+              <span class="font-mono text-2xl font-bold text-white">200+ Agents</span>
+              <span class="font-sans text-sm text-[#7A7A7A]">Registered nationwide</span>
             </div>
-            <!-- Card 2 -->
-            <div class="bg-card border border-border p-8 flex flex-col gap-4">
-              <span class="material-symbols-rounded text-[#FF8400] text-[32px]">work</span>
-              <h3 class="font-mono text-base font-bold text-foreground">Employment Confirmed</h3>
-              <p class="font-sans text-sm text-muted-foreground" style="line-height: 1.6">Employer verification, salary validation, and job tenure confirmed directly.</p>
+            <div class="bg-[#161616] border border-[#2A2A2A] p-7 flex flex-col items-center gap-2 text-center">
+              <span class="font-mono text-2xl font-bold text-white">NDPR Compliant</span>
+              <span class="font-sans text-sm text-[#7A7A7A]">Your data is protected</span>
             </div>
-            <!-- Card 3 -->
-            <div class="bg-card border border-border p-8 flex flex-col gap-4">
-              <span class="material-symbols-rounded text-[#FF8400] text-[32px]">group</span>
-              <h3 class="font-mono text-base font-bold text-foreground">References Checked</h3>
-              <p class="font-sans text-sm text-muted-foreground" style="line-height: 1.6">Previous landlords and personal references contacted and documented.</p>
+            <div class="bg-[#161616] border border-[#2A2A2A] p-7 flex flex-col items-center gap-2 text-center">
+              <span class="font-mono text-2xl font-bold text-white">Field Verified</span>
+              <span class="font-sans text-sm text-[#7A7A7A]">Physical address inspections</span>
             </div>
-            <!-- Card 4 -->
-            <div class="bg-card border border-border p-8 flex flex-col gap-4">
-              <span class="material-symbols-rounded text-[#FF8400] text-[32px]">location_on</span>
-              <h3 class="font-mono text-base font-bold text-foreground">Address Validated</h3>
-              <p class="font-sans text-sm text-muted-foreground" style="line-height: 1.6">Current and previous addresses verified through utility records and field checks.</p>
+            <div class="bg-[#161616] border border-[#2A2A2A] p-7 flex flex-col items-center gap-2 text-center">
+              <span class="font-mono text-2xl font-bold text-white">48hr SLA</span>
+              <span class="font-sans text-sm text-[#7A7A7A]">Average turnaround time</span>
             </div>
           </div>
         </div>
@@ -70,121 +223,27 @@ useSeoMeta({ title: 'For Landlords — RentCred', description: 'Know who you\'re
     </section>
 
     <!-- ============================================ -->
-    <!-- HOW IT WORKS — 3 steps                      -->
+    <!-- 6. FINAL CTA (light)                         -->
     <!-- ============================================ -->
-    <section class="bg-background border-t border-border">
-      <div class="max-w-[1440px] mx-auto px-5 sm:px-8 lg:px-20 py-10 lg:py-20">
-        <div class="flex flex-col items-center gap-12">
-          <div class="flex flex-col items-center gap-3">
-            <span class="font-mono text-[11px] font-semibold text-[#FF8400] tracking-[2px]">HOW IT WORKS</span>
-            <h2 class="font-mono text-2xl sm:text-3xl lg:text-4xl font-bold text-foreground text-center">Three steps to a verified tenant</h2>
-          </div>
-
-          <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8 w-full">
-            <!-- Step 1 -->
-            <div class="bg-card border border-border p-8 flex flex-col items-center gap-4">
-              <div class="w-12 h-12 rounded-full bg-[#FF8400] flex items-center justify-center">
-                <span class="font-mono text-xl font-bold text-[#0D0D0D]">1</span>
-              </div>
-              <h3 class="font-mono text-lg font-bold text-foreground text-center">Your Agent Submits</h3>
-              <p class="font-sans text-sm text-muted-foreground text-center" style="line-height: 1.6">Your real estate agent submits the tenant's details through the RentCred platform.</p>
-            </div>
-            <!-- Step 2 -->
-            <div class="bg-card border border-border p-8 flex flex-col items-center gap-4">
-              <div class="w-12 h-12 rounded-full bg-[#FF8400] flex items-center justify-center">
-                <span class="font-mono text-xl font-bold text-[#0D0D0D]">2</span>
-              </div>
-              <h3 class="font-mono text-lg font-bold text-foreground text-center">We Verify</h3>
-              <p class="font-sans text-sm text-muted-foreground text-center" style="line-height: 1.6">Our team runs identity, employment, reference, and address checks within 48 hours.</p>
-            </div>
-            <!-- Step 3 -->
-            <div class="bg-card border border-border p-8 flex flex-col items-center gap-4">
-              <div class="w-12 h-12 rounded-full bg-[#FF8400] flex items-center justify-center">
-                <span class="font-mono text-xl font-bold text-[#0D0D0D]">3</span>
-              </div>
-              <h3 class="font-mono text-lg font-bold text-foreground text-center">You Get the Report</h3>
-              <p class="font-sans text-sm text-muted-foreground text-center" style="line-height: 1.6">Receive a clear, color-coded report with a recommendation you can trust.</p>
-            </div>
-          </div>
-        </div>
-      </div>
-    </section>
-
-    <!-- ============================================ -->
-    <!-- SAMPLE REPORT PREVIEW                        -->
-    <!-- ============================================ -->
-    <section class="bg-[#0D0D0D]">
-      <div class="max-w-[1440px] mx-auto px-5 sm:px-8 lg:px-20 py-10 lg:py-20">
-        <div class="flex flex-col items-center gap-12">
-          <div class="flex flex-col items-center gap-3">
-            <span class="font-mono text-[11px] font-semibold text-[#FF8400] tracking-[2px]">SAMPLE REPORT</span>
-            <h2 class="font-mono text-2xl sm:text-3xl lg:text-4xl font-bold text-white text-center">What your report looks like</h2>
-          </div>
-
-          <!-- Report Card -->
-          <div class="w-full sm:w-[500px] bg-[#1A1A1A] border border-[#2E2E2E] overflow-hidden">
-            <!-- Top -->
-            <div class="p-8 flex flex-col gap-3">
-              <h3 class="font-mono text-[22px] font-bold text-white">Adebayo Ogundimu</h3>
-              <p class="font-sans text-[13px] text-[#7A7A7A]">Submitted by: Prime Realty Lagos  •  March 2026</p>
-            </div>
-            <!-- Color Band -->
-            <div class="flex h-1.5">
-              <div class="flex-1 bg-[#22C55E]" />
-              <div class="flex-1 bg-[#F59E0B]" />
-              <div class="w-[100px] bg-[#EF4444]" />
-            </div>
-            <!-- Check Items -->
-            <div class="p-8 pt-6 flex flex-col gap-4">
-              <div class="flex items-center gap-3">
-                <span class="material-symbols-rounded text-[#22C55E] text-xl">check_circle</span>
-                <span class="font-sans text-sm text-white">Identity — Verified</span>
-              </div>
-              <div class="flex items-center gap-3">
-                <span class="material-symbols-rounded text-[#22C55E] text-xl">check_circle</span>
-                <span class="font-sans text-sm text-white">Employment — Confirmed</span>
-              </div>
-              <div class="flex items-center gap-3">
-                <span class="material-symbols-rounded text-[#F59E0B] text-xl">warning</span>
-                <span class="font-sans text-sm text-white">References — Partially Verified</span>
-              </div>
-              <div class="flex items-center gap-3">
-                <span class="material-symbols-rounded text-[#22C55E] text-xl">check_circle</span>
-                <span class="font-sans text-sm text-white">Address — Validated</span>
-              </div>
-            </div>
-            <!-- Recommendation Bar -->
-            <div class="bg-[#22C55E20] px-8 py-4 flex items-center gap-2">
-              <span class="material-symbols-rounded text-[#22C55E] text-xl">thumb_up</span>
-              <span class="font-sans text-[13px] font-semibold text-[#22C55E]">Recommendation: Proceed with caution — verify references independently</span>
-            </div>
-          </div>
-        </div>
-      </div>
-    </section>
-
-    <!-- ============================================ -->
-    <!-- FINAL CTA                                    -->
-    <!-- ============================================ -->
-    <section class="bg-[#0D0D0D] border-t border-[#2E2E2E]">
-      <div class="max-w-[1440px] mx-auto px-5 sm:px-8 lg:px-20 py-10 lg:py-20">
-        <div class="flex flex-col items-center justify-center gap-6">
-          <h2 class="font-mono text-2xl sm:text-3xl lg:text-4xl font-bold text-white text-center">Ask your agent about RentCred</h2>
-          <p class="font-sans text-lg text-[#7A7A7A] text-center max-w-[600px]">
-            Get peace of mind before signing the lease. Your agent can request a report in minutes.
+    <section class="bg-background">
+      <div class="max-w-[1440px] mx-auto px-5 sm:px-8 lg:px-20 py-16 lg:py-28">
+        <div class="flex flex-col items-center gap-6">
+          <h2 class="font-mono text-2xl sm:text-[28px] lg:text-[32px] font-medium tracking-tight text-center text-foreground">Ask your agent about RentCred</h2>
+          <p class="font-sans text-lg text-muted-foreground text-center max-w-[600px] leading-relaxed">
+            If your agent isn't using RentCred yet, send them our way. Better tenants start with better verification.
           </p>
           <div class="flex flex-col sm:flex-row items-center gap-4 w-full sm:w-auto">
             <NuxtLink
-              to="/auth/register"
+              to="/contact"
               class="bg-[#FF8400] text-[#0D0D0D] font-semibold text-base px-8 py-3.5 hover:opacity-90 transition-opacity font-sans w-full sm:w-auto text-center"
             >
-              Start Screening
+              Tell Your Agent
             </NuxtLink>
             <NuxtLink
-              to="/auth/register"
-              class="text-white text-base px-8 py-3.5 border border-[#7A7A7A] hover:bg-white/10 transition-colors font-sans w-full sm:w-auto text-center"
+              to="/#how-it-works"
+              class="text-foreground text-base px-8 py-3.5 border border-border hover:bg-muted transition-colors font-sans w-full sm:w-auto text-center"
             >
-              Or Register Directly
+              Learn More
             </NuxtLink>
           </div>
         </div>
