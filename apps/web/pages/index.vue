@@ -12,59 +12,62 @@ useSeoMeta({
     <!-- ============================================ -->
     <!-- HERO SECTION                                 -->
     <!-- ============================================ -->
-    <section class="bg-[#0D0D0D]">
-      <div class="max-w-[1440px] mx-auto px-5 sm:px-8 lg:px-20 py-10 lg:py-16 min-h-[auto] lg:min-h-[700px] flex flex-col gap-12">
-        <!-- Hero Content -->
-        <div class="flex-1 flex flex-col items-center justify-center gap-8">
-          <!-- Badge -->
-          <div class="border border-[#FF840033] bg-[#FF840012] rounded-full px-4 py-1.5">
-            <span class="font-mono text-[#FF8400] text-xs font-medium">Built for real estate agents</span>
-          </div>
-
-          <!-- Headline -->
-          <h1
-            class="font-mono text-3xl sm:text-4xl lg:text-5xl font-medium text-white text-center leading-[1.15] tracking-tight max-w-[800px]"
-          >
-            Screen tenants faster.<br />
-            Close deals with confidence.
-          </h1>
-
-          <!-- Subheadline -->
-          <p class="font-sans text-lg text-[#7A7A7A] text-center leading-relaxed max-w-[700px]">
-            Submit a tenant, we verify identity, employment, references and addresses.
-            Share a credibility report with your landlord client — all within 48 hours.
-          </p>
-
-          <!-- CTA Buttons -->
-          <div class="flex flex-col sm:flex-row items-center gap-4 w-full sm:w-auto">
-            <NuxtLink
-              to="/auth/register"
-              class="bg-[#FF8400] text-[#0D0D0D] font-semibold text-base px-8 py-4 hover:opacity-90 transition-opacity w-full sm:w-auto text-center"
-            >
-              Start Screening Tenants
-            </NuxtLink>
-            <a
-              href="#pricing"
-              class="text-white text-base px-8 py-4 border border-white hover:bg-white/10 transition-colors w-full sm:w-auto text-center"
-            >
-              See Pricing
-            </a>
-          </div>
+    <section class="bg-[#0D0D0D] overflow-hidden">
+      <div class="max-w-[1440px] mx-auto px-5 sm:px-8 lg:px-20 pt-16 sm:pt-20 lg:pt-28 pb-32 sm:pb-36 lg:pb-44 flex flex-col items-center">
+        <!-- Badge -->
+        <div class="border border-[#FF840033] bg-[#FF840012] rounded-full px-4 py-1.5 mb-6 lg:mb-8">
+          <span class="font-mono text-[#FF8400] text-xs font-medium tracking-wide">Built for real estate agents</span>
         </div>
 
-        <!-- Trust Bar / Stats -->
-        <div class="flex flex-col sm:flex-row justify-center gap-6 sm:gap-10 lg:gap-16">
-          <div class="flex flex-col items-center gap-1">
-            <span class="font-mono text-2xl font-bold text-[#FF8400]">200+</span>
-            <span class="font-sans text-[13px] text-[#7A7A7A]">Agents Registered</span>
-          </div>
-          <div class="flex flex-col items-center gap-1">
-            <span class="font-mono text-2xl font-bold text-[#FF8400]">50+</span>
-            <span class="font-sans text-[13px] text-[#7A7A7A]">Reports This Month</span>
-          </div>
-          <div class="flex flex-col items-center gap-1">
-            <span class="font-mono text-2xl font-bold text-[#FF8400]">48hr</span>
-            <span class="font-sans text-[13px] text-[#7A7A7A]">Average Turnaround</span>
+        <!-- Headline -->
+        <h1
+          class="font-mono text-[32px] sm:text-[44px] lg:text-[56px] font-semibold text-white text-center leading-[1.1] tracking-tight max-w-[800px] mb-5 lg:mb-6"
+        >
+          Screen tenants faster.<br />
+          Close deals with confidence.
+        </h1>
+
+        <!-- Subheadline — single concise line -->
+        <p class="font-sans text-base sm:text-lg text-[#7A7A7A] text-center leading-relaxed max-w-[560px] mb-8 lg:mb-10">
+          Verified identity, employment, and address reports — delivered to your inbox within 48 hours.
+        </p>
+
+        <!-- CTA Buttons -->
+        <div class="flex flex-col sm:flex-row items-center gap-3 sm:gap-4 w-full sm:w-auto mb-16 lg:mb-20">
+          <NuxtLink
+            to="/auth/register"
+            class="bg-[#FF8400] text-[#0D0D0D] font-semibold text-[15px] px-8 py-3.5 rounded-md hover:bg-[#E67700] transition-colors w-full sm:w-auto text-center"
+          >
+            Start Screening Tenants
+          </NuxtLink>
+          <a
+            href="#pricing"
+            class="text-white/90 text-[15px] px-8 py-3.5 rounded-md border border-[#3A3A3A] hover:border-[#555] hover:bg-white/[0.04] transition-all w-full sm:w-auto text-center"
+          >
+            See Pricing
+          </a>
+        </div>
+
+        <!-- Floating Stat Cards -->
+        <div class="relative w-full flex justify-center">
+          <div class="flex flex-col sm:flex-row items-center sm:items-end gap-4 sm:gap-5 lg:gap-6">
+            <!-- Card 1 — tilted left -->
+            <div class="hero-card sm:-rotate-3 sm:translate-y-1 bg-[#161616] border border-[#2A2A2A] rounded-xl px-7 py-5 flex flex-col items-center gap-1.5 shadow-[0_8px_30px_rgba(0,0,0,0.4)] hover:translate-y-[-2px] hover:shadow-[0_12px_40px_rgba(0,0,0,0.5)] transition-all duration-300 w-full sm:w-auto">
+              <span class="font-mono text-[28px] font-bold text-[#FF8400]">200+</span>
+              <span class="font-sans text-[12px] text-[#7A7A7A] tracking-wide uppercase">Agents Registered</span>
+            </div>
+
+            <!-- Card 2 — center, raised -->
+            <div class="hero-card sm:-translate-y-2 bg-[#161616] border border-[#2A2A2A] rounded-xl px-7 py-5 flex flex-col items-center gap-1.5 shadow-[0_8px_30px_rgba(0,0,0,0.4)] hover:translate-y-[-4px] hover:shadow-[0_12px_40px_rgba(0,0,0,0.5)] transition-all duration-300 w-full sm:w-auto">
+              <span class="font-mono text-[28px] font-bold text-[#FF8400]">50+</span>
+              <span class="font-sans text-[12px] text-[#7A7A7A] tracking-wide uppercase">Reports This Month</span>
+            </div>
+
+            <!-- Card 3 — tilted right -->
+            <div class="hero-card sm:rotate-3 sm:translate-y-1 bg-[#161616] border border-[#2A2A2A] rounded-xl px-7 py-5 flex flex-col items-center gap-1.5 shadow-[0_8px_30px_rgba(0,0,0,0.4)] hover:translate-y-[-2px] hover:shadow-[0_12px_40px_rgba(0,0,0,0.5)] transition-all duration-300 w-full sm:w-auto">
+              <span class="font-mono text-[28px] font-bold text-[#FF8400]">48hr</span>
+              <span class="font-sans text-[12px] text-[#7A7A7A] tracking-wide uppercase">Average Turnaround</span>
+            </div>
           </div>
         </div>
       </div>
@@ -253,3 +256,24 @@ useSeoMeta({
     </section>
   </div>
 </template>
+
+<style scoped>
+/* Floating card entrance animation */
+.hero-card {
+  animation: floatUp 0.7s cubic-bezier(0.16, 1, 0.3, 1) both;
+}
+.hero-card:nth-child(1) { animation-delay: 0.15s; }
+.hero-card:nth-child(2) { animation-delay: 0.3s; }
+.hero-card:nth-child(3) { animation-delay: 0.45s; }
+
+@keyframes floatUp {
+  from {
+    opacity: 0;
+    transform: translateY(24px) scale(0.95);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+</style>
