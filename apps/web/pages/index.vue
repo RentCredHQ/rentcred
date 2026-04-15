@@ -36,13 +36,13 @@ useSeoMeta({
         <div class="flex flex-col sm:flex-row items-center gap-3 sm:gap-4 w-full sm:w-auto mb-16 lg:mb-20">
           <NuxtLink
             to="/auth/register"
-            class="bg-[#FF8400] text-[#0D0D0D] font-semibold text-[15px] px-8 py-3.5 rounded-md hover:bg-[#E67700] transition-colors w-full sm:w-auto text-center"
+            class="bg-[#FF8400] text-[#0D0D0D] font-semibold text-[15px] px-8 py-3.5 hover:bg-[#E67700] transition-colors w-full sm:w-auto text-center"
           >
             Start Screening Tenants
           </NuxtLink>
           <a
             href="#pricing"
-            class="text-white/90 text-[15px] px-8 py-3.5 rounded-md border border-[#3A3A3A] hover:border-[#555] hover:bg-white/[0.04] transition-all w-full sm:w-auto text-center"
+            class="text-white/90 text-[15px] px-8 py-3.5 border border-[#3A3A3A] hover:border-[#555] hover:bg-white/[0.04] transition-all w-full sm:w-auto text-center"
           >
             See Pricing
           </a>
@@ -52,19 +52,19 @@ useSeoMeta({
         <div class="relative w-full flex justify-center">
           <div class="flex flex-col sm:flex-row items-center sm:items-end gap-4 sm:gap-5 lg:gap-6">
             <!-- Card 1 — tilted left -->
-            <div class="hero-card sm:-rotate-3 sm:translate-y-1 bg-[#161616] border border-[#2A2A2A] rounded-xl px-7 py-5 flex flex-col items-center gap-1.5 shadow-[0_8px_30px_rgba(0,0,0,0.4)] hover:translate-y-[-2px] hover:shadow-[0_12px_40px_rgba(0,0,0,0.5)] transition-all duration-300 w-full sm:w-auto">
+            <div class="hero-card sm:-rotate-3 sm:translate-y-1 bg-[#161616] border border-[#2A2A2A] px-7 py-5 flex flex-col items-center gap-1.5 shadow-[0_8px_30px_rgba(0,0,0,0.4)] hover:translate-y-[-2px] hover:shadow-[0_12px_40px_rgba(0,0,0,0.5)] transition-all duration-300 w-full sm:w-auto">
               <span class="font-mono text-[28px] font-bold text-[#FF8400]">200+</span>
               <span class="font-sans text-[12px] text-[#7A7A7A] tracking-wide uppercase">Agents Registered</span>
             </div>
 
             <!-- Card 2 — center, raised -->
-            <div class="hero-card sm:-translate-y-2 bg-[#161616] border border-[#2A2A2A] rounded-xl px-7 py-5 flex flex-col items-center gap-1.5 shadow-[0_8px_30px_rgba(0,0,0,0.4)] hover:translate-y-[-4px] hover:shadow-[0_12px_40px_rgba(0,0,0,0.5)] transition-all duration-300 w-full sm:w-auto">
+            <div class="hero-card sm:-translate-y-2 bg-[#161616] border border-[#2A2A2A] px-7 py-5 flex flex-col items-center gap-1.5 shadow-[0_8px_30px_rgba(0,0,0,0.4)] hover:translate-y-[-4px] hover:shadow-[0_12px_40px_rgba(0,0,0,0.5)] transition-all duration-300 w-full sm:w-auto">
               <span class="font-mono text-[28px] font-bold text-[#FF8400]">50+</span>
               <span class="font-sans text-[12px] text-[#7A7A7A] tracking-wide uppercase">Reports This Month</span>
             </div>
 
             <!-- Card 3 — tilted right -->
-            <div class="hero-card sm:rotate-3 sm:translate-y-1 bg-[#161616] border border-[#2A2A2A] rounded-xl px-7 py-5 flex flex-col items-center gap-1.5 shadow-[0_8px_30px_rgba(0,0,0,0.4)] hover:translate-y-[-2px] hover:shadow-[0_12px_40px_rgba(0,0,0,0.5)] transition-all duration-300 w-full sm:w-auto">
+            <div class="hero-card sm:rotate-3 sm:translate-y-1 bg-[#161616] border border-[#2A2A2A] px-7 py-5 flex flex-col items-center gap-1.5 shadow-[0_8px_30px_rgba(0,0,0,0.4)] hover:translate-y-[-2px] hover:shadow-[0_12px_40px_rgba(0,0,0,0.5)] transition-all duration-300 w-full sm:w-auto">
               <span class="font-mono text-[28px] font-bold text-[#FF8400]">48hr</span>
               <span class="font-sans text-[12px] text-[#7A7A7A] tracking-wide uppercase">Average Turnaround</span>
             </div>
