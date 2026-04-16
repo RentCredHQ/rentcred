@@ -10,7 +10,7 @@ export class MailService {
 
   constructor() {
     this.resend = new Resend(process.env.RESEND_API_KEY || '');
-    this.fromEmail = process.env.FROM_EMAIL || 'noreply@rentcred.ng';
+    this.fromEmail = process.env.RESEND_FROM_EMAIL || 'noreply@rentcred.ng';
     this.frontendUrl = process.env.FRONTEND_URL || 'http://localhost:3000';
   }
 

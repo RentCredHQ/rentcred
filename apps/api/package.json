@@ -57,7 +57,8 @@
     },
     "collectCoverageFrom": ["**/*.(t|j)s"],
     "coverageDirectory": "../coverage",
-    "testEnvironment": "node"
+    "testEnvironment": "node",
+    "testPathIgnorePatterns": ["/node_modules/", "/dist/"]
   },
   "devDependencies": {
     "@nestjs/cli": "^10.4.0",
