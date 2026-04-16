@@ -112,6 +112,17 @@ export class PaymentsService {
    * Verify a transaction after payment (called from frontend callback).
    */
   async verifyTransaction(reference: string, userId: string) {
+    // Ownership check: verify the transaction belongs to this user
+    const transaction = await this.prisma.transaction.findFirst({
+      where: {
+        OR: [{ id: reference }, { paystackRef: reference }],
+      },
+    });
+
+    if (transaction && transaction.agentId !== userId) {
+      throw new ForbiddenException('Transaction does not belong to this user');
+    }
+
     const response = await fetch(
       `https://api.paystack.co/transaction/verify/${encodeURIComponent(reference)}`,
       {
@@ -134,10 +145,10 @@ export class PaymentsService {
   /**
    * Handle Paystack webhook.
    */
-  async handleWebhook(payload: any, signature: string) {
-    // Verify webhook signature
+  async handleWebhook(rawBody: Buffer, signature: string) {
+    // Verify webhook signature using raw body for integrity
     const hash = createHmac('sha512', this.paystackSecretKey)
-      .update(JSON.stringify(payload))
+      .update(rawBody)
       .digest('hex');
 
     if (hash !== signature) {
@@ -145,6 +156,7 @@ export class PaymentsService {
       throw new ForbiddenException('Invalid signature');
     }
 
+    const payload = JSON.parse(rawBody.toString());
     const event = payload.event;
 
     if (event === 'charge.success') {
@@ -218,9 +230,9 @@ export class PaymentsService {
    * Get payment/transaction history.
    */
   async getHistory(userId: string, options?: { page?: number; limit?: number; type?: string }) {
-    const page = options?.page || 1;
-    const limit = options?.limit || 20;
-    const skip = (page - 1) * limit;
+    const safePage = Math.max(1, options?.page || 1);
+    const safeLimit = Math.min(Math.max(1, options?.limit || 20), 100);
+    const skip = (safePage - 1) * safeLimit;
 
     const where: any = { agentId: userId };
     if (options?.type) where.type = options.type;
@@ -230,14 +242,14 @@ export class PaymentsService {
         where,
         orderBy: { createdAt: 'desc' },
         skip,
-        take: limit,
+        take: safeLimit,
       }),
       this.prisma.transaction.count({ where }),
     ]);
 
     return {
       data: transactions,
-      pagination: { page, limit, total, totalPages: Math.ceil(total / limit) },
+      pagination: { page: safePage, limit: safeLimit, total, totalPages: Math.ceil(total / safeLimit) },
     };
   }
 

@@ -76,8 +76,9 @@ export class ReviewsService {
   }
 
   async findByAgent(agentId: string, options: { page: number; limit: number }) {
-    const { page, limit } = options;
-    const skip = (page - 1) * limit;
+    const safePage = Math.max(1, options.page || 1);
+    const safeLimit = Math.min(Math.max(1, options.limit || 20), 100);
+    const skip = (safePage - 1) * safeLimit;
 
     const where = {
       submission: { agentId },
@@ -89,7 +90,7 @@ export class ReviewsService {
         where,
         orderBy: { createdAt: 'desc' },
         skip,
-        take: limit,
+        take: safeLimit,
         include: {
           tenant: { select: { name: true } },
           submission: {
@@ -125,7 +126,7 @@ export class ReviewsService {
       averageRating: Math.round(averageRating * 10) / 10,
       totalReviews: total,
       data: sanitized,
-      pagination: { page, limit, total, totalPages: Math.ceil(total / limit) },
+      pagination: { page: safePage, limit: safeLimit, total, totalPages: Math.ceil(total / safeLimit) },
     };
   }
 

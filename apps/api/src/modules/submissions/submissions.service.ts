@@ -28,9 +28,17 @@ export class SubmissionsService {
   ) {}
 
   async create(agentId: string, dto: CreateSubmissionDto) {
+    if (!dto.consentObtained) {
+      throw new BadRequestException('Tenant consent is required before submission.');
+    }
+
     const agent = await this.prisma.agentProfile.findUnique({ where: { userId: agentId } });
     if (!agent || agent.creditBalance < 1) {
       throw new ForbiddenException('Insufficient credits. Please purchase a credit bundle.');
+    }
+
+    if (agent.kybStatus !== 'approved') {
+      throw new ForbiddenException('KYB verification must be approved before submitting.');
     }
 
     const [submission] = await this.prisma.$transaction([
@@ -99,9 +107,9 @@ export class SubmissionsService {
     status?: string;
     search?: string;
   }) {
-    const page = options.page || 1;
-    const limit = options.limit || 20;
-    const skip = (page - 1) * limit;
+    const safePage = Math.max(1, options.page || 1);
+    const safeLimit = Math.min(Math.max(1, options.limit || 20), 100);
+    const skip = (safePage - 1) * safeLimit;
 
     const where: any = {};
 
@@ -129,7 +137,7 @@ export class SubmissionsService {
         where,
         orderBy: { createdAt: 'desc' },
         skip,
-        take: limit,
+        take: safeLimit,
         include: {
           agent: { select: { id: true, name: true, email: true } },
           report: { select: { id: true, status: true } },
@@ -150,7 +158,7 @@ export class SubmissionsService {
 
     return {
       data: submissions,
-      pagination: { page, limit, total, totalPages: Math.ceil(total / limit) },
+      pagination: { page: safePage, limit: safeLimit, total, totalPages: Math.ceil(total / safeLimit) },
     };
   }
 

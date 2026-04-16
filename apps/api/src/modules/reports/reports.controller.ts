@@ -20,7 +20,8 @@ export class ReportsController {
 
   // --- Protected endpoints ---
   @ApiBearerAuth()
-  @UseGuards(JwtAuthGuard)
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @Roles('ops', 'admin')
   @Post('generate/:submissionId')
   @ApiOperation({ summary: 'Generate a report from a submission' })
   async generate(@Param('submissionId') submissionId: string, @Req() req: any) {

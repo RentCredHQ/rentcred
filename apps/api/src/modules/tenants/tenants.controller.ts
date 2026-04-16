@@ -1,6 +1,8 @@
 import { Controller, Get, Patch, Post, Body, Param, Query, Req, UseGuards } from '@nestjs/common';
 import { ApiTags, ApiBearerAuth, ApiOperation } from '@nestjs/swagger';
 import { JwtAuthGuard } from '../../common/guards/jwt-auth.guard';
+import { RolesGuard } from '../../common/guards/roles.guard';
+import { Roles } from '../../common/decorators/roles.decorator';
 import { TenantsService } from './tenants.service';
 import {
   UpdatePersonalInfoDto,
@@ -11,54 +13,62 @@ import {
 
 @ApiTags('Tenants')
 @ApiBearerAuth()
-@UseGuards(JwtAuthGuard)
+@UseGuards(JwtAuthGuard, RolesGuard)
 @Controller('tenants')
 export class TenantsController {
   constructor(private readonly tenantsService: TenantsService) {}
 
   @Get('profile')
+  @Roles('tenant', 'ops', 'admin')
   @ApiOperation({ summary: 'Get own tenant profile' })
   async getOwnProfile(@Req() req: any) {
     return this.tenantsService.getProfile(req.user.sub, req.user.sub, req.user.role);
   }
 
   @Get('profile/:userId')
+  @Roles('ops', 'admin')
   @ApiOperation({ summary: 'Get tenant profile by user ID (ops/admin)' })
   async getProfile(@Param('userId') userId: string, @Req() req: any) {
     return this.tenantsService.getProfile(userId, req.user.sub, req.user.role);
   }
 
   @Get('profile/status')
+  @Roles('tenant', 'ops', 'admin')
   @ApiOperation({ summary: 'Get profile completion status' })
   async getProfileStatus(@Req() req: any) {
     return this.tenantsService.getProfileStatus(req.user.sub);
   }
 
   @Patch('profile/personal')
+  @Roles('tenant')
   @ApiOperation({ summary: 'Step 1 — Update personal information' })
   async updatePersonalInfo(@Req() req: any, @Body() dto: UpdatePersonalInfoDto) {
     return this.tenantsService.updatePersonalInfo(req.user.sub, dto);
   }
 
   @Patch('profile/employment')
+  @Roles('tenant')
   @ApiOperation({ summary: 'Step 2 — Update employment information' })
   async updateEmployment(@Req() req: any, @Body() dto: UpdateEmploymentDto) {
     return this.tenantsService.updateEmployment(req.user.sub, dto);
   }
 
   @Patch('profile/references')
+  @Roles('tenant')
   @ApiOperation({ summary: 'Step 3 — Update references' })
   async updateReferences(@Req() req: any, @Body() dto: UpdateReferencesDto) {
     return this.tenantsService.updateReferences(req.user.sub, dto);
   }
 
   @Patch('profile/documents')
+  @Roles('tenant')
   @ApiOperation({ summary: 'Step 4 — Update document URLs' })
   async updateDocuments(@Req() req: any, @Body() dto: UpdateDocumentsDto) {
     return this.tenantsService.updateDocuments(req.user.sub, dto);
   }
 
   @Post('profile/consent')
+  @Roles('tenant')
   @ApiOperation({ summary: 'Record NDPR consent' })
   async recordConsent(@Req() req: any) {
     return this.tenantsService.recordConsent(req.user.sub);

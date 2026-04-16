@@ -75,7 +75,7 @@ describe('AuthService', () => {
     const registerDto = {
       name: 'Test User',
       email: 'test@example.com',
-      password: 'password123',
+      password: 'Password1!',
       role: 'agent' as const,
     };
 
@@ -142,7 +142,7 @@ describe('AuthService', () => {
   describe('login', () => {
     const loginDto = {
       email: 'test@example.com',
-      password: 'password123',
+      password: 'Password1!',
     };
 
     const mockUser = {
@@ -257,7 +257,7 @@ describe('AuthService', () => {
 
   describe('resetPassword', () => {
     const token = 'reset-token';
-    const newPassword = 'newpassword123';
+    const newPassword = 'NewPass1!';
     const mockUser = {
       id: '1',
       resetToken: token,

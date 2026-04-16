@@ -1,4 +1,4 @@
-import { IsEmail, IsEnum, IsString, MinLength } from 'class-validator';
+import { IsEmail, IsEnum, IsString, Matches, MinLength } from 'class-validator';
 import { ApiProperty } from '@nestjs/swagger';
 
 export class RegisterDto {
@@ -13,6 +13,9 @@ export class RegisterDto {
   @ApiProperty()
   @IsString()
   @MinLength(8)
+  @Matches(/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&#]).{8,}$/, {
+    message: 'Password must contain uppercase, lowercase, number, and special character',
+  })
   password: string;
 
   @ApiProperty({ enum: ['agent', 'tenant'] })

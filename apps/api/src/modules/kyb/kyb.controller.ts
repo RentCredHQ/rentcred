@@ -40,6 +40,8 @@ export class KybController {
   }
 
   @Get('applications/:id')
+  @UseGuards(RolesGuard)
+  @Roles('agent', 'ops', 'admin')
   @ApiOperation({ summary: 'Get a single KYB application' })
   async getApplication(@Param('id') id: string) {
     return this.kybService.getApplication(id);

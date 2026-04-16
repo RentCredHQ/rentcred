@@ -1,6 +1,8 @@
 import { Controller, Get, Post, Patch, Body, Param, Query, Req, UseGuards } from '@nestjs/common';
 import { ApiTags, ApiBearerAuth, ApiOperation } from '@nestjs/swagger';
 import { JwtAuthGuard } from '../../common/guards/jwt-auth.guard';
+import { RolesGuard } from '../../common/guards/roles.guard';
+import { Roles } from '../../common/decorators/roles.decorator';
 import { ReviewsService } from './reviews.service';
 import { CreateReviewDto, UpdateReviewStatusDto } from './dto/review.dto';
 
@@ -48,7 +50,8 @@ export class ReviewsController {
 
   @Patch(':id/status')
   @ApiBearerAuth()
-  @UseGuards(JwtAuthGuard)
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @Roles('ops', 'admin')
   @ApiOperation({ summary: 'Flag or remove a review (ops/admin)' })
   async updateStatus(
     @Param('id') id: string,

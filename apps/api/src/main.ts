@@ -44,8 +44,8 @@ async function bootstrap() {
 
   app.enableCors({
     origin: (origin, callback) => {
-      // Allow requests with no origin (like mobile apps or curl requests)
-      if (!origin) return callback(null, true);
+      // Reject requests with no origin
+      if (!origin) return callback(null, false);
 
       if (allowedOrigins.includes(origin)) {
         callback(null, true);
@@ -93,8 +93,8 @@ async function bootstrap() {
 
   const port = process.env.PORT || 4000;
   await app.listen(port);
-  console.log(`RentCred API running on http://localhost:${port}`);
-  console.log(`API Docs: http://localhost:${port}/api/docs`);
+  logger.log(`RentCred API running on http://localhost:${port}`);
+  logger.log(`API Docs: http://localhost:${port}/api/docs`);
 }
 
 bootstrap();

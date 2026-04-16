@@ -18,19 +18,19 @@ function resendEmail() {
       <strong class="text-foreground">your registered email</strong>
     </p>
 
-    <button
-      class="w-full py-3 bg-[#FF8400] text-[#0D0D0D] font-sans font-semibold text-base hover:opacity-90 transition-opacity mb-4"
-      @click="window.open('https://mail.google.com', '_blank')"
+    <a
+      href="mailto:"
+      class="w-full py-3 bg-[#FF8400] text-[#0D0D0D] font-sans font-semibold text-base hover:opacity-90 transition-opacity mb-4 block text-center"
     >
       Open Email App
-    </button>
+    </a>
 
     <button
       class="text-sm font-sans text-[#FF8400] hover:underline mb-4 block mx-auto"
       :class="{ 'opacity-50 pointer-events-none': resent }"
       @click="resendEmail"
     >
-      {{ resent ? 'Verification email resent!' : 'Resend verification email' }}
+      {{ resent ? 'Verification email resent!' : 'Resend verification email (placeholder)' }}
     </button>
 
     <NuxtLink to="/auth/login" class="text-sm font-sans text-muted-foreground hover:text-foreground transition-colors block">

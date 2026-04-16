@@ -171,7 +171,7 @@ model Submission {
   createdAt       DateTime @default(now()) @map("created_at")
   updatedAt       DateTime @updatedAt @map("updated_at")
 
-  agent           User               @relation("AgentSubmissions", fields: [agentId], references: [id])
+  agent           User               @relation("AgentSubmissions", fields: [agentId], references: [id], onDelete: Restrict)
   verificationChecklist VerificationChecklist?
   fieldAssignments FieldAssignment[]
   fieldVisits     FieldVisit[]
@@ -179,6 +179,9 @@ model Submission {
   disputes        Dispute[]
   review          Review?
 
+  @@index([agentId])
+  @@index([status])
+  @@index([tenantEmail])
   @@map("submissions")
 }
 
@@ -216,9 +219,11 @@ model FieldAssignment {
   completedAt     DateTime? @map("completed_at")
   createdAt       DateTime  @default(now()) @map("created_at")
 
-  submission Submission @relation(fields: [submissionId], references: [id])
-  fieldAgent User       @relation("AssignedFieldAgent", fields: [fieldAgentId], references: [id])
+  submission Submission @relation(fields: [submissionId], references: [id], onDelete: Cascade)
+  fieldAgent User       @relation("AssignedFieldAgent", fields: [fieldAgentId], references: [id], onDelete: Restrict)
 
+  @@index([fieldAgentId])
+  @@index([submissionId])
   @@map("field_assignments")
 }
 
@@ -237,8 +242,8 @@ model FieldVisit {
 
   createdAt       DateTime @default(now()) @map("created_at")
 
-  submission Submission @relation(fields: [submissionId], references: [id])
-  fieldAgent User       @relation("FieldAgentVisits", fields: [fieldAgentId], references: [id])
+  submission Submission @relation(fields: [submissionId], references: [id], onDelete: Cascade)
+  fieldAgent User       @relation("FieldAgentVisits", fields: [fieldAgentId], references: [id], onDelete: Restrict)
 
   @@map("field_visits")
 }
@@ -259,7 +264,7 @@ model Report {
   createdAt       DateTime @default(now()) @map("created_at")
   updatedAt       DateTime @updatedAt @map("updated_at")
 
-  submission Submission @relation(fields: [submissionId], references: [id])
+  submission Submission @relation(fields: [submissionId], references: [id], onDelete: Cascade)
 
   @@map("reports")
 }
@@ -290,6 +295,8 @@ model Transaction {
 
   agent AgentProfile @relation(fields: [agentId], references: [userId])
 
+  @@index([agentId])
+  @@index([status])
   @@map("transactions")
 }
 
@@ -332,6 +339,8 @@ model Notification {
 
   user User @relation(fields: [userId], references: [id], onDelete: Cascade)
 
+  @@index([userId])
+  @@index([readAt])
   @@map("notifications")
 }
 
@@ -352,9 +361,11 @@ model Dispute {
   createdAt     DateTime @default(now()) @map("created_at")
   updatedAt     DateTime @updatedAt @map("updated_at")
 
-  submission Submission @relation(fields: [submissionId], references: [id])
-  raisedBy   User       @relation("DisputeRaisedBy", fields: [raisedById], references: [id])
+  submission Submission @relation(fields: [submissionId], references: [id], onDelete: Cascade)
+  raisedBy   User       @relation("DisputeRaisedBy", fields: [raisedById], references: [id], onDelete: Restrict)
 
+  @@index([submissionId])
+  @@index([raisedById])
   @@map("disputes")
 }
 
@@ -364,7 +375,7 @@ model Dispute {
 
 model AuditLog {
   id         String   @id @default(cuid())
-  userId     String   @map("user_id")
+  userId     String?  @map("user_id")
   action     String
   entityType String   @map("entity_type")
   entityId   String   @map("entity_id")
@@ -372,8 +383,10 @@ model AuditLog {
   ipAddress  String?  @map("ip_address")
   createdAt  DateTime @default(now()) @map("created_at")
 
-  user User @relation(fields: [userId], references: [id])
+  user User? @relation(fields: [userId], references: [id], onDelete: SetNull)
 
+  @@index([userId])
+  @@index([createdAt])
   @@map("audit_logs")
 }
 
@@ -399,8 +412,9 @@ model Review {
   createdAt       DateTime @default(now()) @map("created_at")
   updatedAt       DateTime @updatedAt @map("updated_at")
 
-  submission Submission @relation(fields: [submissionId], references: [id])
-  tenant     User       @relation("TenantReviews", fields: [tenantId], references: [id])
+  submission Submission @relation(fields: [submissionId], references: [id], onDelete: Cascade)
+  tenant     User       @relation("TenantReviews", fields: [tenantId], references: [id], onDelete: Restrict)
 
+  @@index([tenantId])
   @@map("reviews")
 }

@@ -68,9 +68,9 @@ export class NotificationsService {
    * List notifications for a user with pagination and unread filter.
    */
   async findAll(userId: string, options?: { page?: number; limit?: number; unreadOnly?: boolean }) {
-    const page = options?.page || 1;
-    const limit = options?.limit || 20;
-    const skip = (page - 1) * limit;
+    const safePage = Math.max(1, options?.page || 1);
+    const safeLimit = Math.min(Math.max(1, options?.limit || 20), 100);
+    const skip = (safePage - 1) * safeLimit;
 
     const where: any = { userId };
     if (options?.unreadOnly) {
@@ -82,7 +82,7 @@ export class NotificationsService {
         where,
         orderBy: { createdAt: 'desc' },
         skip,
-        take: limit,
+        take: safeLimit,
       }),
       this.prisma.notification.count({ where }),
       this.prisma.notification.count({ where: { userId, readAt: null } }),
@@ -92,10 +92,10 @@ export class NotificationsService {
       data: notifications,
       unreadCount,
       pagination: {
-        page,
-        limit,
+        page: safePage,
+        limit: safeLimit,
         total,
-        totalPages: Math.ceil(total / limit),
+        totalPages: Math.ceil(total / safeLimit),
       },
     };
   }

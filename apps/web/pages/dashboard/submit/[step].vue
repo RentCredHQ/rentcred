@@ -441,7 +441,7 @@ async function handleSubmit() {
             </button>
             <span class="font-sans text-sm font-medium text-foreground">Use bundle credit</span>
           </div>
-          <span class="font-sans text-[13px] text-muted-foreground">6 credits remaining</span>
+          <span class="font-sans text-[13px] text-muted-foreground">{{ useAuthStore().user?.creditBalance ?? 0 }} credits remaining</span>
         </div>
 
         <div class="flex flex-col-reverse sm:flex-row items-stretch sm:items-center sm:justify-between gap-3 pt-2">

@@ -116,9 +116,9 @@ export class ReportsService {
     limit?: number;
     status?: string;
   }) {
-    const page = options.page || 1;
-    const limit = options.limit || 20;
-    const skip = (page - 1) * limit;
+    const safePage = Math.max(1, options.page || 1);
+    const safeLimit = Math.min(Math.max(1, options.limit || 20), 100);
+    const skip = (safePage - 1) * safeLimit;
 
     const where: any = {};
 
@@ -136,7 +136,7 @@ export class ReportsService {
         where,
         orderBy: { createdAt: 'desc' },
         skip,
-        take: limit,
+        take: safeLimit,
         include: {
           submission: {
             select: {
@@ -154,7 +154,7 @@ export class ReportsService {
 
     return {
       data: reports,
-      pagination: { page, limit, total, totalPages: Math.ceil(total / limit) },
+      pagination: { page: safePage, limit: safeLimit, total, totalPages: Math.ceil(total / safeLimit) },
     };
   }
 
@@ -210,6 +210,10 @@ export class ReportsService {
     });
 
     if (!report) throw new NotFoundException('Report not found');
+
+    if (report.status !== 'draft' && report.status !== 'pending_approval') {
+      throw new BadRequestException('Report has already been reviewed');
+    }
 
     if (!['approved', 'rejected'].includes(dto.status)) {
       throw new BadRequestException('Status must be approved or rejected');

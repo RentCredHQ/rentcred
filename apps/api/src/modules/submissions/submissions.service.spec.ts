@@ -110,7 +110,7 @@ describe('SubmissionsService', () => {
       consentObtained: true,
     };
 
-    const mockAgent = { userId: agentId, creditBalance: 5 };
+    const mockAgent = { userId: agentId, creditBalance: 5, kybStatus: 'approved' };
     const mockSubmission = { id: 'sub-1', ...createDto, agentId, status: 'pending' };
     const mockUpdatedAgent = { ...mockAgent, creditBalance: 4 };
     const mockTransaction = { id: 'txn-1', agentId, type: 'deduction', amount: 1 };
@@ -149,6 +149,7 @@ describe('SubmissionsService', () => {
       mockPrismaService.agentProfile.findUnique.mockResolvedValue({
         userId: agentId,
         creditBalance: 0,
+        kybStatus: 'approved',
       });
 
       await expect(service.create(agentId, createDto as any)).rejects.toThrow(ForbiddenException);
@@ -196,6 +197,15 @@ describe('SubmissionsService', () => {
       expect(mockPrismaService.verificationChecklist.create).toHaveBeenCalledWith({
         data: { submissionId: mockSubmission.id },
       });
+    });
+
+    it('should reject submission if KYB is not approved', async () => {
+      mockPrismaService.agentProfile.findUnique.mockResolvedValue({ creditBalance: 5, kybStatus: 'pending' });
+      await expect(service.create(agentId, createDto as any)).rejects.toThrow(ForbiddenException);
+    });
+
+    it('should reject submission if consent not obtained', async () => {
+      await expect(service.create(agentId, { ...createDto, consentObtained: false } as any)).rejects.toThrow(BadRequestException);
     });
   });
 

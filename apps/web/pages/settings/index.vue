@@ -66,6 +66,48 @@ function toggleNotification(id: string) {
   const n = notifications.value.find(n => n.id === id)
   if (n) n.enabled = !n.enabled
 }
+
+const passwordLoading = ref(false)
+const passwordError = ref('')
+const passwordSuccess = ref('')
+
+async function handlePasswordChange() {
+  passwordError.value = ''
+  passwordSuccess.value = ''
+
+  if (!passwords.current) {
+    passwordError.value = 'Please enter your current password.'
+    return
+  }
+  if (passwords.new.length < 8) {
+    passwordError.value = 'New password must be at least 8 characters.'
+    return
+  }
+  if (passwords.new !== passwords.confirm) {
+    passwordError.value = 'New passwords do not match.'
+    return
+  }
+
+  passwordLoading.value = true
+  try {
+    const { api } = useApi()
+    await api('/auth/change-password', {
+      method: 'POST',
+      body: {
+        currentPassword: passwords.current,
+        newPassword: passwords.new,
+      },
+    })
+    passwordSuccess.value = 'Password updated successfully.'
+    passwords.current = ''
+    passwords.new = ''
+    passwords.confirm = ''
+  } catch (e: any) {
+    passwordError.value = e.data?.message || e.message || 'Failed to update password. Please try again.'
+  } finally {
+    passwordLoading.value = false
+  }
+}
 </script>
 
 <template>
@@ -130,7 +172,15 @@ function toggleNotification(id: string) {
             </div>
           </div>
 
-          <button class="w-fit px-5 py-2.5 bg-foreground text-white font-mono text-[13px] font-medium hover:opacity-90 transition-opacity">Update Password</button>
+          <div v-if="passwordError" class="text-red-600 text-sm font-sans">{{ passwordError }}</div>
+          <div v-if="passwordSuccess" class="text-green-700 text-sm font-sans">{{ passwordSuccess }}</div>
+          <button
+            class="w-fit px-5 py-2.5 bg-foreground text-white font-mono text-[13px] font-medium hover:opacity-90 transition-opacity disabled:opacity-50"
+            :disabled="passwordLoading"
+            @click="handlePasswordChange"
+          >
+            {{ passwordLoading ? 'Updating...' : 'Update Password' }}
+          </button>
         </div>
       </div>
 

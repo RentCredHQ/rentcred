@@ -87,9 +87,9 @@ export class DisputesService {
     limit?: number;
     status?: string;
   }) {
-    const page = options.page || 1;
-    const limit = options.limit || 20;
-    const skip = (page - 1) * limit;
+    const safePage = Math.max(1, options.page || 1);
+    const safeLimit = Math.min(Math.max(1, options.limit || 20), 100);
+    const skip = (safePage - 1) * safeLimit;
 
     const where: any = {};
 
@@ -107,7 +107,7 @@ export class DisputesService {
         where,
         orderBy: { createdAt: 'desc' },
         skip,
-        take: limit,
+        take: safeLimit,
         include: {
           submission: {
             select: {
@@ -126,7 +126,7 @@ export class DisputesService {
 
     return {
       data: disputes,
-      pagination: { page, limit, total, totalPages: Math.ceil(total / limit) },
+      pagination: { page: safePage, limit: safeLimit, total, totalPages: Math.ceil(total / safeLimit) },
     };
   }
 
@@ -171,6 +171,10 @@ export class DisputesService {
       },
     });
     if (!dispute) throw new NotFoundException('Dispute not found');
+
+    if (dispute.status === 'resolved' || dispute.status === 'closed') {
+      throw new BadRequestException('Dispute has already been resolved');
+    }
 
     if (!['under_review', 'resolved', 'closed'].includes(dto.status)) {
       throw new BadRequestException('Invalid status');

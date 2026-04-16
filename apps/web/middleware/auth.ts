@@ -2,10 +2,15 @@ export default defineNuxtRouteMiddleware((to) => {
   const authStore = useAuthStore()
 
   // Public routes that don't require auth
-  const publicRoutes = ['/', '/for-landlords', '/about', '/contact', '/privacy', '/terms', '/ndpr']
+  const publicRoutes = ['/', '/for-landlords', '/about', '/contact', '/privacy', '/terms', '/ndpr', '/careers', '/status']
   const authRoutes = ['/auth/login', '/auth/register', '/auth/forgot-password', '/auth/reset-password', '/auth/verify-email']
 
   if (publicRoutes.includes(to.path) || authRoutes.includes(to.path)) {
+    return
+  }
+
+  // Prefix-based public route matching
+  if (to.path.startsWith('/careers') || to.path.startsWith('/status')) {
     return
   }
 
@@ -15,7 +20,7 @@ export default defineNuxtRouteMiddleware((to) => {
   }
 
   // Shared report routes are public
-  if (to.path.startsWith('/report/')) {
+  if (to.path.startsWith('/reports/shared/')) {
     return
   }
 
@@ -24,6 +29,14 @@ export default defineNuxtRouteMiddleware((to) => {
   }
 
   // Role-based route protection
+  if (to.path.startsWith('/field-agent') && authStore.user?.role !== 'field_agent') {
+    return navigateTo('/auth/login')
+  }
+
+  if (to.path.startsWith('/settings') && !authStore.isAgent) {
+    return navigateTo('/auth/login')
+  }
+
   if (to.path.startsWith('/dashboard') && !authStore.isAgent) {
     return navigateTo('/auth/login')
   }

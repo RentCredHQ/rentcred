@@ -4,8 +4,21 @@ import { SUBMISSION_STATUS_LABELS } from '@rentcred/shared'
 definePageMeta({ layout: 'dashboard' })
 useSeoMeta({ title: 'Dashboard — RentCred' })
 
+const authStore = useAuthStore()
 const { getDashboardStats } = useAgents()
 const { getSubmissions } = useSubmissions()
+
+const greetingName = computed(() => {
+  const name = authStore.user?.name || ''
+  return name.split(' ')[0] || 'there'
+})
+
+const greetingTime = computed(() => {
+  const hour = new Date().getHours()
+  if (hour < 12) return 'Good morning'
+  if (hour < 17) return 'Good afternoon'
+  return 'Good evening'
+})
 
 const loading = ref(true)
 
@@ -100,7 +113,7 @@ onMounted(async () => {
     <template v-else>
     <!-- Mobile Greeting (shown on mobile only) -->
     <div class="lg:hidden">
-      <h1 class="font-mono text-xl font-bold text-foreground">Good morning, Adebayo</h1>
+      <h1 class="font-mono text-xl font-bold text-foreground">{{ greetingTime }}, {{ greetingName }}</h1>
       <p class="font-sans text-[13px] text-muted-foreground mt-1">Here's your overview for today</p>
     </div>
 
@@ -118,7 +131,7 @@ onMounted(async () => {
         </div>
         <!-- Progress Bar -->
         <div class="w-full h-1.5 bg-[#E7E8E5] rounded-full">
-          <div class="h-1.5 bg-primary rounded-full" :style="{ width: `${(stats.bundleCredits.value / stats.bundleCredits.total) * 100}%` }" />
+          <div class="h-1.5 bg-primary rounded-full" :style="{ width: `${stats.bundleCredits.total > 0 ? (stats.bundleCredits.value / stats.bundleCredits.total) * 100 : 0}%` }" />
         </div>
       </div>
 

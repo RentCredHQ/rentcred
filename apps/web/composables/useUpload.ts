@@ -23,6 +23,9 @@ export function useUpload() {
   }
 
   async function uploadFile(file: File, folder: string): Promise<UploadResult> {
+    // Sanitize folder name to prevent path traversal
+    folder = folder.replace(/[^a-zA-Z0-9_-]/g, '')
+
     const validationError = validateFile(file)
     if (validationError) {
       throw new Error(validationError)

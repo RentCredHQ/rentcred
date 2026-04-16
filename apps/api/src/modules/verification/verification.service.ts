@@ -1,4 +1,4 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import { Injectable, NotFoundException, BadRequestException } from '@nestjs/common';
 import { PrismaService } from '../../prisma/prisma.service';
 import { NotificationsService } from '../notifications/notifications.service';
 import { AuditService } from '../audit/audit.service';
@@ -49,6 +49,10 @@ export class VerificationService {
     });
 
     if (!checklist) throw new NotFoundException('Checklist not found');
+
+    if (checklist.completedAt) {
+      throw new BadRequestException('Checklist has been finalized and cannot be modified');
+    }
 
     const updateData: any = {};
     if (dto.identityVerified !== undefined) updateData.identityVerified = dto.identityVerified;

@@ -48,9 +48,10 @@ export class OpsService {
   }
 
   async getRecentActivity(limit = 10) {
+    const safeLimit = Math.min(Math.max(1, limit), 100);
     return this.prisma.auditLog.findMany({
       orderBy: { createdAt: 'desc' },
-      take: limit,
+      take: safeLimit,
       include: {
         user: { select: { id: true, name: true, role: true } },
       },
@@ -63,9 +64,9 @@ export class OpsService {
     role?: string;
     search?: string;
   }) {
-    const page = options?.page || 1;
-    const limit = options?.limit || 20;
-    const skip = (page - 1) * limit;
+    const safePage = Math.max(1, options?.page || 1);
+    const safeLimit = Math.min(Math.max(1, options?.limit || 20), 100);
+    const skip = (safePage - 1) * safeLimit;
 
     const where: any = {};
     if (options?.role) where.role = options.role;
@@ -81,7 +82,7 @@ export class OpsService {
         where,
         orderBy: { createdAt: 'desc' },
         skip,
-        take: limit,
+        take: safeLimit,
         select: {
           id: true,
           name: true,
@@ -100,7 +101,7 @@ export class OpsService {
 
     return {
       data: users,
-      pagination: { page, limit, total, totalPages: Math.ceil(total / limit) },
+      pagination: { page: safePage, limit: safeLimit, total, totalPages: Math.ceil(total / safeLimit) },
     };
   }
 }

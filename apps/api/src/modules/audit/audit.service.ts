@@ -48,9 +48,9 @@ export class AuditService {
     from?: string;
     to?: string;
   }) {
-    const page = filters.page || 1;
-    const limit = filters.limit || 50;
-    const skip = (page - 1) * limit;
+    const safePage = Math.max(1, filters.page || 1);
+    const safeLimit = Math.min(Math.max(1, filters.limit || 50), 100);
+    const skip = (safePage - 1) * safeLimit;
 
     const where: any = {};
     if (filters.userId) where.userId = filters.userId;
@@ -67,7 +67,7 @@ export class AuditService {
         where,
         orderBy: { createdAt: 'desc' },
         skip,
-        take: limit,
+        take: safeLimit,
         include: {
           user: { select: { id: true, name: true, email: true, role: true } },
         },
@@ -78,10 +78,10 @@ export class AuditService {
     return {
       data: entries,
       pagination: {
-        page,
-        limit,
+        page: safePage,
+        limit: safeLimit,
         total,
-        totalPages: Math.ceil(total / limit),
+        totalPages: Math.ceil(total / safeLimit),
       },
     };
   }

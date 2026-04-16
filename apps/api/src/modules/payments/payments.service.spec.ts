@@ -362,8 +362,8 @@ describe('PaymentsService', () => {
 
     it('should process payment with valid signature', async () => {
       const secret = 'sk_test_secret_key';
-      const body = JSON.stringify(payload);
-      const hash = createHmac('sha512', secret).update(body).digest('hex');
+      const rawBody = Buffer.from(JSON.stringify(payload));
+      const hash = createHmac('sha512', secret).update(rawBody).digest('hex');
 
       const mockTransaction = {
         id: 'txn-1',
@@ -377,7 +377,7 @@ describe('PaymentsService', () => {
       mockNotificationsService.emit.mockResolvedValue({});
       mockAuditService.log.mockResolvedValue({});
 
-      const result = await service.handleWebhook(payload, hash);
+      const result = await service.handleWebhook(rawBody, hash);
 
       expect(result).toEqual({ received: true });
       expect(mockPrismaService.transaction.findFirst).toHaveBeenCalled();
@@ -398,7 +398,8 @@ describe('PaymentsService', () => {
     });
 
     it('should throw ForbiddenException with invalid signature', async () => {
-      await expect(service.handleWebhook(payload, 'invalid-sig')).rejects.toThrow(
+      const rawBody = Buffer.from(JSON.stringify(payload));
+      await expect(service.handleWebhook(rawBody, 'invalid-sig')).rejects.toThrow(
         ForbiddenException,
       );
       expect(mockPrismaService.transaction.findFirst).not.toHaveBeenCalled();
@@ -406,12 +407,12 @@ describe('PaymentsService', () => {
 
     it('should skip processing when no pending transaction found', async () => {
       const secret = 'sk_test_secret_key';
-      const body = JSON.stringify(payload);
-      const hash = createHmac('sha512', secret).update(body).digest('hex');
+      const rawBody = Buffer.from(JSON.stringify(payload));
+      const hash = createHmac('sha512', secret).update(rawBody).digest('hex');
 
       mockPrismaService.transaction.findFirst.mockResolvedValue(null);
 
-      const result = await service.handleWebhook(payload, hash);
+      const result = await service.handleWebhook(rawBody, hash);
 
       expect(result).toEqual({ received: true });
       expect(mockPrismaService.$transaction).not.toHaveBeenCalled();

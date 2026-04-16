@@ -12,6 +12,10 @@ import { MailService } from '../mail/mail.service';
 import { RegisterDto } from './dto/register.dto';
 import { LoginDto } from './dto/login.dto';
 
+const BCRYPT_ROUNDS = 12;
+const EMAIL_VERIFY_EXPIRY_MS = 24 * 60 * 60 * 1000; // 24 hours
+const RESET_TOKEN_EXPIRY_MS = 60 * 60 * 1000; // 1 hour
+
 @Injectable()
 export class AuthService {
   constructor(
@@ -26,9 +30,9 @@ export class AuthService {
       throw new ConflictException('Email already registered');
     }
 
-    const hashedPassword = await bcrypt.hash(dto.password, 12);
+    const hashedPassword = await bcrypt.hash(dto.password, BCRYPT_ROUNDS);
     const emailVerifyToken = randomUUID();
-    const emailVerifyExpires = new Date(Date.now() + 24 * 60 * 60 * 1000); // 24h
+    const emailVerifyExpires = new Date(Date.now() + EMAIL_VERIFY_EXPIRY_MS);
 
     const user = await this.prisma.user.create({
       data: {
@@ -156,7 +160,7 @@ export class AuthService {
     if (!user) return response;
 
     const resetToken = randomUUID();
-    const resetTokenExpires = new Date(Date.now() + 60 * 60 * 1000); // 1 hour
+    const resetTokenExpires = new Date(Date.now() + RESET_TOKEN_EXPIRY_MS);
 
     await this.prisma.user.update({
       where: { id: user.id },
@@ -174,8 +178,8 @@ export class AuthService {
       throw new BadRequestException('Token and new password are required');
     }
 
-    if (newPassword.length < 8) {
-      throw new BadRequestException('Password must be at least 8 characters');
+    if (!/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&#]).{8,}$/.test(newPassword)) {
+      throw new BadRequestException('Password must be at least 8 characters with uppercase, lowercase, number, and special character');
     }
 
     const user = await this.prisma.user.findFirst({
@@ -189,7 +193,7 @@ export class AuthService {
       throw new BadRequestException('Invalid or expired reset token');
     }
 
-    const hashedPassword = await bcrypt.hash(newPassword, 12);
+    const hashedPassword = await bcrypt.hash(newPassword, BCRYPT_ROUNDS);
 
     await this.prisma.user.update({
       where: { id: user.id },

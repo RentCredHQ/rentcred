@@ -61,8 +61,14 @@ export class UploadService {
       );
     }
 
+    const ALLOWED_FOLDERS = ['property-images', 'kyb-documents', 'field-visit-photos', 'profile-photos', 'documents'];
+    const safeFolder = folder.replace(/[^a-zA-Z0-9_-]/g, '');
+    if (!ALLOWED_FOLDERS.includes(safeFolder)) {
+      throw new BadRequestException(`Invalid upload folder. Allowed: ${ALLOWED_FOLDERS.join(', ')}`);
+    }
+
     const ext = filename.split('.').pop() || 'bin';
-    const key = `${folder}/${randomUUID()}.${ext}`;
+    const key = `${safeFolder}/${randomUUID()}.${ext}`;
 
     const command = new PutObjectCommand({
       Bucket: this.bucket,

@@ -77,9 +77,9 @@ export class PaymentsController {
   @Post('webhook')
   @ApiOperation({ summary: 'Paystack webhook (signature verified)' })
   async handleWebhook(
-    @Body() payload: any,
+    @Req() req: RawBodyRequest<Request>,
     @Headers('x-paystack-signature') signature: string,
   ) {
-    return this.paymentsService.handleWebhook(payload, signature);
+    return this.paymentsService.handleWebhook(req.rawBody, signature);
   }
 }

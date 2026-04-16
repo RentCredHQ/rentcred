@@ -32,14 +32,6 @@ export class FieldAgentsController {
     });
   }
 
-  @Get(':id')
-  @UseGuards(RolesGuard)
-  @Roles('ops', 'admin')
-  @ApiOperation({ summary: 'Get single field agent with stats (ops/admin only)' })
-  async findOne(@Param('id') id: string) {
-    return this.fieldAgentsService.findOne(id);
-  }
-
   @Get('dashboard/stats')
   @UseGuards(RolesGuard)
   @Roles('field_agent')
@@ -66,6 +58,14 @@ export class FieldAgentsController {
       limit: limit ? parseInt(limit, 10) : undefined,
       status,
     });
+  }
+
+  @Get(':id')
+  @UseGuards(RolesGuard)
+  @Roles('ops', 'admin')
+  @ApiOperation({ summary: 'Get single field agent with stats (ops/admin only)' })
+  async findOne(@Param('id') id: string) {
+    return this.fieldAgentsService.findOne(id);
   }
 
   @Patch('assignments/:id/status')

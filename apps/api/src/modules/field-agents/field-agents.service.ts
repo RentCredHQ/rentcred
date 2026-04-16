@@ -21,9 +21,9 @@ export class FieldAgentsService {
    * List all field agents with their assignment counts.
    */
   async findAll(options?: { page?: number; limit?: number; search?: string }) {
-    const page = options?.page || 1;
-    const limit = options?.limit || 20;
-    const skip = (page - 1) * limit;
+    const safePage = Math.max(1, options?.page || 1);
+    const safeLimit = Math.min(Math.max(1, options?.limit || 20), 100);
+    const skip = (safePage - 1) * safeLimit;
 
     const where: any = { role: 'field_agent' };
 
@@ -40,7 +40,7 @@ export class FieldAgentsService {
         where,
         orderBy: { name: 'asc' },
         skip,
-        take: limit,
+        take: safeLimit,
         select: {
           id: true,
           name: true,
@@ -68,7 +68,7 @@ export class FieldAgentsService {
 
     return {
       data,
-      pagination: { page, limit, total, totalPages: Math.ceil(total / limit) },
+      pagination: { page: safePage, limit: safeLimit, total, totalPages: Math.ceil(total / safeLimit) },
     };
   }
 
@@ -98,7 +98,7 @@ export class FieldAgentsService {
       },
     });
 
-    if (!agent || !agent) throw new NotFoundException('Field agent not found');
+    if (!agent) throw new NotFoundException('Field agent not found');
 
     const [active, completed, total] = await Promise.all([
       this.prisma.fieldAssignment.count({ where: { fieldAgentId: id, status: { not: 'completed' } } }),
@@ -121,9 +121,9 @@ export class FieldAgentsService {
     fieldAgentId: string,
     options?: { page?: number; limit?: number; status?: string },
   ) {
-    const page = options?.page || 1;
-    const limit = options?.limit || 20;
-    const skip = (page - 1) * limit;
+    const safePage = Math.max(1, options?.page || 1);
+    const safeLimit = Math.min(Math.max(1, options?.limit || 20), 100);
+    const skip = (safePage - 1) * safeLimit;
 
     const where: any = { fieldAgentId };
     if (options?.status) where.status = options.status;
@@ -133,7 +133,7 @@ export class FieldAgentsService {
         where,
         orderBy: { createdAt: 'desc' },
         skip,
-        take: limit,
+        take: safeLimit,
         include: {
           submission: {
             select: {
@@ -151,7 +151,7 @@ export class FieldAgentsService {
 
     return {
       data: assignments,
-      pagination: { page, limit, total, totalPages: Math.ceil(total / limit) },
+      pagination: { page: safePage, limit: safeLimit, total, totalPages: Math.ceil(total / safeLimit) },
     };
   }
 

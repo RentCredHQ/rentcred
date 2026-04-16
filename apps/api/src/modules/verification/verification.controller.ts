@@ -14,6 +14,8 @@ export class VerificationController {
   constructor(private readonly verificationService: VerificationService) {}
 
   @Get('checklist/:submissionId')
+  @UseGuards(RolesGuard)
+  @Roles('agent', 'ops', 'admin')
   @ApiOperation({ summary: 'Get verification checklist for a submission' })
   async getChecklist(@Param('submissionId') submissionId: string) {
     return this.verificationService.getChecklist(submissionId);
