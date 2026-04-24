@@ -49,7 +49,7 @@ export const useAuthStore = defineStore('auth', {
       }
     },
 
-    async register(data: { name: string; email: string; password: string; role: 'agent' | 'tenant' }) {
+    async register(data: { name: string; email: string; phone?: string; password: string; role: 'agent' | 'tenant' }) {
       this.isLoading = true
       try {
         const { $api } = useNuxtApp()

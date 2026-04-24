@@ -21,8 +21,9 @@ async function handleRegister() {
     return
   }
 
-  if (form.password.length < 8) {
-    error.value = 'Password must be at least 8 characters'
+  const passwordRegex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&#]).{8,}$/
+  if (!passwordRegex.test(form.password)) {
+    error.value = 'Password must be at least 8 characters with uppercase, lowercase, number, and special character (@$!%*?&#)'
     return
   }
 
@@ -30,7 +31,7 @@ async function handleRegister() {
     await authStore.register({
       name: form.name,
       email: form.email,
-      phone: form.phone,
+      phone: form.phone || undefined,
       password: form.password,
       role: 'agent',
     })
@@ -89,7 +90,7 @@ async function handleRegister() {
         <input
           v-model="form.password"
           type="password"
-          placeholder="Min. 8 characters"
+          placeholder="Uppercase, lowercase, number, special char"
           required
           class="w-full px-4 py-3 border border-border bg-background text-foreground font-sans text-sm placeholder:text-muted-foreground focus:outline-none focus:border-[#FF8400] transition-colors"
         />
