@@ -11,6 +11,7 @@ const form = reactive({
   password: '',
   agreeTerms: false,
 })
+const showPassword = ref(false)
 const error = ref('')
 
 async function handleRegister() {
@@ -87,13 +88,22 @@ async function handleRegister() {
 
       <div>
         <label class="block text-sm font-sans font-medium text-foreground mb-2">Password</label>
-        <input
-          v-model="form.password"
-          type="password"
-          placeholder="Uppercase, lowercase, number, special char"
-          required
-          class="w-full px-4 py-3 border border-border bg-background text-foreground font-sans text-sm placeholder:text-muted-foreground focus:outline-none focus:border-[#FF8400] transition-colors"
-        />
+        <div class="relative">
+          <input
+            v-model="form.password"
+            :type="showPassword ? 'text' : 'password'"
+            placeholder="Uppercase, lowercase, number, special char"
+            required
+            class="w-full px-4 py-3 pr-16 border border-border bg-background text-foreground font-sans text-sm placeholder:text-muted-foreground focus:outline-none focus:border-[#FF8400] transition-colors"
+          />
+          <button
+            type="button"
+            @click="showPassword = !showPassword"
+            class="absolute right-3 top-1/2 -translate-y-1/2 text-xs font-sans font-medium text-muted-foreground hover:text-foreground transition-colors select-none"
+          >
+            {{ showPassword ? 'Hide' : 'Show' }}
+          </button>
+        </div>
       </div>
 
       <!-- Terms checkbox -->

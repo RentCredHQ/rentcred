@@ -8,6 +8,7 @@ const form = reactive({
   email: '',
   password: '',
 })
+const showPassword = ref(false)
 const error = ref('')
 
 async function handleLogin() {
@@ -53,13 +54,22 @@ async function handleLogin() {
             Forgot password?
           </NuxtLink>
         </div>
-        <input
-          v-model="form.password"
-          type="password"
-          placeholder="••••••••"
-          required
-          class="w-full px-4 py-3 border border-border bg-background text-foreground font-sans text-sm placeholder:text-muted-foreground focus:outline-none focus:border-[#FF8400] transition-colors"
-        />
+        <div class="relative">
+          <input
+            v-model="form.password"
+            :type="showPassword ? 'text' : 'password'"
+            placeholder="••••••••"
+            required
+            class="w-full px-4 py-3 pr-16 border border-border bg-background text-foreground font-sans text-sm placeholder:text-muted-foreground focus:outline-none focus:border-[#FF8400] transition-colors"
+          />
+          <button
+            type="button"
+            @click="showPassword = !showPassword"
+            class="absolute right-3 top-1/2 -translate-y-1/2 text-xs font-sans font-medium text-muted-foreground hover:text-foreground transition-colors select-none"
+          >
+            {{ showPassword ? 'Hide' : 'Show' }}
+          </button>
+        </div>
       </div>
 
       <button
