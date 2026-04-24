@@ -67,6 +67,11 @@ export default defineNuxtConfig({
     '/dashboard/**': { ssr: false },
     '/ops/**': { ssr: false },
     '/tenant/**': { ssr: false },
+    '/field-agent/**': { ssr: false },
     '/settings/**': { ssr: false },
+  },
+
+  nitro: {
+    preset: process.env.NITRO_PRESET || undefined,
   },
 })

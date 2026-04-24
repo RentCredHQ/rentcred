@@ -80,6 +80,9 @@ export class PaymentsController {
     @Req() req: RawBodyRequest<Request>,
     @Headers('x-paystack-signature') signature: string,
   ) {
+    if (!req.rawBody) {
+      throw new Error('Raw body not available');
+    }
     return this.paymentsService.handleWebhook(req.rawBody, signature);
   }
 }
