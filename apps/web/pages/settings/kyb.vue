@@ -82,7 +82,7 @@ async function handleSubmit() {
     })
     // Refresh user profile to get updated kybStatus
     await authStore.fetchUser()
-    router.push('/dashboard')
+    currentStep.value = 4
   } catch (e: any) {
     error.value = e.data?.message || 'Failed to submit KYB application. Please try again.'
   } finally {
@@ -330,6 +330,29 @@ function getStatusInfo(status: string) {
             {{ submitting ? 'Submitting...' : 'Submit Application' }}
           </button>
         </div>
+      </div>
+
+      <!-- Step 4: Success -->
+      <div v-if="currentStep === 4" class="bg-white border border-border p-8 sm:p-10 flex flex-col items-center text-center gap-5">
+        <div class="w-16 h-16 bg-[#DFE6E1] flex items-center justify-center">
+          <span class="material-symbols-rounded text-[32px] text-[#004D1A]">check_circle</span>
+        </div>
+        <div>
+          <h2 class="font-mono text-xl font-bold text-foreground">Application Submitted</h2>
+          <p class="font-sans text-sm text-muted-foreground mt-2 max-w-md">
+            Your KYB application has been submitted successfully. Our team will review your documents and get back to you within 24–48 hours.
+          </p>
+        </div>
+        <div class="bg-[#E7E8E5] px-4 py-3 flex items-center gap-3 w-full max-w-sm">
+          <span class="material-symbols-rounded text-[18px] text-muted-foreground">info</span>
+          <span class="font-sans text-[13px] text-muted-foreground text-left">You'll receive a notification once your verification is complete.</span>
+        </div>
+        <NuxtLink
+          to="/dashboard"
+          class="px-6 py-2.5 bg-[#FF8400] text-[#0D0D0D] font-sans text-sm font-semibold hover:opacity-90 transition-opacity"
+        >
+          Go to Dashboard
+        </NuxtLink>
       </div>
     </template>
 
