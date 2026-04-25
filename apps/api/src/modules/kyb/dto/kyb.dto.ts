@@ -13,7 +13,12 @@ export class ApplyKybDto {
   @ApiPropertyOptional()
   @IsOptional()
   @IsString()
-  cacDocument?: string;
+  companyAddress?: string;
+
+  @ApiPropertyOptional()
+  @IsOptional()
+  @IsString()
+  cacDocumentUrl?: string;
 
   @ApiPropertyOptional()
   @IsOptional()

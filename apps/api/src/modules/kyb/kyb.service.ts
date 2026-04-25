@@ -36,7 +36,7 @@ export class KybService {
         agentProfileId: profile.id,
         companyName: dto.companyName,
         rcNumber: dto.rcNumber,
-        cacDocument: dto.cacDocument,
+        cacDocument: dto.cacDocumentUrl,
         directorIdUrl: dto.directorIdUrl,
         utilityBillUrl: dto.utilityBillUrl,
         status: 'pending',
@@ -46,7 +46,12 @@ export class KybService {
     // Update agent profile KYB status
     await this.prisma.agentProfile.update({
       where: { id: profile.id },
-      data: { kybStatus: 'submitted', companyName: dto.companyName, rcNumber: dto.rcNumber },
+      data: {
+        kybStatus: 'submitted',
+        companyName: dto.companyName,
+        rcNumber: dto.rcNumber,
+        companyAddress: dto.companyAddress,
+      },
     });
 
     // Audit
