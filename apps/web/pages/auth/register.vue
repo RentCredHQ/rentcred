@@ -36,7 +36,12 @@ async function handleRegister() {
       password: form.password,
       role: 'agent',
     })
-    router.push('/auth/verify-email')
+    // Redirect agents to KYB, tenants to their dashboard
+    if (authStore.user?.role === 'tenant') {
+      router.push('/tenant')
+    } else {
+      router.push('/settings/kyb')
+    }
   } catch (e: any) {
     error.value = e.data?.message || 'Registration failed. Please try again.'
   }

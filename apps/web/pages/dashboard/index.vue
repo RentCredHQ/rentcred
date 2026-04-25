@@ -111,6 +111,35 @@ onMounted(async () => {
     </div>
 
     <template v-else>
+    <!-- KYB Banner -->
+    <div
+      v-if="authStore.user?.kybStatus !== 'approved'"
+      class="bg-[#0D0D0D] text-white px-5 py-4 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3"
+    >
+      <div class="flex items-center gap-3">
+        <span class="material-symbols-rounded text-[22px] text-[#FF8400]">warning</span>
+        <div>
+          <p class="font-sans text-sm font-semibold">Complete your KYB verification</p>
+          <p class="font-sans text-xs text-white/60 mt-0.5">
+            {{ authStore.user?.kybStatus === 'submitted' ? 'Your application is under review.' : 'You need to verify your business before you can submit tenants for screening.' }}
+          </p>
+        </div>
+      </div>
+      <NuxtLink
+        v-if="authStore.user?.kybStatus !== 'submitted'"
+        to="/settings/kyb"
+        class="px-4 py-2 bg-[#FF8400] text-[#0D0D0D] font-sans text-sm font-semibold hover:opacity-90 transition-opacity whitespace-nowrap"
+      >
+        Start KYB
+      </NuxtLink>
+      <span
+        v-else
+        class="px-3 py-1.5 bg-white/10 text-white/80 font-sans text-xs font-medium"
+      >
+        Under Review
+      </span>
+    </div>
+
     <!-- Mobile Greeting (shown on mobile only) -->
     <div class="lg:hidden">
       <h1 class="font-mono text-xl font-bold text-foreground">{{ greetingTime }}, {{ greetingName }}</h1>
