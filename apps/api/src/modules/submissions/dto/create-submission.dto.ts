@@ -18,9 +18,10 @@ export class CreateSubmissionDto {
   @IsString()
   propertyAddress: string;
 
-  @ApiProperty()
+  @ApiPropertyOptional()
+  @IsOptional()
   @IsNumber()
-  annualRent: number;
+  annualRent?: number;
 
   @ApiPropertyOptional()
   @IsOptional()

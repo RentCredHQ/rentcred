@@ -141,7 +141,7 @@ async function handleSubmit() {
       tenantEmail: step1.email,
       tenantPhone: step1.phone,
       propertyAddress: step2.propertyAddress,
-      annualRent: step2.annualRent,
+      annualRent: step2.annualRent || 0,
       propertyType: step2.propertyType,
       bedrooms: step2.bedrooms,
       state: step2.state,
