@@ -137,30 +137,30 @@ const { searchQuery, activeFilter, filtered, resultCount } = useFilter({
       </div>
 
       <!-- Desktop Table -->
-      <div class="hidden lg:block">
-        <div class="flex bg-background px-6 py-2.5 border-b border-border">
-          <div class="w-[90px]"><span class="font-mono text-[11px] font-semibold text-muted-foreground tracking-wider">Case ID</span></div>
-          <div class="w-[150px]"><span class="font-mono text-[11px] font-semibold text-muted-foreground tracking-wider">Tenant</span></div>
-          <div class="w-[130px]"><span class="font-mono text-[11px] font-semibold text-muted-foreground tracking-wider">Agent / Business</span></div>
-          <div class="w-[120px]"><span class="font-mono text-[11px] font-semibold text-muted-foreground tracking-wider">Status</span></div>
-          <div class="w-[90px]"><span class="font-mono text-[11px] font-semibold text-muted-foreground tracking-wider">Priority</span></div>
-          <div class="w-[110px]"><span class="font-mono text-[11px] font-semibold text-muted-foreground tracking-wider">Assigned To</span></div>
-          <div class="w-[100px]"><span class="font-mono text-[11px] font-semibold text-muted-foreground tracking-wider">Updated</span></div>
+      <div class="hidden lg:block overflow-x-auto">
+        <div class="flex bg-background px-6 py-2.5 border-b border-border min-w-[900px]">
+          <div class="w-[110px] flex-shrink-0"><span class="font-mono text-[11px] font-semibold text-muted-foreground tracking-wider">Case ID</span></div>
+          <div class="w-[150px] flex-shrink-0"><span class="font-mono text-[11px] font-semibold text-muted-foreground tracking-wider">Tenant</span></div>
+          <div class="w-[140px] flex-shrink-0"><span class="font-mono text-[11px] font-semibold text-muted-foreground tracking-wider">Agent / Business</span></div>
+          <div class="w-[120px] flex-shrink-0"><span class="font-mono text-[11px] font-semibold text-muted-foreground tracking-wider">Status</span></div>
+          <div class="w-[90px] flex-shrink-0"><span class="font-mono text-[11px] font-semibold text-muted-foreground tracking-wider">Priority</span></div>
+          <div class="w-[110px] flex-shrink-0"><span class="font-mono text-[11px] font-semibold text-muted-foreground tracking-wider">Assigned To</span></div>
+          <div class="w-[90px] flex-shrink-0"><span class="font-mono text-[11px] font-semibold text-muted-foreground tracking-wider">Updated</span></div>
           <div class="flex-1"><span class="font-mono text-[11px] font-semibold text-muted-foreground tracking-wider">Action</span></div>
         </div>
 
-        <div v-for="c in filtered" :key="c.id" class="flex items-center px-6 py-3 border-b border-border last:border-0 hover:bg-surface/30 transition-colors">
-          <div class="w-[90px]"><span class="font-mono text-[12px] font-medium text-foreground">{{ c.id }}</span></div>
-          <div class="w-[150px]"><span class="font-sans text-[13px] text-foreground">{{ c.tenant }}</span></div>
-          <div class="w-[130px]"><span class="font-sans text-[13px] text-foreground">{{ c.agent }}</span></div>
-          <div class="w-[120px]">
-            <span class="inline-flex px-2.5 py-0.5 rounded-full text-[11px] font-semibold" :class="[c.statusBg, c.statusText]">{{ c.status }}</span>
+        <div v-for="c in filtered" :key="c.id" class="flex items-center px-6 py-3 border-b border-border last:border-0 hover:bg-surface/30 transition-colors min-w-[900px]">
+          <div class="w-[110px] flex-shrink-0"><span class="font-mono text-[12px] font-medium text-foreground truncate block" :title="c.id">{{ c.id.slice(0, 10) }}…</span></div>
+          <div class="w-[150px] flex-shrink-0"><span class="font-sans text-[13px] text-foreground truncate block">{{ c.tenant }}</span></div>
+          <div class="w-[140px] flex-shrink-0"><span class="font-sans text-[13px] text-foreground truncate block">{{ c.agent }}</span></div>
+          <div class="w-[120px] flex-shrink-0">
+            <span class="inline-flex px-2.5 py-0.5 rounded-full text-[11px] font-semibold whitespace-nowrap" :class="[c.statusBg, c.statusText]">{{ c.status }}</span>
           </div>
-          <div class="w-[90px]">
+          <div class="w-[90px] flex-shrink-0">
             <span class="inline-flex px-2.5 py-0.5 rounded-full text-[11px] font-semibold" :class="[c.priorityBg, c.priorityText]">{{ c.priority }}</span>
           </div>
-          <div class="w-[110px]"><span class="font-sans text-[13px] text-foreground">{{ c.assigned }}</span></div>
-          <div class="w-[100px]"><span class="font-sans text-[13px] text-muted-foreground">{{ c.updated }}</span></div>
+          <div class="w-[110px] flex-shrink-0"><span class="font-sans text-[13px] text-foreground truncate block">{{ c.assigned }}</span></div>
+          <div class="w-[90px] flex-shrink-0"><span class="font-sans text-[13px] text-muted-foreground">{{ c.updated }}</span></div>
           <div class="flex-1 flex items-center gap-1">
             <NuxtLink :to="`/ops/cases/${c.id}`" class="flex items-center justify-center min-w-[36px] min-h-[36px] rounded-lg hover:bg-surface transition-colors"><span class="material-symbols-rounded text-[18px] text-muted-foreground hover:text-foreground">visibility</span></NuxtLink>
             <button @click="openReassign(c.id)" class="flex items-center justify-center min-w-[36px] min-h-[36px] rounded-lg hover:bg-surface transition-colors"><span class="material-symbols-rounded text-[18px] text-muted-foreground hover:text-foreground">swap_horiz</span></button>
@@ -173,7 +173,7 @@ const { searchQuery, activeFilter, filtered, resultCount } = useFilter({
         <div v-for="c in filtered" :key="c.id" class="px-4 py-3.5 border-b border-border last:border-0">
           <div class="flex items-center justify-between mb-1.5">
             <div class="flex items-center gap-2">
-              <span class="font-mono text-[13px] font-medium text-foreground">{{ c.id }}</span>
+              <span class="font-mono text-[13px] font-medium text-foreground">{{ c.id.slice(0, 10) }}…</span>
               <span class="inline-flex px-2 py-0.5 rounded-full text-[10px] font-semibold" :class="[c.priorityBg, c.priorityText]">{{ c.priority }}</span>
             </div>
             <span class="inline-flex px-2 py-0.5 rounded-full text-[10px] font-semibold" :class="[c.statusBg, c.statusText]">{{ c.status }}</span>
