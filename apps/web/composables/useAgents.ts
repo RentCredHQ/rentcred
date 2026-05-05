@@ -2,20 +2,20 @@ export function useAgents() {
   const { api } = useApi()
 
   async function getProfile() {
-    return api<{ data: any }>('/agents/profile', {
+    return api<any>('/agent/profile', {
       method: 'GET',
     })
   }
 
   async function updateProfile(data: any) {
-    return api<{ data: any }>('/agents/profile', {
+    return api<any>('/agent/profile', {
       method: 'PATCH',
       body: data,
     })
   }
 
   async function getDashboardStats() {
-    return api<{ data: any }>('/agents/stats', {
+    return api<any>('/agent/dashboard/stats', {
       method: 'GET',
     })
   }

@@ -90,7 +90,7 @@ onMounted(async () => {
       getSubmissions({ limit: 5 }),
     ])
 
-    const d = statsRes.data
+    const d = statsRes.data ?? statsRes
     stats.value = {
       bundleCredits: { value: d.creditBalance ?? 0, total: d.creditBalance ?? 0, label: 'Bundle Credits', icon: 'inventory_2' },
       activeChecks: { value: d.pendingVerifications ?? 0, label: 'Active Checks', icon: 'pending_actions', badge: `${d.pendingVerifications ?? 0} awaiting review`, badgeBg: 'bg-[#E9E3D8]', badgeText: 'text-[#804200]' },
