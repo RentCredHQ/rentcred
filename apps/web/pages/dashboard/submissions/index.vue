@@ -115,12 +115,12 @@ onMounted(async () => {
     <!-- Desktop Table -->
     <div class="hidden lg:block bg-white border-[1.5px] border-border rounded-lg overflow-hidden">
       <!-- Column Headers -->
-      <div class="flex bg-[#E7E8E5] px-4 py-3">
-        <div class="w-[180px]"><span class="font-mono text-[12px] font-semibold text-muted-foreground tracking-wider">Tenant Name</span></div>
-        <div class="w-[140px]"><span class="font-mono text-[12px] font-semibold text-muted-foreground tracking-wider">Case ID</span></div>
-        <div class="w-[130px]"><span class="font-mono text-[12px] font-semibold text-muted-foreground tracking-wider">Package</span></div>
-        <div class="w-[160px]"><span class="font-mono text-[12px] font-semibold text-muted-foreground tracking-wider">Status</span></div>
-        <div class="w-[120px]"><span class="font-mono text-[12px] font-semibold text-muted-foreground tracking-wider">Submitted</span></div>
+      <div class="flex bg-[#E7E8E5] px-4 py-3 min-w-[860px]">
+        <div class="w-[180px] flex-shrink-0"><span class="font-mono text-[12px] font-semibold text-muted-foreground tracking-wider">Tenant Name</span></div>
+        <div class="w-[120px] flex-shrink-0"><span class="font-mono text-[12px] font-semibold text-muted-foreground tracking-wider">Case ID</span></div>
+        <div class="w-[130px] flex-shrink-0"><span class="font-mono text-[12px] font-semibold text-muted-foreground tracking-wider">Package</span></div>
+        <div class="w-[140px] flex-shrink-0"><span class="font-mono text-[12px] font-semibold text-muted-foreground tracking-wider">Status</span></div>
+        <div class="w-[120px] flex-shrink-0"><span class="font-mono text-[12px] font-semibold text-muted-foreground tracking-wider">Submitted</span></div>
         <div class="flex-1"><span class="font-mono text-[12px] font-semibold text-muted-foreground tracking-wider">Actions</span></div>
       </div>
 
@@ -129,15 +129,15 @@ onMounted(async () => {
         v-for="sub in filtered"
         :key="sub.caseId"
         :to="`/dashboard/submissions/${sub.caseId}`"
-        class="flex items-center px-4 py-3.5 border-b border-border hover:bg-surface/30 transition-colors cursor-pointer"
+        class="flex items-center px-4 py-3.5 border-b border-border hover:bg-surface/30 transition-colors cursor-pointer min-w-[860px]"
       >
-        <div class="w-[180px]"><span class="font-sans text-sm font-medium text-foreground">{{ sub.name }}</span></div>
-        <div class="w-[140px]"><span class="font-mono text-[13px] text-muted-foreground">{{ sub.caseId }}</span></div>
-        <div class="w-[130px]"><span class="font-sans text-sm text-foreground">{{ sub.package }}</span></div>
-        <div class="w-[160px]">
-          <span class="inline-flex px-2.5 py-1 rounded-full text-[12px] font-medium" :class="[sub.statusBg, sub.statusText]">{{ sub.status }}</span>
+        <div class="w-[180px] flex-shrink-0"><span class="font-sans text-sm font-medium text-foreground truncate block">{{ sub.name }}</span></div>
+        <div class="w-[120px] flex-shrink-0"><span class="font-mono text-[13px] text-muted-foreground truncate block" :title="sub.caseId">{{ sub.caseId?.slice(0, 10) }}…</span></div>
+        <div class="w-[130px] flex-shrink-0"><span class="font-sans text-sm text-foreground">{{ sub.package }}</span></div>
+        <div class="w-[140px] flex-shrink-0">
+          <span class="inline-flex px-2.5 py-1 rounded-full text-[12px] font-medium whitespace-nowrap" :class="[sub.statusBg, sub.statusText]">{{ sub.status }}</span>
         </div>
-        <div class="w-[120px]"><span class="font-sans text-[13px] text-muted-foreground">{{ sub.date }}</span></div>
+        <div class="w-[120px] flex-shrink-0"><span class="font-sans text-[13px] text-muted-foreground">{{ sub.date }}</span></div>
         <div class="flex-1 flex items-center gap-2" @click.prevent.stop>
           <NuxtLink :to="`/dashboard/submissions/${sub.caseId}`" class="material-symbols-rounded text-[18px] text-muted-foreground hover:text-foreground cursor-pointer">visibility</NuxtLink>
           <button @click="showShare = true" class="material-symbols-rounded text-[18px] text-muted-foreground hover:text-foreground cursor-pointer">share</button>
@@ -169,7 +169,7 @@ onMounted(async () => {
           <span class="inline-flex px-2 py-0.5 rounded-full text-[11px] font-medium" :class="[sub.statusBg, sub.statusText]">{{ sub.status }}</span>
         </div>
         <div class="flex items-center gap-4 text-[12px] text-muted-foreground font-sans">
-          <span class="font-mono">{{ sub.caseId }}</span>
+          <span class="font-mono">{{ sub.caseId?.slice(0, 10) }}…</span>
           <span>{{ sub.package }}</span>
           <span>{{ sub.date }}</span>
         </div>

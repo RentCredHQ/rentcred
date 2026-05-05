@@ -106,19 +106,19 @@ onMounted(async () => {
     </UiFilterBar>
 
     <!-- Desktop Table -->
-    <div class="hidden lg:block bg-white border-[1.5px] border-border rounded-lg overflow-hidden">
-      <div class="flex bg-[#E7E8E5] px-4 py-3">
-        <div class="w-[170px]"><span class="font-mono text-[12px] font-semibold text-muted-foreground tracking-wider">Tenant Name</span></div>
-        <div class="w-[140px]"><span class="font-mono text-[12px] font-semibold text-muted-foreground tracking-wider">Case ID</span></div>
-        <div class="w-[140px]"><span class="font-mono text-[12px] font-semibold text-muted-foreground tracking-wider">Report Status</span></div>
-        <div class="w-[160px]"><span class="font-mono text-[12px] font-semibold text-muted-foreground tracking-wider">Recommendation</span></div>
-        <div class="w-[110px]"><span class="font-mono text-[12px] font-semibold text-muted-foreground tracking-wider">Generated</span></div>
+    <div class="hidden lg:block bg-white border-[1.5px] border-border rounded-lg overflow-hidden overflow-x-auto">
+      <div class="flex bg-[#E7E8E5] px-4 py-3 min-w-[860px]">
+        <div class="w-[170px] flex-shrink-0"><span class="font-mono text-[12px] font-semibold text-muted-foreground tracking-wider">Tenant Name</span></div>
+        <div class="w-[120px] flex-shrink-0"><span class="font-mono text-[12px] font-semibold text-muted-foreground tracking-wider">Case ID</span></div>
+        <div class="w-[140px] flex-shrink-0"><span class="font-mono text-[12px] font-semibold text-muted-foreground tracking-wider">Report Status</span></div>
+        <div class="w-[160px] flex-shrink-0"><span class="font-mono text-[12px] font-semibold text-muted-foreground tracking-wider">Recommendation</span></div>
+        <div class="w-[110px] flex-shrink-0"><span class="font-mono text-[12px] font-semibold text-muted-foreground tracking-wider">Generated</span></div>
         <div class="flex-1"><span class="font-mono text-[12px] font-semibold text-muted-foreground tracking-wider">Actions</span></div>
       </div>
 
-      <div v-for="report in filtered" :key="report.caseId" class="flex items-center px-4 py-3.5 border-b border-border hover:bg-surface/30 transition-colors">
-        <div class="w-[170px]"><span class="font-sans text-sm font-medium text-foreground">{{ report.tenant }}</span></div>
-        <div class="w-[140px]"><span class="font-mono text-[13px] text-muted-foreground">{{ report.caseId }}</span></div>
+      <div v-for="report in filtered" :key="report.caseId" class="flex items-center px-4 py-3.5 border-b border-border hover:bg-surface/30 transition-colors min-w-[860px]">
+        <div class="w-[170px] flex-shrink-0"><span class="font-sans text-sm font-medium text-foreground truncate block">{{ report.tenant }}</span></div>
+        <div class="w-[120px] flex-shrink-0"><span class="font-mono text-[13px] text-muted-foreground truncate block" :title="report.caseId">{{ report.caseId?.slice(0, 10) }}…</span></div>
         <div class="w-[140px]">
           <span class="inline-flex px-2.5 py-1 rounded-full text-[12px] font-medium" :class="[report.statusBg, report.statusText]">{{ report.status }}</span>
         </div>
@@ -140,7 +140,7 @@ onMounted(async () => {
           <span class="inline-flex px-2 py-0.5 rounded-full text-[11px] font-medium" :class="[report.statusBg, report.statusText]">{{ report.status }}</span>
         </div>
         <div class="flex items-center justify-between">
-          <span class="font-mono text-[12px] text-muted-foreground">{{ report.caseId }}</span>
+          <span class="font-mono text-[12px] text-muted-foreground">{{ report.caseId?.slice(0, 10) }}…</span>
           <span class="font-sans text-[12px] font-medium" :class="report.recColor">{{ report.recommendation }}</span>
         </div>
         <div class="flex items-center justify-between">
