@@ -58,7 +58,7 @@ async function handleUpload(upload: { name: string; key: 'cacDocumentUrl' | 'dir
     upload.uploading = true
     try {
       const result = await uploadFile(file, 'kyb-documents') as any
-      form[upload.key] = result?.key || result?.publicUrl || file.name
+      form[upload.key] = result?.publicUrl || result?.key || file.name
     } catch {
       error.value = `Failed to upload ${upload.name}`
     } finally {
