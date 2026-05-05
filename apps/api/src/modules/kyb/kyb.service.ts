@@ -120,7 +120,22 @@ export class KybService {
       },
     });
     if (!app) throw new NotFoundException('KYB application not found');
-    return app;
+
+    // Resolve document keys to full URLs
+    return {
+      ...app,
+      cacDocument: this.resolveUrl(app.cacDocument),
+      directorIdUrl: this.resolveUrl(app.directorIdUrl),
+      utilityBillUrl: this.resolveUrl(app.utilityBillUrl),
+    };
+  }
+
+  private resolveUrl(value: string | null | undefined): string | null {
+    if (!value) return null;
+    if (value.startsWith('http')) return value;
+    const publicBase = process.env.R2_PUBLIC_URL?.replace(/\/$/, '');
+    if (publicBase) return `${publicBase}/${value}`;
+    return value;
   }
 
   async reviewApplication(id: string, reviewerId: string, dto: ReviewKybDto) {
