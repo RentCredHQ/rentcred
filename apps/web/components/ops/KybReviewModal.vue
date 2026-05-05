@@ -23,20 +23,26 @@ watch(() => props.modelValue, async (open) => {
     const res = await getKybApplication(props.applicationId)
     const app = res.data ?? res
     company.value = {
-      name: app.businessName ?? app.name ?? '',
+      name: app.companyName ?? '',
       rcNumber: app.rcNumber ?? '',
-      director: app.directorName ?? app.director ?? '',
+      director: app.agentProfile?.user?.name ?? '',
       status: app.status === 'approved' ? 'Approved' : app.status === 'rejected' ? 'Rejected' : 'Pending Review',
     }
-    const docs = app.documents ?? []
-    documents.value = docs.map((d: any) => {
-      const st = d.status ?? 'pending'
+    // Build documents list from individual URL fields
+    const docEntries = [
+      { name: 'CAC Certificate', url: app.cacDocument },
+      { name: 'Director ID', url: app.directorIdUrl },
+      { name: 'Utility Bill', url: app.utilityBillUrl },
+    ]
+    documents.value = docEntries.map((d) => {
+      const uploaded = !!d.url
       return {
-        name: d.name ?? d.type ?? '',
-        status: st,
-        detail: st === 'verified' ? `Verified · Uploaded ${d.uploadedAt ? new Date(d.uploadedAt).toLocaleDateString('en-NG', { month: 'short', day: 'numeric' }) : ''}` : st === 'rejected' ? `Rejected · ${d.reason ?? ''}` : 'Pending review',
-        icon: st === 'verified' ? 'check_circle' : st === 'rejected' ? 'cancel' : 'pending',
-        iconColor: st === 'verified' ? 'text-[#004D1A]' : st === 'rejected' ? 'text-[#991B1B]' : 'text-[#804200]',
+        name: d.name,
+        url: d.url,
+        status: uploaded ? 'uploaded' : 'missing',
+        detail: uploaded ? 'Uploaded — click to view' : 'Not provided',
+        icon: uploaded ? 'description' : 'cancel',
+        iconColor: uploaded ? 'text-[#004D1A]' : 'text-[#991B1B]',
       }
     })
   } catch { /* empty */ }
@@ -107,20 +113,25 @@ async function reject() {
             <!-- Document Checklist -->
             <span class="font-mono text-[13px] font-semibold text-foreground">Document Checklist</span>
             <div class="bg-white border border-border rounded-xl overflow-hidden">
-              <div
+              <component
+                :is="doc.url ? 'a' : 'div'"
                 v-for="(doc, idx) in documents"
                 :key="doc.name"
+                :href="doc.url || undefined"
+                :target="doc.url ? '_blank' : undefined"
+                :rel="doc.url ? 'noopener' : undefined"
                 class="flex items-center gap-3 px-4 py-3"
-                :class="idx < documents.length - 1 ? 'border-b border-border' : ''"
+                :class="[idx < documents.length - 1 ? 'border-b border-border' : '', doc.url ? 'hover:bg-surface/50 cursor-pointer' : '']"
               >
                 <span class="material-symbols-rounded text-[20px]" :class="doc.iconColor">{{ doc.icon }}</span>
                 <div class="flex flex-col gap-0.5 flex-1 min-w-0">
                   <span class="font-sans text-[13px] font-medium text-foreground">{{ doc.name }}</span>
-                  <span class="font-sans text-[11px]" :class="doc.status === 'rejected' ? 'text-[#991B1B]' : doc.status === 'pending' ? 'text-[#804200]' : 'text-muted-foreground'">
+                  <span class="font-sans text-[11px]" :class="doc.status === 'missing' ? 'text-[#991B1B]' : 'text-muted-foreground'">
                     {{ doc.detail }}
                   </span>
                 </div>
-              </div>
+                <span v-if="doc.url" class="material-symbols-rounded text-[16px] text-muted-foreground">open_in_new</span>
+              </component>
             </div>
 
             <!-- Review Notes -->
