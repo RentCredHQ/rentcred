@@ -14,18 +14,41 @@ onMounted(async () => {
       api('/field-agents/assignments', { params: { status: 'assigned' } }),
       api('/field-agents/dashboard/stats'),
     ])
-    visits.value = assignmentsRes as any[]
-    stats.value = statsRes
+    const assignData = (assignmentsRes as any)?.data ?? assignmentsRes
+    visits.value = (Array.isArray(assignData) ? assignData : []).map((a: any) => ({
+      id: a.id,
+      submissionId: a.submissionId || a.submission?.id || a.id,
+      tenant: a.submission?.tenantName || a.tenantName || '—',
+      address: a.submission?.propertyAddress || a.propertyAddress || '—',
+      type: a.submission?.propertyType || a.type || '—',
+      status: a.status || 'assigned',
+      time: a.scheduledDate ? new Date(a.scheduledDate).toLocaleTimeString('en-NG', { hour: '2-digit', minute: '2-digit' }) : '—',
+    }))
+    const s = (statsRes as any)?.data ?? statsRes
+    stats.value = {
+      todaysVisits: s?.todaysVisits ?? s?.todayVisits ?? 0,
+      completed: s?.completedVisits ?? s?.completed ?? 0,
+      pending: s?.pending ?? s?.activeAssignments ?? 0,
+    }
   } catch { /* empty */ }
   finally { loading.value = false }
 })
 
 function statusClasses(status: string) {
-  switch (status) {
-    case 'Completed': return 'bg-[#DFE6E1] text-[#004D1A]'
-    case 'In Progress': return 'bg-[#E9E3D8] text-[#804200]'
-    default: return 'bg-background text-muted-foreground'
+  const s = status.toLowerCase()
+  if (s === 'completed') return 'bg-[#DFE6E1] text-[#004D1A]'
+  if (s === 'in_progress' || s === 'in progress') return 'bg-[#E9E3D8] text-[#804200]'
+  if (s === 'assigned' || s === 'pending') return 'bg-blue-50 text-blue-600'
+  return 'bg-[#E9E3D8] text-[#804200]'
+}
+
+function statusLabel(status: string) {
+  const map: Record<string, string> = {
+    assigned: 'Pending',
+    in_progress: 'In Progress',
+    completed: 'Completed',
   }
+  return map[status] || status
 }
 </script>
 
@@ -47,11 +70,11 @@ function statusClasses(status: string) {
     </div>
     <span class="font-mono text-base font-semibold text-foreground">Today's Schedule</span>
     <div class="flex flex-col gap-3">
-      <NuxtLink v-for="v in visits" :key="v.id" :to="`/field-agent/visits/${v.id}`"
+      <NuxtLink v-for="v in visits" :key="v.id" :to="`/field-agent/visits/${v.submissionId}`"
         class="bg-card border border-border rounded-xl p-4 flex flex-col gap-2.5">
         <div class="flex items-center justify-between">
           <span class="font-sans text-sm font-medium text-foreground">{{ v.tenant }}</span>
-          <span class="px-2.5 py-0.5 rounded-full text-[10px] font-semibold" :class="statusClasses(v.status)">{{ v.status }}</span>
+          <span class="px-2.5 py-0.5 rounded-full text-[10px] font-semibold" :class="statusClasses(v.status)">{{ statusLabel(v.status) }}</span>
         </div>
         <span class="font-sans text-[12px] text-muted-foreground">{{ v.type }}</span>
         <div class="flex items-center justify-between text-[12px] text-muted-foreground font-sans">

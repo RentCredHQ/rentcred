@@ -37,6 +37,8 @@ describe('KybService', () => {
   };
 
   beforeEach(async () => {
+    process.env.R2_PUBLIC_URL = 'https://test.r2.dev';
+
     const module: TestingModule = await Test.createTestingModule({
       providers: [
         KybService,
@@ -74,8 +76,9 @@ describe('KybService', () => {
     const userId = 'user-1';
     const dto = {
       companyName: 'Acme Realty',
+      companyAddress: '123 Main St, Lagos',
       rcNumber: 'RC123456',
-      cacDocument: 'https://example.com/cac.pdf',
+      cacDocumentUrl: 'https://example.com/cac.pdf',
       directorIdUrl: 'https://example.com/id.jpg',
       utilityBillUrl: 'https://example.com/bill.pdf',
     };
@@ -111,7 +114,7 @@ describe('KybService', () => {
       });
       expect(mockPrismaService.agentProfile.update).toHaveBeenCalledWith({
         where: { id: mockProfile.id },
-        data: { kybStatus: 'submitted', companyName: dto.companyName, rcNumber: dto.rcNumber },
+        data: { kybStatus: 'submitted', companyName: dto.companyName, rcNumber: dto.rcNumber, companyAddress: dto.companyAddress },
       });
     });
 
@@ -239,6 +242,9 @@ describe('KybService', () => {
       const mockApp = {
         id: 'kyb-1',
         status: 'pending',
+        cacDocument: 'kyb-docs/cac.pdf',
+        directorIdUrl: 'kyb-docs/id.jpg',
+        utilityBillUrl: 'kyb-docs/bill.pdf',
         agentProfile: {
           user: { id: 'user-1', name: 'Agent', email: 'agent@test.com' },
         },
@@ -247,7 +253,12 @@ describe('KybService', () => {
 
       const result = await service.getApplication('kyb-1');
 
-      expect(result).toEqual(mockApp);
+      expect(result).toEqual({
+        ...mockApp,
+        cacDocument: 'https://test.r2.dev/kyb-docs/cac.pdf',
+        directorIdUrl: 'https://test.r2.dev/kyb-docs/id.jpg',
+        utilityBillUrl: 'https://test.r2.dev/kyb-docs/bill.pdf',
+      });
     });
 
     it('should throw NotFoundException when application not found', async () => {

@@ -468,16 +468,20 @@ describe('FieldAgentsService', () => {
       const fieldAgentId = 'fa-1';
 
       mockPrismaService.fieldAssignment.count
-        .mockResolvedValueOnce(3)  // active
-        .mockResolvedValueOnce(10); // total
-      mockPrismaService.fieldVisit.count.mockResolvedValue(8); // completed visits
+        .mockResolvedValueOnce(3)  // active (assigned + in_progress)
+        .mockResolvedValueOnce(8)  // completed
+        .mockResolvedValueOnce(10) // total
+        .mockResolvedValueOnce(2); // pending (assigned only)
+      mockPrismaService.fieldVisit.count.mockResolvedValue(4); // today's visits
 
       const result = await service.getDashboardStats(fieldAgentId);
 
       expect(result).toEqual({
+        todaysVisits: 4,
         activeAssignments: 3,
         completedVisits: 8,
         totalAssignments: 10,
+        pending: 2,
       });
     });
   });

@@ -5,6 +5,32 @@ import { PrismaService } from '../../prisma/prisma.service';
 export class AgentsService {
   constructor(private readonly prisma: PrismaService) {}
 
+  async getProfile(userId: string) {
+    const user = await this.prisma.user.findUnique({
+      where: { id: userId },
+      select: {
+        id: true,
+        name: true,
+        email: true,
+        phone: true,
+        avatarUrl: true,
+        role: true,
+        agentProfile: {
+          select: {
+            companyName: true,
+            companyAddress: true,
+            rcNumber: true,
+            kybStatus: true,
+            creditBalance: true,
+          },
+        },
+      },
+    });
+    if (!user) throw new NotFoundException('User not found');
+    const { agentProfile, ...rest } = user;
+    return { ...rest, ...(agentProfile || {}) };
+  }
+
   async getDashboardStats(userId: string) {
     const profile = await this.prisma.agentProfile.findUnique({
       where: { userId },
@@ -102,8 +128,8 @@ export class AgentsService {
       });
     }
 
-    // Return full profile
-    return this.prisma.user.findUnique({
+    // Return full profile (flattened same as getProfile)
+    const result = await this.prisma.user.findUnique({
       where: { id: userId },
       select: {
         id: true,
@@ -123,5 +149,8 @@ export class AgentsService {
         },
       },
     });
+    if (!result) throw new NotFoundException('User not found');
+    const { agentProfile, ...rest } = result;
+    return { ...rest, ...(agentProfile || {}) };
   }
 }

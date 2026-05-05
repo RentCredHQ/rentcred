@@ -253,14 +253,32 @@ export class FieldAgentsService {
    * Get field agent dashboard stats.
    */
   async getDashboardStats(fieldAgentId: string) {
-    const [activeAssignments, completedVisits, totalAssignments] = await Promise.all([
-      this.prisma.fieldAssignment.count({
-        where: { fieldAgentId, status: { not: 'completed' } },
-      }),
-      this.prisma.fieldVisit.count({ where: { fieldAgentId } }),
-      this.prisma.fieldAssignment.count({ where: { fieldAgentId } }),
-    ]);
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
 
-    return { activeAssignments, completedVisits, totalAssignments };
+    const [activeAssignments, completedVisits, totalAssignments, pending, todaysVisits] =
+      await Promise.all([
+        this.prisma.fieldAssignment.count({
+          where: { fieldAgentId, status: { in: ['assigned', 'in_progress'] } },
+        }),
+        this.prisma.fieldAssignment.count({
+          where: { fieldAgentId, status: 'completed' },
+        }),
+        this.prisma.fieldAssignment.count({ where: { fieldAgentId } }),
+        this.prisma.fieldAssignment.count({
+          where: { fieldAgentId, status: 'assigned' },
+        }),
+        this.prisma.fieldVisit.count({
+          where: { fieldAgentId, visitDate: { gte: today } },
+        }),
+      ]);
+
+    return {
+      todaysVisits,
+      activeAssignments,
+      completedVisits,
+      totalAssignments,
+      pending,
+    };
   }
 }

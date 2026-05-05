@@ -83,7 +83,7 @@ onMounted(async () => {
           <span class="font-sans text-[13px] text-muted-foreground pb-1">of {{ kpis.remaining.total }}</span>
         </div>
         <div class="w-full h-2 bg-background rounded-full mt-1">
-          <div class="h-2 bg-primary rounded-full" :style="{ width: `${(kpis.remaining.value / kpis.remaining.total) * 100}%` }" />
+          <div class="h-2 bg-primary rounded-full" :style="{ width: `${kpis.remaining.total > 0 ? (kpis.remaining.value / kpis.remaining.total) * 100 : 0}%` }" />
         </div>
       </div>
       <div class="bg-white border border-border rounded-xl p-5 flex flex-col gap-2">

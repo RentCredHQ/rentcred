@@ -19,6 +19,13 @@ export class OpsController {
     return this.opsService.getDashboardStats();
   }
 
+  @Get('dashboard/recent-cases')
+  @ApiOperation({ summary: 'Get recent cases for ops dashboard' })
+  @ApiQuery({ name: 'limit', required: false, type: Number })
+  async getRecentCases(@Query('limit') limit?: string) {
+    return this.opsService.getRecentCases(parseInt(limit || '10', 10));
+  }
+
   @Get('dashboard/activity')
   @ApiOperation({ summary: 'Get recent platform activity' })
   @ApiQuery({ name: 'limit', required: false, type: Number })

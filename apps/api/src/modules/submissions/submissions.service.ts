@@ -186,7 +186,18 @@ export class SubmissionsService {
       throw new ForbiddenException('Access denied');
     }
 
-    return submission;
+    return {
+      ...submission,
+      propertyImages: (submission.propertyImages || []).map(img => this.resolveUrl(img as string)).filter(Boolean),
+    };
+  }
+
+  private resolveUrl(value: string | null | undefined): string | null {
+    if (!value) return null;
+    if (value.startsWith('http')) return value;
+    const publicBase = process.env.R2_PUBLIC_URL?.replace(/\/$/, '');
+    if (publicBase) return `${publicBase}/${value}`;
+    return value;
   }
 
   async updateStatus(id: string, userId: string, dto: UpdateSubmissionStatusDto) {

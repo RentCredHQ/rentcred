@@ -22,7 +22,7 @@ export function useSubmissions() {
   }
 
   async function createSubmission(data: any) {
-    return api<{ data: Submission }>('/submissions', {
+    return api<Submission>('/submissions', {
       method: 'POST',
       body: data,
     })

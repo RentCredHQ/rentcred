@@ -14,6 +14,12 @@ import { UpdateAgentProfileDto } from './dto/update-agent-profile.dto';
 export class AgentsController {
   constructor(private readonly agentsService: AgentsService) {}
 
+  @Get('profile')
+  @ApiOperation({ summary: 'Get agent profile' })
+  async getProfile(@Req() req: any) {
+    return this.agentsService.getProfile(req.user.sub);
+  }
+
   @Get('dashboard/stats')
   @ApiOperation({ summary: 'Get agent dashboard statistics' })
   async getDashboardStats(@Req() req: any) {

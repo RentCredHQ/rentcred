@@ -6,7 +6,7 @@ useSeoMeta({ title: 'Complete Profile — RentCred' })
 
 const route = useRoute()
 const router = useRouter()
-const currentStep = computed(() => Number(route.params.step) || 1)
+const currentStep = ref(Number(route.params.step) || 1)
 const isLoading = ref(false)
 const error = ref<string | null>(null)
 const showCompletion = ref(false)
@@ -89,18 +89,18 @@ onMounted(async () => {
 })
 
 function nextStep() {
-  if (currentStep.value < 5) router.push(`/tenant/profile/${currentStep.value + 1}`)
+  if (currentStep.value < 5) currentStep.value++
 }
 
 function prevStep() {
-  if (currentStep.value > 1) router.push(`/tenant/profile/${currentStep.value - 1}`)
+  if (currentStep.value > 1) currentStep.value--
 }
 
 async function handleDocUpload(event: Event, field: 'idDocumentUrl' | 'proofOfIncomeUrl' | 'utilityBillUrl') {
   const input = event.target as HTMLInputElement
   if (!input.files?.[0]) return
   try {
-    const result = await uploadFile(input.files[0], 'tenant-documents')
+    const result = await uploadFile(input.files[0], 'documents')
     step4[field] = result.publicUrl
   } catch {
     // Error set by useUpload

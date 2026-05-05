@@ -25,18 +25,18 @@ export class TenantsController {
     return this.tenantsService.getProfile(req.user.sub, req.user.sub, req.user.role);
   }
 
-  @Get('profile/:userId')
-  @Roles('ops', 'admin')
-  @ApiOperation({ summary: 'Get tenant profile by user ID (ops/admin)' })
-  async getProfile(@Param('userId') userId: string, @Req() req: any) {
-    return this.tenantsService.getProfile(userId, req.user.sub, req.user.role);
-  }
-
   @Get('profile/status')
   @Roles('tenant', 'ops', 'admin')
   @ApiOperation({ summary: 'Get profile completion status' })
   async getProfileStatus(@Req() req: any) {
     return this.tenantsService.getProfileStatus(req.user.sub);
+  }
+
+  @Get('profile/:userId')
+  @Roles('ops', 'admin')
+  @ApiOperation({ summary: 'Get tenant profile by user ID (ops/admin)' })
+  async getProfile(@Param('userId') userId: string, @Req() req: any) {
+    return this.tenantsService.getProfile(userId, req.user.sub, req.user.role);
   }
 
   @Patch('profile/personal')

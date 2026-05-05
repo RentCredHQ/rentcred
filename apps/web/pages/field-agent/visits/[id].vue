@@ -11,8 +11,8 @@ const loading = ref(true)
 onMounted(async () => {
   try {
     const res = await getSubmission(visitId)
-    visit.value = res
-    checklist.value = res?.checklist ?? []
+    visit.value = res.data ?? res
+    checklist.value = visit.value?.checklist ?? []
   } catch { /* empty */ }
   finally { loading.value = false }
 })
@@ -35,11 +35,11 @@ onMounted(async () => {
     <template v-else-if="visit">
     <span class="inline-flex self-start px-2.5 py-0.5 rounded-full text-[11px] font-semibold bg-[#E9E3D8] text-[#804200]">{{ visit.status }}</span>
     <div class="bg-card border border-border rounded-xl p-4 flex flex-col gap-3">
-      <span class="font-sans text-base font-medium text-foreground">{{ visit.tenant }}</span>
-      <span class="font-sans text-[13px] text-muted-foreground">{{ visit.type }}</span>
+      <span class="font-sans text-base font-medium text-foreground">{{ visit.tenantName }}</span>
+      <span class="font-sans text-[13px] text-muted-foreground">{{ visit.propertyType }}</span>
       <div class="flex items-center gap-2 text-[13px] text-muted-foreground font-sans">
         <span class="material-symbols-rounded text-[16px]">location_on</span>
-        {{ visit.address }}
+        {{ visit.propertyAddress }}
       </div>
       <div class="flex items-center gap-2 text-[13px] text-muted-foreground font-sans">
         <span class="material-symbols-rounded text-[16px]">calendar_today</span>

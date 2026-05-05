@@ -152,7 +152,7 @@ async function handleSubmit() {
       propertyImages: step2.propertyImages.map(img => img.key),
       consentObtained: true,
     })
-    createdCaseId.value = result.data?.id || ''
+    createdCaseId.value = result?.id || result?.data?.id || ''
     showConfirmation.value = true
   } catch (e: any) {
     const msg = e.data?.message

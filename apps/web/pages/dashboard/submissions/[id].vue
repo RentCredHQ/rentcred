@@ -47,12 +47,12 @@ const caseData = ref({
 })
 
 const CHECKLIST_LABELS: Record<string, string> = {
-  identity_verified: 'Identity Check',
-  employment_verified: 'Employment Verification',
-  references_verified: 'Reference Check',
-  address_verified: 'Address Verification',
-  criminal_check_done: 'Criminal Record Check',
-  field_visit_completed: 'Field Visit',
+  identityVerified: 'Identity Check',
+  employmentVerified: 'Employment Verification',
+  referencesVerified: 'References Check',
+  addressVerified: 'Address Verification',
+  criminalCheckDone: 'Criminal Background Check',
+  fieldVisitCompleted: 'Field Visit',
 }
 
 const steps = ref<{ name: string; status: string; date: string; icon: string; iconColor: string; dateColor: string }[]>([])
@@ -73,7 +73,7 @@ function buildSteps(submission: any) {
 onMounted(async () => {
   try {
     const res = await getSubmission(caseId.value)
-    const s = res.data
+    const s = res.data ?? res
     const style = getStatusStyle(s.status)
     caseData.value = {
       name: s.tenantName,

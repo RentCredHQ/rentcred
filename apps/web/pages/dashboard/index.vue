@@ -93,8 +93,8 @@ onMounted(async () => {
     const d = statsRes.data ?? statsRes
     stats.value = {
       bundleCredits: { value: d.creditBalance ?? 0, total: d.creditBalance ?? 0, label: 'Bundle Credits', icon: 'inventory_2' },
-      activeChecks: { value: d.pendingVerifications ?? 0, label: 'Active Checks', icon: 'pending_actions', badge: `${d.pendingVerifications ?? 0} awaiting review`, badgeBg: 'bg-[#E9E3D8]', badgeText: 'text-[#804200]' },
-      reportsReady: { value: d.completedReports ?? 0, label: 'Reports Ready', icon: 'task', badge: 'Ready to share', badgeBg: 'bg-[#DFE6E1]', badgeText: 'text-[#004D1A]' },
+      activeChecks: { value: d.pendingSubmissions ?? 0, label: 'Active Checks', icon: 'pending_actions', badge: `${d.pendingSubmissions ?? 0} awaiting review`, badgeBg: 'bg-[#E9E3D8]', badgeText: 'text-[#804200]' },
+      reportsReady: { value: d.reportsReady ?? 0, label: 'Reports Ready', icon: 'task', badge: 'Ready to share', badgeBg: 'bg-[#DFE6E1]', badgeText: 'text-[#004D1A]' },
     }
 
     submissions.value = subsRes.data ?? []

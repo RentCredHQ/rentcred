@@ -6,45 +6,55 @@ export class OpsService {
   constructor(private readonly prisma: PrismaService) {}
 
   async getDashboardStats() {
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+
+    const sevenDaysAgo = new Date();
+    sevenDaysAgo.setDate(sevenDaysAgo.getDate() - 7);
+
     const [
-      totalUsers,
-      totalAgents,
-      totalTenants,
-      totalFieldAgents,
-      totalSubmissions,
-      pendingSubmissions,
-      completedSubmissions,
-      totalReports,
-      approvedReports,
-      openDisputes,
-      pendingKyb,
-      totalRevenue,
+      totalCases,
+      pendingVerifications,
+      fieldVisitsToday,
+      reportsReady,
+      inProgress,
+      completedThisWeek,
     ] = await Promise.all([
-      this.prisma.user.count(),
-      this.prisma.user.count({ where: { role: 'agent' } }),
-      this.prisma.user.count({ where: { role: 'tenant' } }),
-      this.prisma.user.count({ where: { role: 'field_agent' } }),
       this.prisma.submission.count(),
       this.prisma.submission.count({ where: { status: 'pending' } }),
-      this.prisma.submission.count({ where: { status: 'completed' } }),
-      this.prisma.report.count(),
+      this.prisma.fieldVisit.count({ where: { createdAt: { gte: today } } }),
       this.prisma.report.count({ where: { status: 'approved' } }),
-      this.prisma.dispute.count({ where: { status: 'open' } }),
-      this.prisma.kybApplication.count({ where: { status: 'pending' } }),
-      this.prisma.transaction.aggregate({
-        where: { type: 'purchase', status: 'completed' },
-        _sum: { amount: true },
+      this.prisma.submission.count({ where: { status: 'in_progress' } }),
+      this.prisma.submission.count({
+        where: { status: 'completed', updatedAt: { gte: sevenDaysAgo } },
       }),
     ]);
 
     return {
-      users: { total: totalUsers, agents: totalAgents, tenants: totalTenants, fieldAgents: totalFieldAgents },
-      submissions: { total: totalSubmissions, pending: pendingSubmissions, completed: completedSubmissions },
-      reports: { total: totalReports, approved: approvedReports },
-      disputes: { open: openDisputes },
-      kyb: { pending: pendingKyb },
-      revenue: { totalCredits: totalRevenue._sum.amount || 0 },
+      totalCases,
+      pendingVerifications,
+      fieldVisitsToday,
+      reportsReady,
+      inProgress,
+      completedThisWeek,
     };
+  }
+
+  async getRecentCases(limit = 10) {
+    const safeLimit = Math.min(Math.max(1, limit), 100);
+    return this.prisma.submission.findMany({
+      orderBy: { createdAt: 'desc' },
+      take: safeLimit,
+      select: {
+        id: true,
+        tenantName: true,
+        propertyAddress: true,
+        status: true,
+        createdAt: true,
+        updatedAt: true,
+        agent: { select: { name: true } },
+      },
+    });
   }
 
   async getRecentActivity(limit = 10) {

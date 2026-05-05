@@ -61,7 +61,7 @@ export class UploadService {
       );
     }
 
-    const ALLOWED_FOLDERS = ['property-images', 'kyb-documents', 'field-visit-photos', 'profile-photos', 'documents'];
+    const ALLOWED_FOLDERS = ['property-images', 'kyb-documents', 'field-visit-photos', 'profile-photos', 'documents', 'tenant-documents'];
     const safeFolder = folder.replace(/[^a-zA-Z0-9_-]/g, '');
     if (!ALLOWED_FOLDERS.includes(safeFolder)) {
       throw new BadRequestException(`Invalid upload folder. Allowed: ${ALLOWED_FOLDERS.join(', ')}`);

@@ -51,6 +51,8 @@ describe('SubmissionsService', () => {
   };
 
   beforeEach(async () => {
+    process.env.R2_PUBLIC_URL = 'https://test.r2.dev';
+
     const module: TestingModule = await Test.createTestingModule({
       providers: [
         SubmissionsService,
@@ -294,6 +296,7 @@ describe('SubmissionsService', () => {
       id: 'sub-1',
       agentId: 'agent-1',
       tenantName: 'John',
+      propertyImages: ['property-images/test.jpg'],
       agent: { id: 'agent-1', name: 'Agent', email: 'agent@test.com' },
       verificationChecklist: {},
       fieldAssignments: [],
@@ -302,12 +305,17 @@ describe('SubmissionsService', () => {
       disputes: [],
     };
 
+    const expectedResult = {
+      ...mockSubmission,
+      propertyImages: ['https://test.r2.dev/property-images/test.jpg'],
+    };
+
     it('should return full submission with includes', async () => {
       mockPrismaService.submission.findUnique.mockResolvedValue(mockSubmission);
 
       const result = await service.findById('sub-1', 'agent-1', 'agent');
 
-      expect(result).toEqual(mockSubmission);
+      expect(result).toEqual(expectedResult);
       expect(mockPrismaService.submission.findUnique).toHaveBeenCalledWith(
         expect.objectContaining({
           where: { id: 'sub-1' },
@@ -336,7 +344,7 @@ describe('SubmissionsService', () => {
 
       const result = await service.findById('sub-1', 'ops-1', 'ops');
 
-      expect(result).toEqual(mockSubmission);
+      expect(result).toEqual(expectedResult);
     });
 
     it('should throw NotFoundException when submission not found', async () => {
