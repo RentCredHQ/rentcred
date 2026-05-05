@@ -78,7 +78,7 @@ async function reassign() {
         <div class="relative w-full mx-4 max-w-md bg-white rounded-2xl border border-border shadow-xl flex flex-col max-h-[85vh] overflow-hidden">
           <!-- Header -->
           <div class="flex items-center justify-between px-5 py-4 border-b border-border flex-shrink-0">
-            <h2 class="font-mono text-[16px] font-bold text-foreground">Reassign Case</h2>
+            <h2 class="font-mono text-[16px] font-bold text-foreground">{{ caseInfo.currentAgent === '—' ? 'Assign Field Agent' : 'Reassign Case' }}</h2>
             <button @click="close" class="w-8 h-8 flex items-center justify-center rounded-lg bg-[#E7E8E5] hover:bg-border transition-colors">
               <span class="material-symbols-rounded text-[18px] text-muted-foreground">close</span>
             </button>
@@ -88,17 +88,21 @@ async function reassign() {
           <div class="flex-1 overflow-y-auto px-5 py-5 flex flex-col gap-5">
             <!-- Current Assignment -->
             <div class="bg-white border border-border rounded-xl p-4 flex flex-col gap-2">
-              <span class="font-mono text-[11px] font-semibold text-muted-foreground tracking-wider">CURRENT ASSIGNMENT</span>
-              <span class="font-mono text-[15px] font-bold text-foreground">{{ caseInfo.id }}</span>
+              <span class="font-mono text-[11px] font-semibold text-muted-foreground tracking-wider">CASE DETAILS</span>
+              <span class="font-mono text-[15px] font-bold text-foreground">{{ caseInfo.id?.slice(0, 10) }}…</span>
               <span class="font-sans text-[13px] text-muted-foreground">Tenant: {{ caseInfo.tenant }}</span>
-              <div class="flex items-center gap-2">
+              <div v-if="caseInfo.currentAgent !== '—'" class="flex items-center gap-2">
                 <div class="w-2 h-2 rounded-full bg-[#804200]" />
                 <span class="font-sans text-[12px] text-foreground">Currently assigned to: {{ caseInfo.currentAgent }}</span>
+              </div>
+              <div v-else class="flex items-center gap-2">
+                <div class="w-2 h-2 rounded-full bg-blue-500" />
+                <span class="font-sans text-[12px] text-muted-foreground">No field agent assigned yet</span>
               </div>
             </div>
 
             <!-- Select Agent -->
-            <span class="font-mono text-[13px] font-semibold text-foreground">Select New Agent</span>
+            <span class="font-mono text-[13px] font-semibold text-foreground">{{ caseInfo.currentAgent === '—' ? 'Select Field Agent' : 'Select New Agent' }}</span>
 
             <!-- Search -->
             <div class="flex items-center gap-2.5 h-11 px-3.5 border border-border rounded-lg bg-white">

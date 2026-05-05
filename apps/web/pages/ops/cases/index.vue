@@ -162,8 +162,8 @@ const { searchQuery, activeFilter, filtered, resultCount } = useFilter({
           <div class="w-[110px] flex-shrink-0"><span class="font-sans text-[13px] text-foreground truncate block">{{ c.assigned }}</span></div>
           <div class="w-[90px] flex-shrink-0"><span class="font-sans text-[13px] text-muted-foreground">{{ c.updated }}</span></div>
           <div class="flex-1 flex items-center gap-1">
-            <NuxtLink :to="`/ops/cases/${c.id}`" class="flex items-center justify-center min-w-[36px] min-h-[36px] rounded-lg hover:bg-surface transition-colors"><span class="material-symbols-rounded text-[18px] text-muted-foreground hover:text-foreground">visibility</span></NuxtLink>
-            <button @click="openReassign(c.id)" class="flex items-center justify-center min-w-[36px] min-h-[36px] rounded-lg hover:bg-surface transition-colors"><span class="material-symbols-rounded text-[18px] text-muted-foreground hover:text-foreground">swap_horiz</span></button>
+            <NuxtLink :to="`/ops/cases/${c.id}`" class="flex items-center justify-center min-w-[36px] min-h-[36px] rounded-lg hover:bg-surface transition-colors" title="View"><span class="material-symbols-rounded text-[18px] text-muted-foreground hover:text-foreground">visibility</span></NuxtLink>
+            <button @click="openReassign(c.id)" class="flex items-center justify-center min-w-[36px] min-h-[36px] rounded-lg hover:bg-surface transition-colors" :title="c.assigned === '—' ? 'Assign' : 'Reassign'"><span class="material-symbols-rounded text-[18px] text-muted-foreground hover:text-foreground">{{ c.assigned === '—' ? 'person_add' : 'swap_horiz' }}</span></button>
           </div>
         </div>
       </div>
