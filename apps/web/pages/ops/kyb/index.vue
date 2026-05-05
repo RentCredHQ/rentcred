@@ -82,9 +82,9 @@ async function fetchApplications(page = 1) {
       const style = statusStyleMap[app.status] ?? { bg: 'bg-[#E9E3D8]', text: 'text-[#804200]' }
       return {
         id: app.id,
-        business: app.businessName ?? app.business ?? '',
-        email: app.email ?? '',
-        agent: app.agentName ?? app.agent?.name ?? '',
+        business: app.companyName ?? app.agentProfile?.companyName ?? '',
+        email: app.agentProfile?.user?.email ?? '',
+        agent: app.agentProfile?.user?.name ?? '',
         rc: app.rcNumber ?? '',
         status: label,
         statusBg: style.bg,
