@@ -150,7 +150,7 @@ const { searchQuery, activeFilter, filtered, resultCount } = useFilter({
         </div>
 
         <div v-for="txn in filtered" :key="txn.id" class="flex items-center px-6 py-3 border-b border-border last:border-0 hover:bg-surface/30 transition-colors">
-          <div class="w-[120px]"><span class="font-mono text-[12px] font-medium text-foreground">{{ txn.id }}</span></div>
+          <div class="w-[120px]"><span class="font-mono text-[12px] font-medium text-foreground truncate block" :title="txn.id">{{ txn.id.slice(0, 10) }}…</span></div>
           <div class="w-[160px]">
             <span class="font-sans text-[13px] font-medium text-foreground block">{{ txn.agent }}</span>
             <span class="font-sans text-[11px] text-muted-foreground">{{ txn.business }}</span>
@@ -171,7 +171,7 @@ const { searchQuery, activeFilter, filtered, resultCount } = useFilter({
       <div class="lg:hidden">
         <div v-for="txn in filtered" :key="txn.id" class="px-4 py-3.5 border-b border-border last:border-0">
           <div class="flex items-center justify-between mb-1.5">
-            <span class="font-mono text-[13px] font-medium text-foreground">{{ txn.id }}</span>
+            <span class="font-mono text-[13px] font-medium text-foreground truncate block" :title="txn.id">{{ txn.id.slice(0, 10) }}…</span>
             <span class="inline-flex px-2 py-0.5 rounded-full text-[10px] font-semibold" :class="[txn.statusBg, txn.statusText]">{{ txn.status }}</span>
           </div>
           <div class="flex items-center justify-between">

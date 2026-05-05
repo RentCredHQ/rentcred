@@ -92,7 +92,7 @@ onMounted(async () => {
           <div v-for="c in recentCases" :key="c.id" class="flex items-center justify-between px-6 py-4">
             <div>
               <div class="flex items-center gap-2">
-                <span class="font-mono text-xs text-muted-foreground">{{ c.id }}</span>
+                <span class="font-mono text-xs text-muted-foreground truncate block" :title="c.id">{{ c.id.slice(0, 8) }}…</span>
                 <span class="font-sans text-sm font-medium text-foreground">{{ c.tenant }}</span>
               </div>
               <span class="font-sans text-xs text-muted-foreground">{{ c.agent }} · {{ c.updated }}</span>

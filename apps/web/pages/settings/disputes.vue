@@ -84,7 +84,7 @@ const { searchQuery, activeFilter, filtered, resultCount } = useFilter({
         </div>
 
         <div v-for="d in filtered" :key="d.id" class="flex items-center px-6 py-3 border-b border-border last:border-0 hover:bg-surface/30 transition-colors">
-          <div class="w-[140px]"><span class="font-mono text-[13px] font-medium text-foreground">{{ d.id }}</span></div>
+          <div class="w-[140px]"><span class="font-mono text-[13px] font-medium text-foreground truncate block" :title="d.id">{{ d.id.slice(0, 10) }}…</span></div>
           <div class="w-[160px]"><span class="font-sans text-[13px] text-foreground">{{ d.parties }}</span></div>
           <div class="flex-1"><span class="font-sans text-[13px] text-foreground">{{ d.reason }}</span></div>
           <div class="w-[100px]">
@@ -106,7 +106,7 @@ const { searchQuery, activeFilter, filtered, resultCount } = useFilter({
       <div class="lg:hidden">
         <div v-for="d in filtered" :key="d.id" class="px-4 py-3.5 border-b border-border last:border-0">
           <div class="flex items-center justify-between mb-1.5">
-            <span class="font-mono text-[13px] font-medium text-foreground">{{ d.id }}</span>
+            <span class="font-mono text-[13px] font-medium text-foreground truncate block" :title="d.id">{{ d.id.slice(0, 10) }}…</span>
             <span class="inline-flex px-2 py-0.5 rounded-full text-[10px] font-semibold" :class="[d.statusBg, d.statusText]">{{ d.status }}</span>
           </div>
           <span class="font-sans text-sm text-foreground block mb-1">{{ d.reason }}</span>

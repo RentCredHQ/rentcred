@@ -51,7 +51,7 @@ function resultClasses(result: string) {
     <div class="flex flex-col gap-3">
       <div v-for="r in filtered" :key="r.id" class="bg-card border border-border rounded-xl p-4 flex flex-col gap-2">
         <div class="flex items-center justify-between">
-          <span class="font-mono text-[12px] text-foreground">{{ r.id }}</span>
+          <span class="font-mono text-[12px] text-foreground truncate block" :title="r.id">{{ r.id.slice(0, 10) }}…</span>
           <span class="px-2.5 py-0.5 rounded-full text-[10px] font-semibold" :class="resultClasses(r.result)">{{ r.result }}</span>
         </div>
         <span class="font-sans text-sm font-medium text-foreground">{{ r.tenant }}</span>

@@ -70,23 +70,23 @@ const { searchQuery, activeFilter, filtered, resultCount } = useFilter({
       </div>
 
       <!-- Desktop Table -->
-      <div class="hidden lg:block">
-        <div class="flex bg-background px-6 py-2.5 border-b border-border">
-          <div class="w-[100px]"><span class="font-mono text-[11px] font-semibold text-muted-foreground tracking-wider">Report ID</span></div>
-          <div class="w-[90px]"><span class="font-mono text-[11px] font-semibold text-muted-foreground tracking-wider">Case ID</span></div>
-          <div class="w-[150px]"><span class="font-mono text-[11px] font-semibold text-muted-foreground tracking-wider">Tenant</span></div>
-          <div class="w-[120px]"><span class="font-mono text-[11px] font-semibold text-muted-foreground tracking-wider">Field Agent</span></div>
-          <div class="w-[90px]"><span class="font-mono text-[11px] font-semibold text-muted-foreground tracking-wider">Risk Level</span></div>
-          <div class="w-[120px]"><span class="font-mono text-[11px] font-semibold text-muted-foreground tracking-wider">Status</span></div>
-          <div class="w-[80px]"><span class="font-mono text-[11px] font-semibold text-muted-foreground tracking-wider">Date</span></div>
+      <div class="hidden lg:block overflow-x-auto">
+        <div class="flex bg-background px-6 py-2.5 border-b border-border min-w-[900px]">
+          <div class="w-[110px] flex-shrink-0"><span class="font-mono text-[11px] font-semibold text-muted-foreground tracking-wider">Report ID</span></div>
+          <div class="w-[110px] flex-shrink-0"><span class="font-mono text-[11px] font-semibold text-muted-foreground tracking-wider">Case ID</span></div>
+          <div class="w-[150px] flex-shrink-0"><span class="font-mono text-[11px] font-semibold text-muted-foreground tracking-wider">Tenant</span></div>
+          <div class="w-[120px] flex-shrink-0"><span class="font-mono text-[11px] font-semibold text-muted-foreground tracking-wider">Field Agent</span></div>
+          <div class="w-[90px] flex-shrink-0"><span class="font-mono text-[11px] font-semibold text-muted-foreground tracking-wider">Risk Level</span></div>
+          <div class="w-[120px] flex-shrink-0"><span class="font-mono text-[11px] font-semibold text-muted-foreground tracking-wider">Status</span></div>
+          <div class="w-[80px] flex-shrink-0"><span class="font-mono text-[11px] font-semibold text-muted-foreground tracking-wider">Date</span></div>
           <div class="flex-1"><span class="font-mono text-[11px] font-semibold text-muted-foreground tracking-wider">Action</span></div>
         </div>
 
-        <div v-for="rpt in filtered" :key="rpt.id" class="flex items-center px-6 py-3 border-b border-border last:border-0 hover:bg-surface/30 transition-colors">
-          <div class="w-[100px]"><span class="font-mono text-[12px] font-medium text-foreground">{{ rpt.id }}</span></div>
-          <div class="w-[90px]"><span class="font-mono text-[12px] text-muted-foreground">{{ rpt.caseId }}</span></div>
-          <div class="w-[150px]"><span class="font-sans text-[13px] text-foreground">{{ rpt.tenant }}</span></div>
-          <div class="w-[120px]"><span class="font-sans text-[13px] text-foreground">{{ rpt.agent }}</span></div>
+        <div v-for="rpt in filtered" :key="rpt.id" class="flex items-center px-6 py-3 border-b border-border last:border-0 hover:bg-surface/30 transition-colors min-w-[900px]">
+          <div class="w-[110px] flex-shrink-0"><span class="font-mono text-[12px] font-medium text-foreground truncate block" :title="rpt.id">{{ rpt.id.slice(0, 10) }}…</span></div>
+          <div class="w-[110px] flex-shrink-0"><span class="font-mono text-[12px] text-muted-foreground truncate block" :title="rpt.caseId">{{ rpt.caseId?.slice(0, 10) }}…</span></div>
+          <div class="w-[150px] flex-shrink-0"><span class="font-sans text-[13px] text-foreground truncate block">{{ rpt.tenant }}</span></div>
+          <div class="w-[120px] flex-shrink-0"><span class="font-sans text-[13px] text-foreground truncate block">{{ rpt.agent }}</span></div>
           <div class="w-[90px]">
             <span class="inline-flex px-2.5 py-0.5 rounded-full text-[11px] font-semibold" :class="[rpt.riskBg, rpt.riskText]">{{ rpt.risk }}</span>
           </div>
@@ -105,7 +105,7 @@ const { searchQuery, activeFilter, filtered, resultCount } = useFilter({
         <div v-for="rpt in filtered" :key="rpt.id" class="px-4 py-3.5 border-b border-border last:border-0">
           <div class="flex items-center justify-between mb-1.5">
             <div class="flex items-center gap-2">
-              <span class="font-mono text-[13px] font-medium text-foreground">{{ rpt.id }}</span>
+              <span class="font-mono text-[13px] font-medium text-foreground">{{ rpt.id.slice(0, 10) }}…</span>
               <span class="inline-flex px-2 py-0.5 rounded-full text-[10px] font-semibold" :class="[rpt.riskBg, rpt.riskText]">{{ rpt.risk }}</span>
             </div>
             <span class="inline-flex px-2 py-0.5 rounded-full text-[10px] font-semibold" :class="[rpt.statusBg, rpt.statusText]">{{ rpt.status }}</span>

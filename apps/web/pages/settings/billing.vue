@@ -73,7 +73,7 @@ onMounted(async () => {
         </div>
 
         <div v-for="inv in invoices" :key="inv.id" class="flex items-center px-6 py-3 border-b border-border last:border-0 hover:bg-surface/30 transition-colors">
-          <div class="w-[160px]"><span class="font-mono text-[13px] text-foreground font-medium">{{ inv.id }}</span></div>
+          <div class="w-[160px]"><span class="font-mono text-[13px] text-foreground font-medium truncate block" :title="inv.id">{{ inv.id.slice(0, 10) }}…</span></div>
           <div class="w-[140px]"><span class="font-sans text-[13px] text-muted-foreground">{{ inv.date }}</span></div>
           <div class="flex-1"><span class="font-sans text-[13px] text-foreground">{{ inv.desc }}</span></div>
           <div class="w-[120px]"><span class="font-mono text-sm font-medium text-foreground">{{ inv.amount }}</span></div>

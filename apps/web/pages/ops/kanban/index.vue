@@ -86,7 +86,7 @@ const columns = ref([
             class="bg-card border border-border rounded-xl p-4 flex flex-col gap-2.5 hover:shadow-sm transition-shadow cursor-pointer"
           >
             <div class="flex items-center justify-between">
-              <span class="font-mono text-[12px] font-medium text-foreground">{{ card.id }}</span>
+              <span class="font-mono text-[12px] font-medium text-foreground truncate block" :title="card.id">{{ card.id.slice(0, 8) }}…</span>
               <span class="inline-flex px-2 py-0.5 rounded-full text-[10px] font-semibold" :class="[card.priorityBg, card.priorityText]">{{ card.priority }}</span>
             </div>
             <span class="font-sans text-[13px] font-medium text-foreground">{{ card.tenant }}</span>

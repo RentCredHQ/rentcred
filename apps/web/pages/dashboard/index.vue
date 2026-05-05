@@ -215,7 +215,7 @@ onMounted(async () => {
 
       <!-- Rows -->
       <div v-for="sub in mappedSubmissions" :key="sub.id" class="flex items-center border-b border-border hover:bg-surface/30 transition-colors">
-        <div class="w-[100px] px-4 py-3"><span class="font-mono text-[13px] text-foreground">{{ sub.id }}</span></div>
+        <div class="w-[100px] px-4 py-3"><span class="font-mono text-[13px] text-foreground truncate block" :title="sub.id">{{ sub.id.slice(0, 10) }}…</span></div>
         <div class="flex-1 px-4 py-3">
           <div class="flex flex-col gap-0.5">
             <span class="font-sans text-[13px] font-medium text-foreground">{{ sub.tenant.name }}</span>

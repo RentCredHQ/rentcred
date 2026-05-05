@@ -122,7 +122,7 @@ onMounted(async () => {
           <div class="w-[100px]"><span class="font-sans text-[12px] font-medium text-muted-foreground">Status</span></div>
         </div>
         <div v-for="tx in filtered" :key="tx.id" class="flex items-center px-5 py-3.5 border-b border-border last:border-0 hover:bg-surface/30 transition-colors">
-          <div class="w-[140px]"><span class="font-mono text-[13px] text-muted-foreground">{{ tx.id }}</span></div>
+          <div class="w-[140px]"><span class="font-mono text-[13px] text-muted-foreground truncate block" :title="tx.id">{{ tx.id.slice(0, 10) }}…</span></div>
           <div class="flex-1"><span class="font-sans text-sm text-foreground">{{ tx.desc }}</span></div>
           <div class="w-[120px]"><span class="font-sans text-[13px] text-muted-foreground">{{ tx.date }}</span></div>
           <div class="w-[100px]"><span class="font-mono text-sm font-medium text-foreground">{{ tx.amount }}</span></div>
