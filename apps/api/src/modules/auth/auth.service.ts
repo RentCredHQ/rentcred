@@ -69,7 +69,10 @@ export class AuthService {
   }
 
   async login(dto: LoginDto) {
-    const user = await this.prisma.user.findUnique({ where: { email: dto.email } });
+    const user = await this.prisma.user.findUnique({
+      where: { email: dto.email },
+      include: { agentProfile: { select: { kybStatus: true, creditBalance: true, companyName: true } } },
+    });
     if (!user) {
       throw new UnauthorizedException('Invalid email or password');
     }
@@ -88,6 +91,11 @@ export class AuthService {
         email: user.email,
         role: user.role,
         isVerified: user.isVerified,
+        ...(user.agentProfile ? {
+          kybStatus: user.agentProfile.kybStatus,
+          creditBalance: user.agentProfile.creditBalance,
+          companyName: user.agentProfile.companyName,
+        } : {}),
       },
       token,
     };
