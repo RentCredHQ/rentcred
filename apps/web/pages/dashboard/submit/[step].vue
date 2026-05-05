@@ -4,10 +4,9 @@ import { PROPERTY_TYPES, PROPERTY_CONDITIONS, NIGERIAN_STATES, NIGERIAN_LGAS } f
 definePageMeta({ layout: 'dashboard' })
 useSeoMeta({ title: 'Submit Tenant — RentCred' })
 
-const route = useRoute()
 const router = useRouter()
 
-const currentStep = computed(() => Number(route.params.step) || 1)
+const currentStep = ref(1)
 const isLoading = ref(false)
 const showConfirmation = ref(false)
 const submitError = ref<string | null>(null)
@@ -120,13 +119,13 @@ const reviewRows = computed(() => [
 
 function nextStep() {
   if (currentStep.value < 4) {
-    router.push(`/dashboard/submit/${currentStep.value + 1}`)
+    currentStep.value++
   }
 }
 
 function prevStep() {
   if (currentStep.value > 1) {
-    router.push(`/dashboard/submit/${currentStep.value - 1}`)
+    currentStep.value--
   }
 }
 
@@ -156,7 +155,8 @@ async function handleSubmit() {
     createdCaseId.value = result.data?.id || ''
     showConfirmation.value = true
   } catch (e: any) {
-    submitError.value = e.data?.message || e.message || 'Failed to submit. Please try again.'
+    const msg = e.data?.message
+    submitError.value = Array.isArray(msg) ? msg.join(', ') : msg || e.message || 'Failed to submit. Please try again.'
   } finally {
     isLoading.value = false
   }
