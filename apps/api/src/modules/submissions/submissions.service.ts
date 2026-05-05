@@ -50,7 +50,7 @@ export class SubmissionsService {
           tenantPhone: dto.tenantPhone,
           propertyAddress: dto.propertyAddress,
           annualRent: dto.annualRent,
-          monthlyRent: dto.monthlyRent ?? dto.annualRent / 12,
+          monthlyRent: dto.monthlyRent ?? (dto.annualRent || 0) / 12,
           propertyType: dto.propertyType,
           bedrooms: dto.bedrooms,
           state: dto.state,
