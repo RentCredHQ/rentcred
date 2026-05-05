@@ -9,11 +9,12 @@ const { getKybApplication, reviewKyb } = useKyb()
 
 const close = () => emit('update:modelValue', false)
 
-const company = ref({ name: '', rcNumber: '', director: '', status: '' })
+const company = ref({ name: '', rcNumber: '', director: '', status: '', rawStatus: '' })
 const documents = ref<any[]>([])
 const reviewNotes = ref('')
 const loading = ref(false)
 const actionLoading = ref(false)
+const canAction = ref(false)
 
 watch(() => props.modelValue, async (open) => {
   if (!open || !props.applicationId) return
@@ -27,7 +28,9 @@ watch(() => props.modelValue, async (open) => {
       rcNumber: app.rcNumber ?? '',
       director: app.agentProfile?.user?.name ?? '',
       status: app.status === 'approved' ? 'Approved' : app.status === 'rejected' ? 'Rejected' : 'Pending Review',
+      rawStatus: app.status ?? '',
     }
+    canAction.value = ['pending', 'submitted', 'under_review'].includes(app.status)
     // Build documents list from individual URL fields
     const docEntries = [
       { name: 'CAC Certificate', url: app.cacDocument },
@@ -134,8 +137,8 @@ async function reject() {
               </component>
             </div>
 
-            <!-- Review Notes -->
-            <div class="flex flex-col gap-1.5">
+            <!-- Review Notes (only when actionable) -->
+            <div v-if="canAction" class="flex flex-col gap-1.5">
               <label class="font-sans text-[13px] font-medium text-foreground">Review Notes</label>
               <textarea
                 v-model="reviewNotes"
@@ -144,8 +147,8 @@ async function reject() {
               />
             </div>
 
-            <!-- Action Buttons -->
-            <div class="flex gap-3">
+            <!-- Action Buttons (only when pending/submitted/under_review) -->
+            <div v-if="canAction" class="flex gap-3">
               <button @click="reject" class="flex-1 flex items-center justify-center gap-2 h-12 border-[1.5px] border-[#991B1B] rounded-lg text-[13px] font-mono font-semibold text-[#991B1B] hover:bg-[#FDECEC] transition-colors">
                 <span class="material-symbols-rounded text-[18px]">close</span>
                 Reject
