@@ -26,7 +26,7 @@ onMounted(async () => {
       getTransactionHistory({ limit: 5 }),
     ])
 
-    const d = statsRes.data
+    const d = statsRes.data ?? statsRes
     const creditBalance = d.creditBalance ?? 0
     const totalSubmissions = d.totalSubmissions ?? 0
     kpis.value = {
@@ -36,7 +36,7 @@ onMounted(async () => {
       purchased: '',
     }
 
-    bundles.value = (bundlesRes.data ?? []).map((b: any, i: number) => ({
+    bundles.value = (bundlesRes.data ?? bundlesRes ?? []).map((b: any, i: number) => ({
       name: b.name,
       credits: b.credits,
       price: b.priceNgn ?? b.price ?? 0,
@@ -45,7 +45,7 @@ onMounted(async () => {
       badge: i === 1 ? 'Best Value' : undefined,
     }))
 
-    history.value = (historyRes.data ?? []).map((tx: any) => ({
+    history.value = (historyRes.data ?? historyRes ?? []).map((tx: any) => ({
       bundle: tx.description || tx.type || '',
       date: new Date(tx.createdAt).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' }),
       amount: `₦${(tx.amount ?? 0).toLocaleString()}`,
