@@ -47,7 +47,8 @@ const caseData = ref({
 const checks = ref<any[]>([])
 const timeline = ref<any[]>([])
 
-onMounted(async () => {
+async function fetchCaseData() {
+  loading.value = true
   try {
     const [submissionRes, auditRes] = await Promise.all([
       getSubmission(caseId.value),
@@ -56,6 +57,10 @@ onMounted(async () => {
 
     const s = submissionRes.data ?? submissionRes
     const style = statusStyleMap[s.status] ?? { bg: 'bg-[#E9E3D8]', text: 'text-[#804200]' }
+
+    // Extract field agent from fieldAssignments array
+    const latestAssignment = s.fieldAssignments?.[0]
+    const fieldAgentName = latestAssignment?.fieldAgent?.name ?? s.fieldAgentName ?? s.fieldAgent?.name ?? ''
 
     caseData.value = {
       id: s.id,
@@ -83,7 +88,7 @@ onMounted(async () => {
         contact: s.agent?.name ?? '',
         rc: s.agent?.rcNumber ?? '',
       },
-      assignee: s.fieldAgentName ?? s.fieldAgent?.name ?? '—',
+      assignee: fieldAgentName || '—',
       status: SUBMISSION_STATUS_LABELS[s.status] ?? s.status,
       statusBg: style.bg,
       statusText: style.text,
@@ -122,7 +127,9 @@ onMounted(async () => {
     }))
   } catch { /* empty */ }
   finally { loading.value = false }
-})
+}
+
+onMounted(fetchCaseData)
 </script>
 
 <template>
@@ -364,6 +371,6 @@ onMounted(async () => {
     </div>
 
     <!-- Case Reassign Modal -->
-    <OpsCaseReassignModal v-model="showReassign" :submission-id="caseId" />
+    <OpsCaseReassignModal v-model="showReassign" :submission-id="caseId" @reassigned="fetchCaseData" />
   </div>
 </template>

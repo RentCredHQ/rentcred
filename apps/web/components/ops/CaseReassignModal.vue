@@ -53,7 +53,7 @@ watch(() => props.modelValue, async (open) => {
       caseInfo.value = {
         id: s.id ?? '',
         tenant: s.tenantName ?? '',
-        currentAgent: s.fieldAgentName ?? s.fieldAgent?.name ?? '—',
+        currentAgent: s.fieldAssignments?.[0]?.fieldAgent?.name ?? s.fieldAgentName ?? s.fieldAgent?.name ?? '—',
       }
     }
   } catch (e: any) {
