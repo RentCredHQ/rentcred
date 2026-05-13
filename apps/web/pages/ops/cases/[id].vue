@@ -13,6 +13,7 @@ const { getAuditLogs } = useAuditLog()
 
 const showReassign = ref(false)
 const loading = ref(true)
+const hasFieldAgent = ref(false)
 
 const statusStyleMap: Record<string, { bg: string; text: string }> = {
   pending: { bg: 'bg-[#E9E3D8]', text: 'text-[#804200]' },
@@ -93,6 +94,7 @@ onMounted(async () => {
       updated: s.updatedAt ? new Date(s.updatedAt).toLocaleDateString('en-NG', { month: 'short', day: 'numeric', year: 'numeric' }) : '',
       sla: s.sla ?? '',
     }
+    hasFieldAgent.value = caseData.assignee !== '—' && caseData.assignee !== ''
 
     // Map verification checklist
     const checklist = s.verificationChecklist ?? s.verificationResults ?? {}
@@ -107,7 +109,6 @@ onMounted(async () => {
     checks.value = Object.entries(checkLabels).map(([key, label]) => {
       const val = checklist[key]
       if (val === true) return { label, status: 'Verified', icon: 'check_circle', color: 'text-[#004D1A]' }
-      if (val === false) return { label, status: 'Failed', icon: 'cancel', color: 'text-[#8C1C00]' }
       return { label, status: 'Pending', icon: 'schedule', color: 'text-muted-foreground' }
     })
 
@@ -141,8 +142,8 @@ onMounted(async () => {
         </div>
         <div class="flex items-center gap-3">
           <button @click="showReassign = true" class="flex items-center gap-2 px-4 py-2.5 border border-border rounded-lg text-[13px] font-sans text-foreground hover:bg-surface transition-colors">
-            <span class="material-symbols-rounded text-[16px]">swap_horiz</span>
-            Reassign
+            <span class="material-symbols-rounded text-[16px]">{{ hasFieldAgent ? 'swap_horiz' : 'person_add' }}</span>
+            {{ hasFieldAgent ? 'Reassign' : 'Assign Field Agent' }}
           </button>
           <button class="flex items-center gap-2 px-4 py-2.5 bg-primary text-foreground rounded font-mono text-[13px] font-medium hover:opacity-90 transition-opacity">
             <span class="material-symbols-rounded text-[16px]">edit_note</span>
