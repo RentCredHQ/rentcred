@@ -364,6 +364,6 @@ onMounted(async () => {
     </div>
 
     <!-- Case Reassign Modal -->
-    <OpsCaseReassignModal v-model="showReassign" />
+    <OpsCaseReassignModal v-model="showReassign" :submission-id="caseId" />
   </div>
 </template>
