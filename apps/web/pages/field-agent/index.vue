@@ -70,6 +70,16 @@ function statusLabel(status: string) {
     </div>
     <span class="font-mono text-base font-semibold text-foreground">Today's Schedule</span>
     <div class="flex flex-col gap-3">
+      <!-- Empty State -->
+      <div v-if="visits.length === 0 && !loading" class="flex flex-col items-center justify-center py-16 gap-4">
+        <div class="w-16 h-16 rounded-full bg-[#E7E8E5] flex items-center justify-center">
+          <span class="material-symbols-rounded text-[28px] text-muted-foreground">event_available</span>
+        </div>
+        <div class="flex flex-col items-center gap-1">
+          <h3 class="font-mono text-base font-semibold text-foreground">No visits scheduled</h3>
+          <p class="font-sans text-sm text-muted-foreground text-center max-w-[320px]">You have no field visits assigned for today</p>
+        </div>
+      </div>
       <NuxtLink v-for="v in visits" :key="v.id" :to="`/field-agent/visits/${v.submissionId}`"
         class="bg-card border border-border rounded-xl p-4 flex flex-col gap-2.5">
         <div class="flex items-center justify-between">

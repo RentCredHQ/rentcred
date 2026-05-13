@@ -40,6 +40,7 @@ describe('SubmissionsService', () => {
       findUnique: jest.fn(),
     },
     $transaction: jest.fn(),
+    $queryRawUnsafe: jest.fn(),
   };
 
   const mockNotificationsService = {
@@ -77,6 +78,14 @@ describe('SubmissionsService', () => {
     auditService = module.get<AuditService>(AuditService);
 
     jest.clearAllMocks();
+
+    // Support interactive transactions: execute callback with mockPrismaService as tx
+    mockPrismaService.$transaction.mockImplementation(async (callback: any) => {
+      if (typeof callback === 'function') {
+        return callback(mockPrismaService);
+      }
+      return callback;
+    });
   });
 
   it('should be defined', () => {
@@ -112,28 +121,24 @@ describe('SubmissionsService', () => {
       consentObtained: true,
     };
 
-    const mockAgent = { userId: agentId, creditBalance: 5, kybStatus: 'approved' };
     const mockSubmission = { id: 'sub-1', ...createDto, agentId, status: 'pending' };
-    const mockUpdatedAgent = { ...mockAgent, creditBalance: 4 };
-    const mockTransaction = { id: 'txn-1', agentId, type: 'deduction', amount: 1 };
 
     it('should create a submission with credit deduction', async () => {
-      mockPrismaService.agentProfile.findUnique.mockResolvedValue(mockAgent);
-      mockPrismaService.$transaction.mockResolvedValue([
-        mockSubmission,
-        mockUpdatedAgent,
-        mockTransaction,
-      ]);
+      mockPrismaService.$queryRawUnsafe.mockResolvedValue([{ credit_balance: 5, kyb_status: 'approved' }]);
+      mockPrismaService.submission.create.mockResolvedValue(mockSubmission);
+      mockPrismaService.agentProfile.update.mockResolvedValue({});
+      mockPrismaService.transaction.create.mockResolvedValue({});
       mockPrismaService.verificationChecklist.create.mockResolvedValue({ id: 'vc-1' });
       mockAuditService.log.mockResolvedValue(undefined);
 
       const result = await service.create(agentId, createDto as any);
 
       expect(result).toEqual(mockSubmission);
-      expect(mockPrismaService.agentProfile.findUnique).toHaveBeenCalledWith({
-        where: { userId: agentId },
-      });
       expect(mockPrismaService.$transaction).toHaveBeenCalled();
+      expect(mockPrismaService.$queryRawUnsafe).toHaveBeenCalledWith(
+        expect.stringContaining('SELECT'),
+        agentId,
+      );
       expect(mockPrismaService.verificationChecklist.create).toHaveBeenCalledWith({
         data: { submissionId: mockSubmission.id },
       });
@@ -148,49 +153,36 @@ describe('SubmissionsService', () => {
     });
 
     it('should throw ForbiddenException when agent has insufficient credits', async () => {
-      mockPrismaService.agentProfile.findUnique.mockResolvedValue({
-        userId: agentId,
-        creditBalance: 0,
-        kybStatus: 'approved',
-      });
+      mockPrismaService.$queryRawUnsafe.mockResolvedValue([{ credit_balance: 0, kyb_status: 'approved' }]);
 
       await expect(service.create(agentId, createDto as any)).rejects.toThrow(ForbiddenException);
-      expect(mockPrismaService.$transaction).not.toHaveBeenCalled();
     });
 
     it('should throw ForbiddenException when agent profile not found', async () => {
-      mockPrismaService.agentProfile.findUnique.mockResolvedValue(null);
+      mockPrismaService.$queryRawUnsafe.mockResolvedValue([]);
 
       await expect(service.create(agentId, createDto as any)).rejects.toThrow(ForbiddenException);
-      expect(mockPrismaService.$transaction).not.toHaveBeenCalled();
     });
 
     it('should derive monthlyRent from annualRent / 12 when not provided', async () => {
       const dtoNoMonthly = { ...createDto, monthlyRent: undefined };
-      mockPrismaService.agentProfile.findUnique.mockResolvedValue(mockAgent);
-      mockPrismaService.$transaction.mockResolvedValue([
-        mockSubmission,
-        mockUpdatedAgent,
-        mockTransaction,
-      ]);
+      mockPrismaService.$queryRawUnsafe.mockResolvedValue([{ credit_balance: 5, kyb_status: 'approved' }]);
+      mockPrismaService.submission.create.mockResolvedValue(mockSubmission);
+      mockPrismaService.agentProfile.update.mockResolvedValue({});
+      mockPrismaService.transaction.create.mockResolvedValue({});
       mockPrismaService.verificationChecklist.create.mockResolvedValue({ id: 'vc-1' });
       mockAuditService.log.mockResolvedValue(undefined);
 
       await service.create(agentId, dtoNoMonthly as any);
 
-      // The $transaction call receives an array of Prisma operations.
-      // We verify the submission.create call was made via $transaction
-      // which internally uses dto.monthlyRent ?? dto.annualRent / 12
       expect(mockPrismaService.$transaction).toHaveBeenCalled();
     });
 
     it('should create verification checklist after creation', async () => {
-      mockPrismaService.agentProfile.findUnique.mockResolvedValue(mockAgent);
-      mockPrismaService.$transaction.mockResolvedValue([
-        mockSubmission,
-        mockUpdatedAgent,
-        mockTransaction,
-      ]);
+      mockPrismaService.$queryRawUnsafe.mockResolvedValue([{ credit_balance: 5, kyb_status: 'approved' }]);
+      mockPrismaService.submission.create.mockResolvedValue(mockSubmission);
+      mockPrismaService.agentProfile.update.mockResolvedValue({});
+      mockPrismaService.transaction.create.mockResolvedValue({});
       mockPrismaService.verificationChecklist.create.mockResolvedValue({ id: 'vc-1' });
       mockAuditService.log.mockResolvedValue(undefined);
 
@@ -202,11 +194,12 @@ describe('SubmissionsService', () => {
     });
 
     it('should reject submission if KYB is not approved', async () => {
-      mockPrismaService.agentProfile.findUnique.mockResolvedValue({ creditBalance: 5, kybStatus: 'pending' });
+      mockPrismaService.$queryRawUnsafe.mockResolvedValue([{ credit_balance: 5, kyb_status: 'pending' }]);
       await expect(service.create(agentId, createDto as any)).rejects.toThrow(ForbiddenException);
     });
 
     it('should reject submission if consent not obtained', async () => {
+      mockPrismaService.$queryRawUnsafe.mockResolvedValue([{ credit_balance: 5, kyb_status: 'approved' }]);
       await expect(service.create(agentId, { ...createDto, consentObtained: false } as any)).rejects.toThrow(BadRequestException);
     });
   });

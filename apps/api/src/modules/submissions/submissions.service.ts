@@ -28,29 +28,36 @@ export class SubmissionsService {
   ) {}
 
   async create(agentId: string, dto: CreateSubmissionDto) {
-    if (!dto.consentObtained) {
-      throw new BadRequestException('Tenant consent is required before submission.');
-    }
+    // Use an interactive transaction with SELECT FOR UPDATE to prevent
+    // race conditions where two concurrent requests could overdraw credits.
+    const submission = await this.prisma.$transaction(async (tx) => {
+      // Lock the agent profile row to prevent concurrent credit deduction
+      const [agent] = await tx.$queryRawUnsafe<any[]>(
+        `SELECT * FROM agent_profiles WHERE user_id = $1 FOR UPDATE`,
+        agentId,
+      );
 
-    const agent = await this.prisma.agentProfile.findUnique({ where: { userId: agentId } });
-    if (!agent || agent.creditBalance < 1) {
-      throw new ForbiddenException('Insufficient credits. Please purchase a credit bundle.');
-    }
+      if (!agent || agent.credit_balance < 1) {
+        throw new ForbiddenException('Insufficient credits. Please purchase a credit bundle.');
+      }
 
-    if (agent.kybStatus !== 'approved') {
-      throw new ForbiddenException('KYB verification must be approved before submitting.');
-    }
+      if (agent.kyb_status !== 'approved') {
+        throw new ForbiddenException('KYB verification must be approved before submitting.');
+      }
 
-    const [submission] = await this.prisma.$transaction([
-      this.prisma.submission.create({
+      if (!dto.consentObtained) {
+        throw new BadRequestException('Tenant consent is required before submitting.');
+      }
+
+      const created = await tx.submission.create({
         data: {
           agentId,
           tenantName: dto.tenantName,
           tenantEmail: dto.tenantEmail,
           tenantPhone: dto.tenantPhone,
           propertyAddress: dto.propertyAddress,
-          annualRent: dto.annualRent,
-          monthlyRent: dto.monthlyRent ?? (dto.annualRent || 0) / 12,
+          annualRent: dto.annualRent ?? 0,
+          monthlyRent: dto.monthlyRent ?? (dto.annualRent ?? 0) / 12,
           propertyType: dto.propertyType,
           bedrooms: dto.bedrooms,
           state: dto.state,
@@ -69,26 +76,31 @@ export class SubmissionsService {
           consentObtained: dto.consentObtained,
           status: 'pending',
         },
-      }),
-      this.prisma.agentProfile.update({
+      });
+
+      await tx.agentProfile.update({
         where: { userId: agentId },
         data: { creditBalance: { decrement: 1 } },
-      }),
-      this.prisma.transaction.create({
+      });
+
+      await tx.transaction.create({
         data: {
           agentId,
           type: 'deduction',
           amount: 1,
           description: `Submission for ${dto.tenantName}`,
         },
-      }),
-    ]);
+      });
 
-    // Create verification checklist
-    await this.prisma.verificationChecklist.create({
-      data: { submissionId: submission.id },
+      // Create verification checklist
+      await tx.verificationChecklist.create({
+        data: { submissionId: created.id },
+      });
+
+      return created;
     });
 
+    // Audit log and notifications run AFTER the transaction commits
     await this.audit.log({
       userId: agentId,
       action: 'submission_created',

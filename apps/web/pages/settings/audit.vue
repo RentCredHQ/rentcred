@@ -24,6 +24,16 @@ const categoryStyles: Record<string, { bg: string; text: string }> = {
 const summary = ref<any[]>([])
 const events = ref<any[]>([])
 const loading = ref(true)
+const currentPage = ref(1)
+const totalEvents = ref(0)
+const totalPages = computed(() => Math.max(1, Math.ceil(totalEvents.value / 20)))
+
+function goPage(dir: number) {
+  const next = currentPage.value + dir
+  if (next < 1 || next > totalPages.value) return
+  currentPage.value = next
+  // Re-fetch when backend supports pagination
+}
 
 onMounted(async () => {
   try {
@@ -54,6 +64,7 @@ onMounted(async () => {
         categoryText: categoryStyles[category]?.text ?? 'text-foreground',
       }
     })
+    totalEvents.value = res?.pagination?.total ?? events.value.length
     if (res?.summary) {
       summary.value = res.summary
     } else {
@@ -111,6 +122,17 @@ const { searchQuery, activeFilter, filtered, resultCount } = useFilter({
           <div class="w-[120px]"><span class="font-mono text-[11px] font-semibold text-muted-foreground tracking-wider">IP Address</span></div>
         </div>
 
+        <!-- Empty State -->
+        <div v-if="filtered.length === 0 && !loading" class="flex flex-col items-center justify-center py-16 gap-4">
+          <div class="w-16 h-16 rounded-full bg-[#E7E8E5] flex items-center justify-center">
+            <span class="material-symbols-rounded text-[28px] text-muted-foreground">history</span>
+          </div>
+          <div class="flex flex-col items-center gap-1">
+            <h3 class="font-mono text-base font-semibold text-foreground">No audit entries</h3>
+            <p class="font-sans text-sm text-muted-foreground text-center max-w-[320px]">Activity logs will appear here</p>
+          </div>
+        </div>
+
         <div v-for="evt in filtered" :key="evt.time" class="flex items-center px-6 py-3 border-b border-border last:border-0 hover:bg-surface/30 transition-colors">
           <div class="w-[160px]"><span class="font-mono text-[12px] text-muted-foreground">{{ evt.time }}</span></div>
           <div class="w-[140px]"><span class="font-sans text-[13px] font-medium text-foreground">{{ evt.user }}</span></div>
@@ -124,6 +146,15 @@ const { searchQuery, activeFilter, filtered, resultCount } = useFilter({
 
       <!-- Mobile -->
       <div class="lg:hidden">
+        <div v-if="filtered.length === 0 && !loading" class="flex flex-col items-center justify-center py-16 gap-4">
+          <div class="w-16 h-16 rounded-full bg-[#E7E8E5] flex items-center justify-center">
+            <span class="material-symbols-rounded text-[28px] text-muted-foreground">history</span>
+          </div>
+          <div class="flex flex-col items-center gap-1">
+            <h3 class="font-mono text-base font-semibold text-foreground">No audit entries</h3>
+            <p class="font-sans text-sm text-muted-foreground text-center max-w-[320px]">Activity logs will appear here</p>
+          </div>
+        </div>
         <div v-for="evt in filtered" :key="evt.time" class="px-4 py-3.5 border-b border-border last:border-0">
           <div class="flex items-center justify-between mb-1">
             <span class="font-sans text-sm font-medium text-foreground">{{ evt.user }}</span>
@@ -139,11 +170,11 @@ const { searchQuery, activeFilter, filtered, resultCount } = useFilter({
 
       <!-- Footer -->
       <div class="flex items-center justify-between px-6 py-3 border-t border-border">
-        <span class="font-sans text-[12px] text-muted-foreground">Showing 1–6 of 148 events</span>
+        <span class="font-sans text-[12px] text-muted-foreground">Showing {{ resultCount }} of {{ totalEvents }} events</span>
         <div class="flex items-center gap-1.5">
-          <button class="px-2.5 py-1 bg-white border border-border rounded-md text-[12px] font-sans text-foreground">Prev</button>
-          <button class="px-2.5 py-1 bg-foreground rounded-md text-[12px] font-sans text-white">1</button>
-          <button class="px-2.5 py-1 bg-white border border-border rounded-md text-[12px] font-sans text-foreground">Next</button>
+          <button @click="goPage(-1)" :disabled="currentPage <= 1" class="px-2.5 py-1 bg-white border border-border rounded-md text-[12px] font-sans text-foreground disabled:opacity-40">Prev</button>
+          <span class="px-2.5 py-1 bg-foreground rounded-md text-[12px] font-sans text-white">{{ currentPage }}</span>
+          <button @click="goPage(1)" :disabled="currentPage >= totalPages" class="px-2.5 py-1 bg-primary rounded-md text-[12px] font-sans text-white disabled:opacity-40">Next</button>
         </div>
       </div>
     </div>

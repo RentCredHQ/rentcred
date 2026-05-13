@@ -25,6 +25,11 @@ export class AuthService {
   ) {}
 
   async register(dto: RegisterDto) {
+    // NOTE: We intentionally reveal that the email is already registered.
+    // This is an accepted UX trade-off shared by most SaaS platforms (Google, GitHub, etc.).
+    // The login endpoint already uses constant-time comparison and generic messages.
+    // If stricter anti-enumeration is needed in the future, return a generic success
+    // response here and send a "someone tried to register" notification email instead.
     const existing = await this.prisma.user.findUnique({ where: { email: dto.email } });
     if (existing) {
       throw new ConflictException('Email already registered');

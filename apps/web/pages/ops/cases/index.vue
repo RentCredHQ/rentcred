@@ -149,6 +149,17 @@ const { searchQuery, activeFilter, filtered, resultCount } = useFilter({
           <div class="flex-1"><span class="font-mono text-[11px] font-semibold text-muted-foreground tracking-wider">Action</span></div>
         </div>
 
+        <!-- Empty State -->
+        <div v-if="filtered.length === 0 && !loading" class="flex flex-col items-center justify-center py-16 gap-4">
+          <div class="w-16 h-16 rounded-full bg-[#E7E8E5] flex items-center justify-center">
+            <span class="material-symbols-rounded text-[28px] text-muted-foreground">folder_open</span>
+          </div>
+          <div class="flex flex-col items-center gap-1">
+            <h3 class="font-mono text-base font-semibold text-foreground">No cases found</h3>
+            <p class="font-sans text-sm text-muted-foreground text-center max-w-[320px]">No verification cases match your filters</p>
+          </div>
+        </div>
+
         <div v-for="c in filtered" :key="c.id" class="flex items-center px-6 py-3 border-b border-border last:border-0 hover:bg-surface/30 transition-colors min-w-[900px]">
           <div class="w-[110px] flex-shrink-0"><span class="font-mono text-[12px] font-medium text-foreground truncate block" :title="c.id">{{ c.id.slice(0, 10) }}…</span></div>
           <div class="w-[150px] flex-shrink-0"><span class="font-sans text-[13px] text-foreground truncate block">{{ c.tenant }}</span></div>
@@ -170,6 +181,15 @@ const { searchQuery, activeFilter, filtered, resultCount } = useFilter({
 
       <!-- Mobile Cards -->
       <div class="lg:hidden">
+        <div v-if="filtered.length === 0 && !loading" class="flex flex-col items-center justify-center py-16 gap-4">
+          <div class="w-16 h-16 rounded-full bg-[#E7E8E5] flex items-center justify-center">
+            <span class="material-symbols-rounded text-[28px] text-muted-foreground">folder_open</span>
+          </div>
+          <div class="flex flex-col items-center gap-1">
+            <h3 class="font-mono text-base font-semibold text-foreground">No cases found</h3>
+            <p class="font-sans text-sm text-muted-foreground text-center max-w-[320px]">No verification cases match your filters</p>
+          </div>
+        </div>
         <div v-for="c in filtered" :key="c.id" class="px-4 py-3.5 border-b border-border last:border-0">
           <div class="flex items-center justify-between mb-1.5">
             <div class="flex items-center gap-2">

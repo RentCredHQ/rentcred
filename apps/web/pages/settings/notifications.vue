@@ -46,6 +46,17 @@ const yesterdayNotifications = computed(() =>
   })
 )
 
+const unreadCount = computed(() => allNotifications.value.filter((n: any) => n.unread).length)
+const needActionCount = computed(() => allNotifications.value.filter((n: any) => n.unread && n.type === 'action').length)
+const resolvedThisWeek = computed(() => {
+  const weekAgo = new Date()
+  weekAgo.setDate(weekAgo.getDate() - 7)
+  return allNotifications.value.filter((n: any) => {
+    const d = new Date(n.createdAt ?? '')
+    return !n.unread && d >= weekAgo
+  }).length
+})
+
 async function handleMarkAsRead(id: string) {
   try {
     await markAsRead(id)
@@ -92,19 +103,30 @@ async function handleMarkAllAsRead() {
     <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
       <div class="flex items-center gap-2 px-3 py-2.5 bg-white border border-border rounded-lg">
         <span class="material-symbols-rounded text-[16px] text-primary">notifications</span>
-        <span class="font-mono text-[12px] font-semibold text-foreground">4 unread</span>
+        <span class="font-mono text-[12px] font-semibold text-foreground">{{ unreadCount }} unread</span>
       </div>
       <div class="flex items-center gap-2 px-3 py-2.5 bg-white border border-border rounded-lg">
-        <span class="font-mono text-[12px] font-semibold text-[#804200]">2 need action</span>
+        <span class="font-mono text-[12px] font-semibold text-[#804200]">{{ needActionCount }} need action</span>
       </div>
       <div class="flex items-center gap-2 px-3 py-2.5 bg-white border border-border rounded-lg">
-        <span class="font-mono text-[12px] font-medium text-muted-foreground">18 resolved this week</span>
+        <span class="font-mono text-[12px] font-medium text-muted-foreground">{{ resolvedThisWeek }} resolved this week</span>
+      </div>
+    </div>
+
+    <!-- Empty State (no notifications at all) -->
+    <div v-if="allNotifications.length === 0 && !loading" class="flex flex-col items-center justify-center py-16 gap-4">
+      <div class="w-16 h-16 rounded-full bg-[#E7E8E5] flex items-center justify-center">
+        <span class="material-symbols-rounded text-[28px] text-muted-foreground">notifications_none</span>
+      </div>
+      <div class="flex flex-col items-center gap-1">
+        <h3 class="font-mono text-base font-semibold text-foreground">No notifications</h3>
+        <p class="font-sans text-sm text-muted-foreground text-center max-w-[320px]">You're all caught up</p>
       </div>
     </div>
 
     <!-- Today -->
-    <div class="flex flex-col gap-0">
-      <span class="font-mono text-[12px] font-semibold text-muted-foreground tracking-wider mb-3">TODAY · 4</span>
+    <div v-if="allNotifications.length > 0" class="flex flex-col gap-0">
+      <span class="font-mono text-[12px] font-semibold text-muted-foreground tracking-wider mb-3">TODAY · {{ todayNotifications.length }}</span>
       <div class="bg-white border border-border rounded-lg overflow-hidden">
         <div v-for="(notif, i) in todayNotifications" :key="i" class="flex gap-3.5 p-4 border-b border-border last:border-0" :class="notif.unread ? 'bg-white' : ''">
           <div class="w-10 h-10 rounded-full flex items-center justify-center flex-shrink-0" :class="notif.iconBg">
@@ -121,8 +143,8 @@ async function handleMarkAllAsRead() {
     </div>
 
     <!-- Yesterday -->
-    <div class="flex flex-col gap-0">
-      <span class="font-mono text-[12px] font-semibold text-muted-foreground tracking-wider mb-3">YESTERDAY · 2</span>
+    <div v-if="allNotifications.length > 0" class="flex flex-col gap-0">
+      <span class="font-mono text-[12px] font-semibold text-muted-foreground tracking-wider mb-3">YESTERDAY · {{ yesterdayNotifications.length }}</span>
       <div class="bg-white border border-border rounded-lg overflow-hidden">
         <div v-for="(notif, i) in yesterdayNotifications" :key="i" class="flex gap-3.5 p-4 border-b border-border last:border-0">
           <div class="w-10 h-10 rounded-full flex items-center justify-center flex-shrink-0" :class="notif.iconBg">
@@ -138,7 +160,7 @@ async function handleMarkAllAsRead() {
     </div>
 
     <!-- Earlier -->
-    <div class="flex flex-col gap-0">
+    <div v-if="allNotifications.length > 0" class="flex flex-col gap-0">
       <span class="font-mono text-[12px] font-semibold text-muted-foreground tracking-wider mb-3">EARLIER</span>
       <div class="flex items-center gap-2.5 px-4.5 py-4 bg-[#E7E8E5] border border-border rounded-lg">
         <span class="material-symbols-rounded text-[18px] text-muted-foreground">inbox</span>

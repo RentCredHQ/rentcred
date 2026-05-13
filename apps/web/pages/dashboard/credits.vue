@@ -6,6 +6,8 @@ const { getDashboardStats } = useAgents()
 const { getBundles, getTransactionHistory } = usePayments()
 
 const loading = ref(true)
+const showPurchase = ref(false)
+const selectedBundleId = ref('')
 
 const kpis = ref({
   remaining: { value: 0, total: 0 },
@@ -37,10 +39,11 @@ onMounted(async () => {
     }
 
     bundles.value = (bundlesRes.data ?? bundlesRes ?? []).map((b: any, i: number) => ({
+      id: b.id ?? b.name,
       name: b.name,
       credits: b.credits,
       price: b.priceNgn ?? b.price ?? 0,
-      perCheck: `₦${Math.round((b.priceNgn ?? b.price ?? 0) / b.credits).toLocaleString()}/check`,
+      perCheck: `₦${Math.round((b.priceNgn ?? b.price ?? 0) / (b.credits || 1)).toLocaleString()}/check`,
       featured: i === 1,
       badge: i === 1 ? 'Best Value' : undefined,
     }))
@@ -68,7 +71,7 @@ onMounted(async () => {
     <!-- Header -->
     <div class="flex items-center justify-between">
       <h1 class="font-mono text-2xl font-bold text-foreground">Bundle Credits</h1>
-      <button class="flex items-center gap-2 px-6 py-2.5 bg-primary text-foreground font-sans text-sm font-semibold hover:opacity-90 transition-opacity">
+      <button @click="showPurchase = true" class="flex items-center gap-2 px-6 py-2.5 bg-primary text-foreground font-sans text-sm font-semibold hover:opacity-90 transition-opacity">
         <span class="material-symbols-rounded text-[18px]">add</span>
         Buy Bundle
       </button>
@@ -119,6 +122,7 @@ onMounted(async () => {
           </div>
           <span class="font-sans text-[12px] text-muted-foreground">{{ bundle.perCheck }}</span>
           <button
+            @click="selectedBundleId = bundle.id; showPurchase = true"
             class="w-full py-3 rounded text-sm font-sans font-semibold text-center transition-all mt-auto"
             :class="bundle.featured ? 'bg-primary text-foreground hover:opacity-90' : 'border border-border text-foreground hover:bg-surface'"
           >
@@ -144,6 +148,16 @@ onMounted(async () => {
           <div class="flex-1"><span class="font-mono text-[12px] font-semibold text-muted-foreground tracking-wider">Payment</span></div>
           <div class="w-[100px]"><span class="font-mono text-[12px] font-semibold text-muted-foreground tracking-wider">Status</span></div>
         </div>
+        <!-- Empty State -->
+        <div v-if="history.length === 0" class="flex flex-col items-center justify-center py-16 gap-4">
+          <div class="w-16 h-16 rounded-full bg-[#E7E8E5] flex items-center justify-center">
+            <span class="material-symbols-rounded text-[28px] text-muted-foreground">history</span>
+          </div>
+          <div class="flex flex-col items-center gap-1">
+            <h3 class="font-mono text-base font-semibold text-foreground">No purchase history</h3>
+            <p class="font-sans text-sm text-muted-foreground text-center max-w-[320px]">Your credit purchases will appear here</p>
+          </div>
+        </div>
         <div v-for="tx in history" :key="tx.date" class="flex items-center px-6 py-3.5 border-b border-border last:border-0">
           <div class="flex-1"><span class="font-sans text-sm text-foreground">{{ tx.bundle }}</span></div>
           <div class="flex-1"><span class="font-sans text-[13px] text-muted-foreground">{{ tx.date }}</span></div>
@@ -157,6 +171,15 @@ onMounted(async () => {
 
       <!-- Mobile List -->
       <div class="lg:hidden">
+        <div v-if="history.length === 0" class="flex flex-col items-center justify-center py-16 gap-4">
+          <div class="w-16 h-16 rounded-full bg-[#E7E8E5] flex items-center justify-center">
+            <span class="material-symbols-rounded text-[28px] text-muted-foreground">history</span>
+          </div>
+          <div class="flex flex-col items-center gap-1">
+            <h3 class="font-mono text-base font-semibold text-foreground">No purchase history</h3>
+            <p class="font-sans text-sm text-muted-foreground text-center max-w-[320px]">Your credit purchases will appear here</p>
+          </div>
+        </div>
         <div v-for="tx in history" :key="tx.date" class="px-5 py-3.5 border-b border-border last:border-0">
           <div class="flex items-center justify-between mb-1">
             <span class="font-sans text-sm font-medium text-foreground">{{ tx.bundle }}</span>
@@ -169,6 +192,8 @@ onMounted(async () => {
         </div>
       </div>
     </div>
+    <!-- Purchase Credits Modal -->
+    <DashboardPurchaseCreditsModal v-model="showPurchase" :bundle-id="selectedBundleId" @purchase-complete="$router.go(0)" />
     </template>
   </div>
 </template>

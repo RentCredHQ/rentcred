@@ -61,6 +61,14 @@ function handleProfileSave(data: { firstName: string; lastName: string; email: s
   profile.email = data.email
   profile.phone = data.phone
   company.value.name = data.company
+
+  // Update authStore so the sidebar reflects changes immediately
+  if (authStore.user) {
+    authStore.user.name = `${data.firstName} ${data.lastName}`
+    if ('companyName' in authStore.user) {
+      (authStore.user as any).companyName = data.company
+    }
+  }
 }
 
 function toggleNotification(id: string) {

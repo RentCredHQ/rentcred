@@ -116,6 +116,17 @@ onMounted(async () => {
         <div class="flex-1"><span class="font-mono text-[12px] font-semibold text-muted-foreground tracking-wider">Actions</span></div>
       </div>
 
+      <!-- Empty State -->
+      <div v-if="filtered.length === 0" class="flex flex-col items-center justify-center py-16 gap-4">
+        <div class="w-16 h-16 rounded-full bg-[#E7E8E5] flex items-center justify-center">
+          <span class="material-symbols-rounded text-[28px] text-muted-foreground">assessment</span>
+        </div>
+        <div class="flex flex-col items-center gap-1">
+          <h3 class="font-mono text-base font-semibold text-foreground">No reports yet</h3>
+          <p class="font-sans text-sm text-muted-foreground text-center max-w-[320px]">Reports will appear here once verifications are complete</p>
+        </div>
+      </div>
+
       <div v-for="report in filtered" :key="report.caseId" class="flex items-center px-4 py-3.5 border-b border-border hover:bg-surface/30 transition-colors min-w-[860px]">
         <div class="w-[170px] flex-shrink-0"><span class="font-sans text-sm font-medium text-foreground truncate block">{{ report.tenant }}</span></div>
         <div class="w-[120px] flex-shrink-0"><span class="font-mono text-[13px] text-muted-foreground truncate block" :title="report.caseId">{{ report.caseId?.slice(0, 10) }}…</span></div>
@@ -134,6 +145,15 @@ onMounted(async () => {
 
     <!-- Mobile Card List -->
     <div class="lg:hidden flex flex-col gap-3">
+      <div v-if="filtered.length === 0" class="flex flex-col items-center justify-center py-16 gap-4">
+        <div class="w-16 h-16 rounded-full bg-[#E7E8E5] flex items-center justify-center">
+          <span class="material-symbols-rounded text-[28px] text-muted-foreground">assessment</span>
+        </div>
+        <div class="flex flex-col items-center gap-1">
+          <h3 class="font-mono text-base font-semibold text-foreground">No reports yet</h3>
+          <p class="font-sans text-sm text-muted-foreground text-center max-w-[320px]">Reports will appear here once verifications are complete</p>
+        </div>
+      </div>
       <div v-for="report in filtered" :key="report.caseId" class="bg-white border border-border rounded-xl p-4 flex flex-col gap-3">
         <div class="flex items-center justify-between">
           <span class="font-sans text-sm font-semibold text-foreground">{{ report.tenant }}</span>

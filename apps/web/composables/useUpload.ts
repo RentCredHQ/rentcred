@@ -13,6 +13,7 @@ export function useUpload() {
   const error = ref<string | null>(null)
 
   function validateFile(file: File): string | null {
+    if (file.size === 0) return 'File is empty'
     if (!ALLOWED_TYPES.includes(file.type)) {
       return `File type not allowed. Accepted: JPG, PNG, WebP`
     }
@@ -69,6 +70,9 @@ export function useUpload() {
 
         xhr.addEventListener('error', () => reject(new Error('Upload failed')))
         xhr.addEventListener('abort', () => reject(new Error('Upload cancelled')))
+
+        xhr.timeout = 120000 // 2 minutes
+        xhr.ontimeout = () => { reject(new Error('Upload timed out')) }
 
         xhr.open('PUT', presigned.uploadUrl)
         xhr.setRequestHeader('Content-Type', file.type)

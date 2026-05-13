@@ -89,6 +89,16 @@ onMounted(async () => {
           <NuxtLink to="/ops/cases" class="text-primary text-sm font-sans hover:underline">View all</NuxtLink>
         </div>
         <div class="divide-y divide-border">
+          <!-- Empty State -->
+          <div v-if="recentCases.length === 0" class="flex flex-col items-center justify-center py-16 gap-4">
+            <div class="w-16 h-16 rounded-full bg-[#E7E8E5] flex items-center justify-center">
+              <span class="material-symbols-rounded text-[28px] text-muted-foreground">inbox</span>
+            </div>
+            <div class="flex flex-col items-center gap-1">
+              <h3 class="font-mono text-base font-semibold text-foreground">No recent cases</h3>
+              <p class="font-sans text-sm text-muted-foreground text-center max-w-[320px]">Cases will appear here as agents submit tenants</p>
+            </div>
+          </div>
           <div v-for="c in recentCases" :key="c.id" class="flex items-center justify-between px-6 py-4">
             <div>
               <div class="flex items-center gap-2">

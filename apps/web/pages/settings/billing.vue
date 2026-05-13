@@ -7,12 +7,42 @@ const { getPaymentStats, getTransactionHistory } = usePayments()
 const kpis = ref<any[]>([])
 const invoices = ref<any[]>([])
 const loading = ref(true)
+const currentPage = ref(1)
+const totalInvoices = ref(0)
+const totalPages = computed(() => Math.max(1, Math.ceil(totalInvoices.value / 20)))
+
+function goPage(dir: number) {
+  const next = currentPage.value + dir
+  if (next < 1 || next > totalPages.value) return
+  currentPage.value = next
+  fetchInvoices()
+}
+
+async function fetchInvoices() {
+  try {
+    const historyRes = await getTransactionHistory({ page: currentPage.value, limit: 20 })
+    const txns = (historyRes as any)?.data ?? (Array.isArray(historyRes) ? historyRes : [])
+    invoices.value = txns.map((tx: any) => {
+      const statusLabel = tx.status === 'completed' ? 'Paid' : tx.status === 'pending' ? 'Pending' : tx.status || 'Pending'
+      return {
+        id: tx.id,
+        date: new Date(tx.createdAt).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' }),
+        desc: tx.description || tx.type || '',
+        amount: `₦${(tx.amount ?? 0).toLocaleString()}`,
+        status: statusLabel,
+        statusBg: statusLabel === 'Paid' ? 'bg-[#DFE6E1]' : 'bg-[#E9E3D8]',
+        statusText: statusLabel === 'Paid' ? 'text-[#004D1A]' : 'text-[#804200]',
+      }
+    })
+    totalInvoices.value = (historyRes as any)?.pagination?.total ?? invoices.value.length
+  } catch { /* empty */ }
+}
 
 onMounted(async () => {
   try {
     const [statsRes, historyRes] = await Promise.all([
       getPaymentStats(),
-      getTransactionHistory(),
+      getTransactionHistory({ page: 1, limit: 20 }),
     ])
     if (statsRes) {
       // Backend getStats() returns { totalSpent, thisMonth, transactionCount }
@@ -39,6 +69,7 @@ onMounted(async () => {
           statusText: statusLabel === 'Paid' ? 'text-[#004D1A]' : 'text-[#804200]',
         }
       })
+      totalInvoices.value = (historyRes as any)?.pagination?.total ?? invoices.value.length
     }
   } catch { /* empty */ }
   finally { loading.value = false }
@@ -82,6 +113,17 @@ onMounted(async () => {
           <div class="w-[80px]"><span class="font-mono text-[11px] font-semibold text-muted-foreground tracking-wider">Action</span></div>
         </div>
 
+        <!-- Empty State -->
+        <div v-if="invoices.length === 0" class="flex flex-col items-center justify-center py-16 gap-4">
+          <div class="w-16 h-16 rounded-full bg-[#E7E8E5] flex items-center justify-center">
+            <span class="material-symbols-rounded text-[28px] text-muted-foreground">receipt_long</span>
+          </div>
+          <div class="flex flex-col items-center gap-1">
+            <h3 class="font-mono text-base font-semibold text-foreground">No billing history</h3>
+            <p class="font-sans text-sm text-muted-foreground text-center max-w-[320px]">Your invoices will appear here</p>
+          </div>
+        </div>
+
         <div v-for="inv in invoices" :key="inv.id" class="flex items-center px-6 py-3 border-b border-border last:border-0 hover:bg-surface/30 transition-colors">
           <div class="w-[160px]"><span class="font-mono text-[13px] text-foreground font-medium truncate block" :title="inv.id">{{ inv.id.slice(0, 10) }}…</span></div>
           <div class="w-[140px]"><span class="font-sans text-[13px] text-muted-foreground">{{ inv.date }}</span></div>
@@ -98,6 +140,15 @@ onMounted(async () => {
 
       <!-- Mobile -->
       <div class="lg:hidden">
+        <div v-if="invoices.length === 0" class="flex flex-col items-center justify-center py-16 gap-4">
+          <div class="w-16 h-16 rounded-full bg-[#E7E8E5] flex items-center justify-center">
+            <span class="material-symbols-rounded text-[28px] text-muted-foreground">receipt_long</span>
+          </div>
+          <div class="flex flex-col items-center gap-1">
+            <h3 class="font-mono text-base font-semibold text-foreground">No billing history</h3>
+            <p class="font-sans text-sm text-muted-foreground text-center max-w-[320px]">Your invoices will appear here</p>
+          </div>
+        </div>
         <div v-for="inv in invoices" :key="inv.id" class="px-4 py-3.5 border-b border-border last:border-0">
           <div class="flex items-center justify-between mb-1">
             <span class="font-sans text-sm font-medium text-foreground">{{ inv.desc }}</span>
@@ -112,11 +163,11 @@ onMounted(async () => {
 
       <!-- Footer -->
       <div class="flex items-center justify-between px-6 py-3 border-t border-border">
-        <span class="font-sans text-[12px] text-muted-foreground">Showing 1–5 of 5 invoices</span>
+        <span class="font-sans text-[12px] text-muted-foreground">Showing {{ invoices.length }} of {{ totalInvoices }} invoices</span>
         <div class="flex items-center gap-1.5">
-          <button class="px-2.5 py-1 bg-white border border-border rounded-md text-[12px] font-sans text-foreground">Prev</button>
-          <button class="px-2.5 py-1 bg-foreground rounded-md text-[12px] font-sans text-white">1</button>
-          <button class="px-2.5 py-1 bg-white border border-border rounded-md text-[12px] font-sans text-foreground">Next</button>
+          <button @click="goPage(-1)" :disabled="currentPage <= 1" class="px-2.5 py-1 bg-white border border-border rounded-md text-[12px] font-sans text-foreground disabled:opacity-40">Prev</button>
+          <span class="px-2.5 py-1 bg-foreground rounded-md text-[12px] font-sans text-white">{{ currentPage }}</span>
+          <button @click="goPage(1)" :disabled="currentPage >= totalPages" class="px-2.5 py-1 bg-primary rounded-md text-[12px] font-sans text-white disabled:opacity-40">Next</button>
         </div>
       </div>
     </div>

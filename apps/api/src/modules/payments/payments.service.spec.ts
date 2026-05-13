@@ -40,6 +40,7 @@ describe('PaymentsService', () => {
       aggregate: jest.fn(),
     },
     $transaction: jest.fn(),
+    $queryRawUnsafe: jest.fn(),
   };
 
   const mockNotificationsService = {
@@ -89,6 +90,14 @@ describe('PaymentsService', () => {
     auditService = module.get<AuditService>(AuditService);
 
     jest.clearAllMocks();
+
+    // Support interactive transactions: execute callback with mockPrismaService as tx
+    mockPrismaService.$transaction.mockImplementation(async (callback: any) => {
+      if (typeof callback === 'function') {
+        return callback(mockPrismaService);
+      }
+      return callback;
+    });
   });
 
   it('should be defined', () => {
@@ -365,23 +374,20 @@ describe('PaymentsService', () => {
       const rawBody = Buffer.from(JSON.stringify(payload));
       const hash = createHmac('sha512', secret).update(rawBody).digest('hex');
 
-      const mockTransaction = {
-        id: 'txn-1',
-        agentId: 'user-1',
-        amount: 10,
-        status: 'pending',
-      };
-
-      mockPrismaService.transaction.findFirst.mockResolvedValue(mockTransaction);
-      mockPrismaService.$transaction.mockResolvedValue([{}, {}]);
+      // $queryRawUnsafe returns the transaction row with snake_case fields
+      mockPrismaService.$queryRawUnsafe.mockResolvedValue([
+        { id: 'txn-1', agent_id: 'user-1', amount: 10, status: 'pending', paystack_ref: 'txn-1' },
+      ]);
+      mockPrismaService.transaction.update.mockResolvedValue({});
+      mockPrismaService.agentProfile.update.mockResolvedValue({});
       mockNotificationsService.emit.mockResolvedValue({});
       mockAuditService.log.mockResolvedValue({});
 
       const result = await service.handleWebhook(rawBody, hash);
 
       expect(result).toEqual({ received: true });
-      expect(mockPrismaService.transaction.findFirst).toHaveBeenCalled();
       expect(mockPrismaService.$transaction).toHaveBeenCalled();
+      expect(mockPrismaService.$queryRawUnsafe).toHaveBeenCalled();
       expect(mockNotificationsService.emit).toHaveBeenCalledWith(
         expect.objectContaining({
           userId: 'user-1',
@@ -402,7 +408,7 @@ describe('PaymentsService', () => {
       await expect(service.handleWebhook(rawBody, 'invalid-sig')).rejects.toThrow(
         ForbiddenException,
       );
-      expect(mockPrismaService.transaction.findFirst).not.toHaveBeenCalled();
+      expect(mockPrismaService.$queryRawUnsafe).not.toHaveBeenCalled();
     });
 
     it('should skip processing when no pending transaction found', async () => {
@@ -410,12 +416,18 @@ describe('PaymentsService', () => {
       const rawBody = Buffer.from(JSON.stringify(payload));
       const hash = createHmac('sha512', secret).update(rawBody).digest('hex');
 
-      mockPrismaService.transaction.findFirst.mockResolvedValue(null);
+      // No pending transaction found
+      mockPrismaService.$queryRawUnsafe.mockResolvedValue([]);
+      mockPrismaService.transaction.update.mockResolvedValue({});
+      mockPrismaService.agentProfile.update.mockResolvedValue({});
 
       const result = await service.handleWebhook(rawBody, hash);
 
       expect(result).toEqual({ received: true });
-      expect(mockPrismaService.$transaction).not.toHaveBeenCalled();
+      // $transaction IS called (interactive), but returns null internally
+      expect(mockPrismaService.$transaction).toHaveBeenCalled();
+      // notifications should NOT be called since no pending tx was found
+      expect(mockNotificationsService.emit).not.toHaveBeenCalled();
     });
   });
 });

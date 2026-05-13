@@ -30,6 +30,10 @@ const stats = ref({
 
 const submissions = ref<any[]>([])
 const showShare = ref(false)
+const searchQuery = ref('')
+const currentPage = ref(1)
+const totalSubmissions = ref(0)
+const pageSize = 5
 
 function getStatusStyle(status: string) {
   const map: Record<string, { bg: string; text: string }> = {
@@ -53,22 +57,30 @@ function formatDate(dateStr: string) {
   return new Date(dateStr).toLocaleDateString('en-US', { month: 'short', day: 'numeric' })
 }
 
-const mappedSubmissions = computed(() =>
-  submissions.value.map((s: any) => {
-    const style = getStatusStyle(s.status)
-    return {
-      id: s.id,
-      tenant: { name: s.tenantName, detail: `${s.neighborhood || ''} • ${s.propertyType || ''}` },
-      package: 'Standard',
-      packageColor: 'text-foreground',
-      status: SUBMISSION_STATUS_LABELS[s.status] || s.status,
-      statusBg: style.bg,
-      statusText: style.text,
-      date: formatDate(s.createdAt),
-      action: getAction(s.status),
-    }
-  })
-)
+const mappedSubmissions = computed(() => {
+  const query = searchQuery.value.toLowerCase().trim()
+  return submissions.value
+    .map((s: any) => {
+      const style = getStatusStyle(s.status)
+      return {
+        id: s.id,
+        tenant: { name: s.tenantName, detail: `${s.neighborhood || ''} • ${s.propertyType || ''}` },
+        package: 'Standard',
+        packageColor: 'text-foreground',
+        status: SUBMISSION_STATUS_LABELS[s.status] || s.status,
+        statusBg: style.bg,
+        statusText: style.text,
+        date: formatDate(s.createdAt),
+        action: getAction(s.status),
+      }
+    })
+    .filter((sub) => {
+      if (!query) return true
+      return sub.tenant.name.toLowerCase().includes(query) || sub.id.toLowerCase().includes(query)
+    })
+})
+
+const totalPages = computed(() => Math.max(1, Math.ceil(totalSubmissions.value / pageSize)))
 
 const recentActivity = computed(() =>
   submissions.value.slice(0, 4).map((s: any) => {
@@ -83,11 +95,19 @@ const recentActivity = computed(() =>
   })
 )
 
+async function fetchSubmissions() {
+  try {
+    const subsRes = await getSubmissions({ limit: pageSize, page: currentPage.value })
+    submissions.value = subsRes.data ?? []
+    totalSubmissions.value = subsRes.pagination?.total ?? submissions.value.length
+  } catch { /* empty */ }
+}
+
 onMounted(async () => {
   try {
     const [statsRes, subsRes] = await Promise.all([
       getDashboardStats(),
-      getSubmissions({ limit: 5 }),
+      getSubmissions({ limit: pageSize, page: 1 }),
     ])
 
     const d = statsRes.data ?? statsRes
@@ -98,6 +118,7 @@ onMounted(async () => {
     }
 
     submissions.value = subsRes.data ?? []
+    totalSubmissions.value = subsRes.pagination?.total ?? submissions.value.length
   } catch { /* empty */ }
   finally { loading.value = false }
 })
@@ -199,7 +220,7 @@ onMounted(async () => {
         </div>
         <div class="flex items-center gap-2 px-3 h-9 bg-background border border-border rounded-lg w-[200px]">
           <span class="material-symbols-rounded text-[16px] text-muted-foreground">search</span>
-          <input type="text" placeholder="Search tenants..." class="flex-1 bg-transparent text-[13px] font-sans text-foreground placeholder:text-muted-foreground outline-none" />
+          <input v-model="searchQuery" type="text" placeholder="Search tenants..." class="flex-1 bg-transparent text-[13px] font-sans text-foreground placeholder:text-muted-foreground outline-none" />
         </div>
       </div>
 
@@ -213,7 +234,19 @@ onMounted(async () => {
         <div class="w-[120px] px-4 py-2.5"><span class="font-sans text-[12px] font-medium text-muted-foreground">Action</span></div>
       </div>
 
+      <!-- Empty State -->
+      <div v-if="mappedSubmissions.length === 0" class="flex flex-col items-center justify-center py-16 gap-4">
+        <div class="w-16 h-16 rounded-full bg-[#E7E8E5] flex items-center justify-center">
+          <span class="material-symbols-rounded text-[28px] text-muted-foreground">description</span>
+        </div>
+        <div class="flex flex-col items-center gap-1">
+          <h3 class="font-mono text-base font-semibold text-foreground">No submissions yet</h3>
+          <p class="font-sans text-sm text-muted-foreground text-center max-w-[320px]">Submit your first tenant to get started</p>
+        </div>
+      </div>
+
       <!-- Rows -->
+      <template v-if="mappedSubmissions.length > 0">
       <div v-for="sub in mappedSubmissions" :key="sub.id" class="flex items-center border-b border-border hover:bg-surface/30 transition-colors">
         <div class="w-[100px] px-4 py-3"><span class="font-mono text-[13px] text-foreground truncate block" :title="sub.id">{{ sub.id.slice(0, 10) }}…</span></div>
         <div class="flex-1 px-4 py-3">
@@ -252,12 +285,14 @@ onMounted(async () => {
         </div>
       </div>
 
+      </template>
+
       <!-- Table Footer -->
       <div class="flex items-center justify-between px-5 py-3">
-        <span class="font-sans text-[13px] text-muted-foreground">Showing {{ mappedSubmissions.length }} submissions</span>
+        <span class="font-sans text-[13px] text-muted-foreground">Showing {{ mappedSubmissions.length }} of {{ totalSubmissions }} submissions</span>
         <div class="flex items-center gap-2">
-          <button class="px-3 py-1.5 h-8 border border-border rounded-lg text-[12px] font-sans text-foreground hover:bg-surface transition-colors">Previous</button>
-          <button class="px-3 py-1.5 h-8 bg-primary rounded-lg text-[12px] font-sans font-medium text-foreground hover:opacity-90 transition-opacity">Next</button>
+          <button @click="currentPage > 1 && (currentPage--, fetchSubmissions())" :disabled="currentPage <= 1" class="px-3 py-1.5 h-8 border border-border rounded-lg text-[12px] font-sans text-foreground hover:bg-surface transition-colors disabled:opacity-40">Previous</button>
+          <button @click="currentPage < totalPages && (currentPage++, fetchSubmissions())" :disabled="currentPage >= totalPages" class="px-3 py-1.5 h-8 bg-primary rounded-lg text-[12px] font-sans font-medium text-foreground hover:opacity-90 transition-opacity disabled:opacity-40">Next</button>
         </div>
       </div>
     </div>
@@ -265,7 +300,16 @@ onMounted(async () => {
     <!-- Mobile: Recent Activity (shown on mobile only) -->
     <div class="lg:hidden flex flex-col gap-3">
       <h2 class="font-mono text-base font-semibold text-foreground">Recent Activity</h2>
-      <div class="flex flex-col gap-2">
+      <div v-if="recentActivity.length === 0" class="flex flex-col items-center justify-center py-16 gap-4">
+        <div class="w-16 h-16 rounded-full bg-[#E7E8E5] flex items-center justify-center">
+          <span class="material-symbols-rounded text-[28px] text-muted-foreground">description</span>
+        </div>
+        <div class="flex flex-col items-center gap-1">
+          <h3 class="font-mono text-base font-semibold text-foreground">No submissions yet</h3>
+          <p class="font-sans text-sm text-muted-foreground text-center max-w-[320px]">Submit your first tenant to get started</p>
+        </div>
+      </div>
+      <div v-else class="flex flex-col gap-2">
         <div
           v-for="item in recentActivity"
           :key="item.name"

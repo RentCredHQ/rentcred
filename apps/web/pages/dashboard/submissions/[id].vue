@@ -7,9 +7,12 @@ const caseId = computed(() => route.params.id as string)
 
 useSeoMeta({ title: `Case ${caseId.value} — RentCred` })
 
-const { getSubmission } = useSubmissions()
+const { getSubmission, updateSubmissionStatus } = useSubmissions()
+const { shareReport } = useReports()
 
 const loading = ref(true)
+const hasReport = ref(false)
+const sharingReport = ref(false)
 
 function getStatusStyle(status: string) {
   const map: Record<string, { bg: string; text: string }> = {
@@ -73,6 +76,34 @@ function buildSteps(submission: any) {
   })
 }
 
+async function handleShareReport() {
+  if (!hasReport.value) return
+  sharingReport.value = true
+  try {
+    const res = await shareReport(caseId.value)
+    alert(`Share URL: ${res.shareUrl}`)
+  } catch (e: any) {
+    alert(e.data?.message || 'Failed to share report')
+  } finally {
+    sharingReport.value = false
+  }
+}
+
+function handleResendInvite() {
+  // TODO: Wire to email service when available
+  alert('Invite resend is not available yet — email service required')
+}
+
+async function handleCancelCase() {
+  if (!confirm('Are you sure you want to cancel this case? This action cannot be undone.')) return
+  try {
+    await updateSubmissionStatus(caseId.value, 'rejected')
+    navigateTo('/dashboard/submissions')
+  } catch (e: any) {
+    alert(e.data?.message || 'Failed to cancel case')
+  }
+}
+
 onMounted(async () => {
   try {
     const res = await getSubmission(caseId.value)
@@ -105,6 +136,7 @@ onMounted(async () => {
       scheduledDate: latestAssignment?.scheduledDate ? new Date(latestAssignment.scheduledDate).toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' }) : '',
     }
     steps.value = buildSteps(s)
+    hasReport.value = s.status === 'completed' || !!s.report
   } catch { /* empty */ }
   finally { loading.value = false }
 })
@@ -233,15 +265,19 @@ onMounted(async () => {
         <!-- Actions -->
         <div class="bg-white border-[1.5px] border-border rounded-lg p-5 lg:p-6 flex flex-col gap-3">
           <h2 class="font-mono text-base font-semibold text-foreground">Actions</h2>
-          <button class="flex items-center justify-center gap-2 w-full py-2.5 bg-primary text-foreground font-sans text-sm font-semibold hover:opacity-90 transition-opacity">
+          <button
+            @click="handleShareReport"
+            :disabled="!hasReport || sharingReport"
+            class="flex items-center justify-center gap-2 w-full py-2.5 bg-primary text-foreground font-sans text-sm font-semibold hover:opacity-90 transition-opacity disabled:opacity-40 disabled:cursor-not-allowed"
+          >
             <span class="material-symbols-rounded text-[18px]">share</span>
-            Share Report
+            {{ sharingReport ? 'Sharing...' : 'Share Report' }}
           </button>
-          <button class="flex items-center justify-center gap-2 w-full py-2.5 border-[1.5px] border-border font-sans text-sm font-semibold text-foreground hover:bg-surface transition-colors">
+          <button @click="handleResendInvite" class="flex items-center justify-center gap-2 w-full py-2.5 border-[1.5px] border-border font-sans text-sm font-semibold text-foreground hover:bg-surface transition-colors">
             <span class="material-symbols-rounded text-[18px]">mail</span>
             Resend Invite
           </button>
-          <button class="font-sans text-sm font-medium text-[#D93C15] text-center hover:underline">Cancel Case</button>
+          <button @click="handleCancelCase" class="font-sans text-sm font-medium text-[#D93C15] text-center hover:underline">Cancel Case</button>
         </div>
       </div>
     </div>

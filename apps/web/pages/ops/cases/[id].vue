@@ -80,6 +80,12 @@ const caseData = ref({
 const checks = ref<any[]>([])
 const timeline = ref<any[]>([])
 
+const assigneeInitials = computed(() => {
+  const name = caseData.value.assignee
+  if (!name || name === '—') return '—'
+  return name.split(' ').map(n => n[0]).join('').slice(0, 2).toUpperCase()
+})
+
 async function fetchCaseData() {
   loading.value = true
   try {
@@ -379,44 +385,10 @@ onMounted(fetchCaseData)
           </div>
           <div class="p-6 flex items-center gap-3">
             <div class="w-10 h-10 rounded-full bg-primary flex items-center justify-center">
-              <span class="font-mono text-[13px] font-semibold text-foreground">CN</span>
+              <span class="font-mono text-[13px] font-semibold text-foreground">{{ assigneeInitials }}</span>
             </div>
             <div class="flex flex-col gap-px">
               <span class="font-sans text-[13px] font-medium text-foreground">{{ caseData.assignee }}</span>
-              <span class="font-sans text-[11px] text-muted-foreground">Lagos · Active 10 min ago</span>
-            </div>
-          </div>
-        </div>
-
-        <!-- Documents -->
-        <div class="bg-card border border-border rounded-xl overflow-hidden">
-          <div class="px-6 py-4 border-b border-border">
-            <span class="font-mono text-sm font-semibold text-foreground">Documents</span>
-          </div>
-          <div class="divide-y divide-border">
-            <div class="flex items-center gap-3 px-6 py-3">
-              <span class="material-symbols-rounded text-[20px] text-muted-foreground">description</span>
-              <div class="flex-1 flex flex-col">
-                <span class="font-sans text-[13px] text-foreground">NIN Slip</span>
-                <span class="font-sans text-[11px] text-muted-foreground">Uploaded Mar 10</span>
-              </div>
-              <span class="material-symbols-rounded text-[16px] text-muted-foreground hover:text-foreground cursor-pointer">download</span>
-            </div>
-            <div class="flex items-center gap-3 px-6 py-3">
-              <span class="material-symbols-rounded text-[20px] text-muted-foreground">description</span>
-              <div class="flex-1 flex flex-col">
-                <span class="font-sans text-[13px] text-foreground">Utility Bill</span>
-                <span class="font-sans text-[11px] text-muted-foreground">Uploaded Mar 10</span>
-              </div>
-              <span class="material-symbols-rounded text-[16px] text-muted-foreground hover:text-foreground cursor-pointer">download</span>
-            </div>
-            <div class="flex items-center gap-3 px-6 py-3">
-              <span class="material-symbols-rounded text-[20px] text-muted-foreground">description</span>
-              <div class="flex-1 flex flex-col">
-                <span class="font-sans text-[13px] text-foreground">Employment Letter</span>
-                <span class="font-sans text-[11px] text-muted-foreground">Uploaded Mar 10</span>
-              </div>
-              <span class="material-symbols-rounded text-[16px] text-muted-foreground hover:text-foreground cursor-pointer">download</span>
             </div>
           </div>
         </div>

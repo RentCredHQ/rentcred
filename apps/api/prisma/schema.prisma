@@ -289,11 +289,11 @@ model Transaction {
   type        String   // purchase, deduction, refund
   amount      Int
   description String?
-  paystackRef String?  @map("paystack_ref")
+  paystackRef String?  @unique @map("paystack_ref")
   status      String   @default("completed") // pending, completed, failed
   createdAt   DateTime @default(now()) @map("created_at")
 
-  agent AgentProfile @relation(fields: [agentId], references: [userId])
+  agent AgentProfile @relation(fields: [agentId], references: [userId], onDelete: Restrict)
 
   @@index([agentId])
   @@index([status])
@@ -318,7 +318,7 @@ model KybApplication {
   createdAt       DateTime @default(now()) @map("created_at")
   updatedAt       DateTime @updatedAt @map("updated_at")
 
-  agentProfile AgentProfile @relation(fields: [agentProfileId], references: [id])
+  agentProfile AgentProfile @relation(fields: [agentProfileId], references: [id], onDelete: Restrict)
 
   @@map("kyb_applications")
 }

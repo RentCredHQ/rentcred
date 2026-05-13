@@ -168,42 +168,65 @@ export class PaymentsService {
 
   /**
    * Process a successful payment — credit the agent's balance.
+   * Uses an interactive transaction with SELECT FOR UPDATE to prevent
+   * webhook replay / double-credit attacks.
    */
   private async processSuccessfulPayment(paystackData: any) {
     const reference = paystackData.reference;
-    const metadata = paystackData.metadata;
 
-    // Find the pending transaction
-    const transaction = await this.prisma.transaction.findFirst({
-      where: {
-        OR: [{ id: reference }, { paystackRef: reference }],
-        status: 'pending',
-      },
-    });
+    let transaction: any;
+
+    try {
+      transaction = await this.prisma.$transaction(async (tx) => {
+        // Lock the transaction row to prevent concurrent webhook replays
+        const rows = await tx.$queryRawUnsafe<any[]>(
+          `SELECT * FROM transactions
+           WHERE (id = $1 OR paystack_ref = $1)
+           FOR UPDATE`,
+          reference,
+        );
+
+        const pendingTx = rows?.find((r: any) => r.status === 'pending');
+
+        if (!pendingTx) {
+          // Already processed or not found — return null for idempotency
+          return null;
+        }
+
+        // Update transaction status to completed
+        await tx.transaction.update({
+          where: { id: pendingTx.id },
+          data: {
+            status: 'completed',
+            paystackRef: paystackData.reference,
+          },
+        });
+
+        // Credit the agent's balance atomically within the same transaction
+        await tx.agentProfile.update({
+          where: { userId: pendingTx.agent_id },
+          data: { creditBalance: { increment: pendingTx.amount } },
+        });
+
+        return pendingTx;
+      });
+    } catch (error: any) {
+      // Handle unique constraint violation on paystackRef (idempotency guard)
+      if (error?.code === 'P2002' && error?.meta?.target?.includes('paystack_ref')) {
+        this.logger.warn(`Duplicate paystackRef detected for reference: ${reference}. Skipping.`);
+        return;
+      }
+      throw error;
+    }
 
     if (!transaction) {
       this.logger.warn(`No pending transaction found for reference: ${reference}`);
       return; // Idempotent — already processed
     }
 
-    // Update transaction and credit agent in a single DB transaction
-    await this.prisma.$transaction([
-      this.prisma.transaction.update({
-        where: { id: transaction.id },
-        data: {
-          status: 'completed',
-          paystackRef: paystackData.reference,
-        },
-      }),
-      this.prisma.agentProfile.update({
-        where: { userId: transaction.agentId },
-        data: { creditBalance: { increment: transaction.amount } },
-      }),
-    ]);
-
-    // Notify the agent
+    // Notify the agent (after transaction commits)
     await this.notifications.emit({
-      userId: transaction.agentId,
+      userId: transaction.agent_id,
       type: 'payment_confirmed',
       title: 'Payment Confirmed',
       message: `${transaction.amount} credits have been added to your account.`,
@@ -211,7 +234,7 @@ export class PaymentsService {
     });
 
     await this.audit.log({
-      userId: transaction.agentId,
+      userId: transaction.agent_id,
       action: 'payment_completed',
       entityType: 'transaction',
       entityId: transaction.id,
@@ -222,7 +245,7 @@ export class PaymentsService {
     });
 
     this.logger.log(
-      `Payment completed: ${transaction.amount} credits for agent ${transaction.agentId}`,
+      `Payment completed: ${transaction.amount} credits for agent ${transaction.agent_id}`,
     );
   }
 

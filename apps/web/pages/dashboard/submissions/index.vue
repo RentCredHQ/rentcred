@@ -124,6 +124,17 @@ onMounted(async () => {
         <div class="flex-1"><span class="font-mono text-[12px] font-semibold text-muted-foreground tracking-wider">Actions</span></div>
       </div>
 
+      <!-- Empty State -->
+      <div v-if="filtered.length === 0" class="flex flex-col items-center justify-center py-16 gap-4">
+        <div class="w-16 h-16 rounded-full bg-[#E7E8E5] flex items-center justify-center">
+          <span class="material-symbols-rounded text-[28px] text-muted-foreground">folder_open</span>
+        </div>
+        <div class="flex flex-col items-center gap-1">
+          <h3 class="font-mono text-base font-semibold text-foreground">No submissions</h3>
+          <p class="font-sans text-sm text-muted-foreground text-center max-w-[320px]">You haven't submitted any tenants yet</p>
+        </div>
+      </div>
+
       <!-- Rows -->
       <NuxtLink
         v-for="sub in filtered"
@@ -158,6 +169,15 @@ onMounted(async () => {
 
     <!-- Mobile Card List -->
     <div class="lg:hidden flex flex-col gap-3">
+      <div v-if="filtered.length === 0" class="flex flex-col items-center justify-center py-16 gap-4">
+        <div class="w-16 h-16 rounded-full bg-[#E7E8E5] flex items-center justify-center">
+          <span class="material-symbols-rounded text-[28px] text-muted-foreground">folder_open</span>
+        </div>
+        <div class="flex flex-col items-center gap-1">
+          <h3 class="font-mono text-base font-semibold text-foreground">No submissions</h3>
+          <p class="font-sans text-sm text-muted-foreground text-center max-w-[320px]">You haven't submitted any tenants yet</p>
+        </div>
+      </div>
       <NuxtLink
         v-for="sub in filtered"
         :key="sub.caseId"

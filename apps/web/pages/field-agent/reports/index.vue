@@ -58,6 +58,16 @@ function resultClasses(result: string) {
     </div>
     <UiFilterTabs v-model="activeFilter" :tabs="filterTabs" variant="pill" />
     <div class="flex flex-col gap-3">
+      <!-- Empty State -->
+      <div v-if="filtered.length === 0 && !loading" class="flex flex-col items-center justify-center py-16 gap-4">
+        <div class="w-16 h-16 rounded-full bg-[#E7E8E5] flex items-center justify-center">
+          <span class="material-symbols-rounded text-[28px] text-muted-foreground">assessment</span>
+        </div>
+        <div class="flex flex-col items-center gap-1">
+          <h3 class="font-mono text-base font-semibold text-foreground">No visit reports</h3>
+          <p class="font-sans text-sm text-muted-foreground text-center max-w-[320px]">Your submitted visit reports will appear here</p>
+        </div>
+      </div>
       <div v-for="r in filtered" :key="r.id" class="bg-card border border-border rounded-xl p-4 flex flex-col gap-2">
         <div class="flex items-center justify-between">
           <span class="font-mono text-[12px] text-foreground truncate block" :title="r.id">{{ r.id.slice(0, 10) }}…</span>

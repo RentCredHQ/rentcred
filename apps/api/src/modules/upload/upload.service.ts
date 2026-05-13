@@ -70,6 +70,10 @@ export class UploadService {
     const ext = filename.split('.').pop() || 'bin';
     const key = `${safeFolder}/${randomUUID()}.${ext}`;
 
+    // NOTE: S3/R2 presigned PutObject URLs do not natively support content-length-range
+    // conditions (unlike presigned POST). File size enforcement is handled on the frontend
+    // via the useUpload.ts validateFile() method (10MB cap). If stricter server-side
+    // enforcement is required, switch to createPresignedPost (S3 only, not supported by R2).
     const command = new PutObjectCommand({
       Bucket: this.bucket,
       Key: key,
@@ -100,8 +104,15 @@ export class UploadService {
       throw new BadRequestException('File exceeds 10MB limit');
     }
 
+    // Validate folder against allowlist (same check as presigned URL path)
+    const ALLOWED_FOLDERS = ['property-images', 'kyb-documents', 'field-visit-photos', 'profile-photos', 'documents', 'tenant-documents'];
+    const safeFolder = folder.replace(/[^a-zA-Z0-9_-]/g, '');
+    if (!ALLOWED_FOLDERS.includes(safeFolder)) {
+      throw new BadRequestException(`Invalid upload folder. Allowed: ${ALLOWED_FOLDERS.join(', ')}`);
+    }
+
     const ext = filename.split('.').pop() || 'bin';
-    const key = `${folder}/${randomUUID()}.${ext}`;
+    const key = `${safeFolder}/${randomUUID()}.${ext}`;
 
     await this.s3.send(
       new PutObjectCommand({

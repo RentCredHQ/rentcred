@@ -47,6 +47,16 @@ function statusClasses(status: string) {
       </button>
     </div>
     <div class="flex flex-col gap-3">
+      <!-- Empty State -->
+      <div v-if="schedule.length === 0 && !loading" class="flex flex-col items-center justify-center py-16 gap-4">
+        <div class="w-16 h-16 rounded-full bg-[#E7E8E5] flex items-center justify-center">
+          <span class="material-symbols-rounded text-[28px] text-muted-foreground">calendar_month</span>
+        </div>
+        <div class="flex flex-col items-center gap-1">
+          <h3 class="font-mono text-base font-semibold text-foreground">No scheduled visits</h3>
+          <p class="font-sans text-sm text-muted-foreground text-center max-w-[320px]">Check back later for new assignments</p>
+        </div>
+      </div>
       <NuxtLink v-for="v in schedule" :key="v.id" :to="`/field-agent/visits/${v.id}`"
         class="bg-card border border-border rounded-xl p-4 flex flex-col gap-2.5">
         <div class="flex items-center justify-between">

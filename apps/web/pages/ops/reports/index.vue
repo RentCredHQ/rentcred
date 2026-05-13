@@ -138,6 +138,17 @@ const { searchQuery, activeFilter, filtered, resultCount } = useFilter({
           <div class="flex-1"><span class="font-mono text-[11px] font-semibold text-muted-foreground tracking-wider">Action</span></div>
         </div>
 
+        <!-- Empty State -->
+        <div v-if="filtered.length === 0 && !loading" class="flex flex-col items-center justify-center py-16 gap-4">
+          <div class="w-16 h-16 rounded-full bg-[#E7E8E5] flex items-center justify-center">
+            <span class="material-symbols-rounded text-[28px] text-muted-foreground">assessment</span>
+          </div>
+          <div class="flex flex-col items-center gap-1">
+            <h3 class="font-mono text-base font-semibold text-foreground">No reports</h3>
+            <p class="font-sans text-sm text-muted-foreground text-center max-w-[320px]">Reports will appear here as verifications complete</p>
+          </div>
+        </div>
+
         <div v-for="rpt in filtered" :key="rpt.id" class="flex items-center px-6 py-3 border-b border-border last:border-0 hover:bg-surface/30 transition-colors min-w-[900px]">
           <div class="w-[110px] flex-shrink-0"><span class="font-mono text-[12px] font-medium text-foreground truncate block" :title="rpt.id">{{ rpt.id.slice(0, 10) }}…</span></div>
           <div class="w-[110px] flex-shrink-0"><span class="font-mono text-[12px] text-muted-foreground truncate block" :title="rpt.caseId">{{ rpt.caseId?.slice(0, 10) }}…</span></div>
@@ -151,13 +162,22 @@ const { searchQuery, activeFilter, filtered, resultCount } = useFilter({
           </div>
           <div class="w-[80px]"><span class="font-sans text-[13px] text-foreground">{{ rpt.date }}</span></div>
           <div class="flex-1">
-            <span @click="showApproval = true" class="material-symbols-rounded text-[18px] text-muted-foreground hover:text-foreground cursor-pointer">visibility</span>
+            <span @click="selectedReportId = rpt.id; showApproval = true" class="material-symbols-rounded text-[18px] text-muted-foreground hover:text-foreground cursor-pointer">visibility</span>
           </div>
         </div>
       </div>
 
       <!-- Mobile Cards -->
       <div class="lg:hidden">
+        <div v-if="filtered.length === 0 && !loading" class="flex flex-col items-center justify-center py-16 gap-4">
+          <div class="w-16 h-16 rounded-full bg-[#E7E8E5] flex items-center justify-center">
+            <span class="material-symbols-rounded text-[28px] text-muted-foreground">assessment</span>
+          </div>
+          <div class="flex flex-col items-center gap-1">
+            <h3 class="font-mono text-base font-semibold text-foreground">No reports</h3>
+            <p class="font-sans text-sm text-muted-foreground text-center max-w-[320px]">Reports will appear here as verifications complete</p>
+          </div>
+        </div>
         <div v-for="rpt in filtered" :key="rpt.id" class="px-4 py-3.5 border-b border-border last:border-0">
           <div class="flex items-center justify-between mb-1.5">
             <div class="flex items-center gap-2">
@@ -188,6 +208,6 @@ const { searchQuery, activeFilter, filtered, resultCount } = useFilter({
       </div>
     </div>
     <!-- Report Approval Modal -->
-    <OpsReportApprovalModal v-model="showApproval" />
+    <OpsReportApprovalModal v-model="showApproval" :report-id="selectedReportId" @reviewed="fetchReports()" />
   </div>
 </template>

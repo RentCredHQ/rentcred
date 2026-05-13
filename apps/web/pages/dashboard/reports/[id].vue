@@ -5,9 +5,27 @@ useSeoMeta({ title: 'Report Detail — RentCred' })
 const route = useRoute()
 const caseId = computed(() => route.params.id as string)
 
-const { getReport } = useReports()
+const { getReport, shareReport } = useReports()
 
 const loading = ref(true)
+const sharingReport = ref(false)
+
+async function handleShareReport() {
+  sharingReport.value = true
+  try {
+    const res = await shareReport(caseId.value)
+    alert(`Share URL: ${res.shareUrl}`)
+  } catch (e: any) {
+    alert(e.data?.message || 'Failed to share report')
+  } finally {
+    sharingReport.value = false
+  }
+}
+
+function handleDownload() {
+  // TODO: Implement PDF download when backend supports it
+  alert('PDF download coming soon')
+}
 
 function getReportStatusLabel(status: string) {
   const map: Record<string, string> = { approved: 'Ready', pending_approval: 'Pending Review', draft: 'Draft', rejected: 'Rejected' }
@@ -185,11 +203,11 @@ onMounted(async () => {
         </div>
       </div>
       <div class="flex flex-wrap items-center gap-3">
-        <button class="flex items-center gap-2 px-5 py-2.5 bg-primary text-foreground font-mono text-[13px] font-medium hover:opacity-90 transition-opacity">
+        <button @click="handleShareReport" :disabled="sharingReport" class="flex items-center gap-2 px-5 py-2.5 bg-primary text-foreground font-mono text-[13px] font-medium hover:opacity-90 transition-opacity disabled:opacity-50">
           <span class="material-symbols-rounded text-[16px]">share</span>
-          Share Report
+          {{ sharingReport ? 'Sharing...' : 'Share Report' }}
         </button>
-        <button class="flex items-center gap-2 px-5 py-2.5 bg-[#E7E8E5] border border-border text-foreground font-mono text-[13px] font-medium hover:opacity-90 transition-opacity">
+        <button @click="handleDownload" class="flex items-center gap-2 px-5 py-2.5 bg-[#E7E8E5] border border-border text-foreground font-mono text-[13px] font-medium hover:opacity-90 transition-opacity">
           <span class="material-symbols-rounded text-[16px]">download</span>
           Download
         </button>

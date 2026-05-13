@@ -56,12 +56,30 @@ const { searchQuery, activeFilter, filtered, resultCount } = useFilter({
 })
 
 const selectedDate = ref('all')
+const currentPage = ref(1)
+const totalTransactions = ref(0)
+const totalPages = computed(() => Math.max(1, Math.ceil(totalTransactions.value / 20)))
+
+function goPage(dir: number) {
+  const next = currentPage.value + dir
+  if (next < 1 || next > totalPages.value) return
+  currentPage.value = next
+  fetchTransactions()
+}
+
+async function fetchTransactions() {
+  try {
+    const historyRes = await getTransactionHistory({ page: currentPage.value, limit: 20 })
+    rawTransactions.value = historyRes.data ?? []
+    totalTransactions.value = historyRes.pagination?.total ?? rawTransactions.value.length
+  } catch { /* empty */ }
+}
 
 onMounted(async () => {
   try {
     const [statsRes, historyRes] = await Promise.all([
       getPaymentStats(),
-      getTransactionHistory(),
+      getTransactionHistory({ page: 1, limit: 20 }),
     ])
 
     const s = statsRes.data ?? statsRes
@@ -72,6 +90,7 @@ onMounted(async () => {
     ]
 
     rawTransactions.value = historyRes.data ?? []
+    totalTransactions.value = historyRes.pagination?.total ?? rawTransactions.value.length
   } catch { /* empty */ }
   finally { loading.value = false }
 })
@@ -121,6 +140,17 @@ onMounted(async () => {
           <div class="w-[120px]"><span class="font-sans text-[12px] font-medium text-muted-foreground">Method</span></div>
           <div class="w-[100px]"><span class="font-sans text-[12px] font-medium text-muted-foreground">Status</span></div>
         </div>
+        <!-- Empty State -->
+        <div v-if="filtered.length === 0" class="flex flex-col items-center justify-center py-16 gap-4">
+          <div class="w-16 h-16 rounded-full bg-[#E7E8E5] flex items-center justify-center">
+            <span class="material-symbols-rounded text-[28px] text-muted-foreground">receipt_long</span>
+          </div>
+          <div class="flex flex-col items-center gap-1">
+            <h3 class="font-mono text-base font-semibold text-foreground">No transactions</h3>
+            <p class="font-sans text-sm text-muted-foreground text-center max-w-[320px]">Your payment history will appear here</p>
+          </div>
+        </div>
+
         <div v-for="tx in filtered" :key="tx.id" class="flex items-center px-5 py-3.5 border-b border-border last:border-0 hover:bg-surface/30 transition-colors">
           <div class="w-[140px]"><span class="font-mono text-[13px] text-muted-foreground truncate block" :title="tx.id">{{ tx.id.slice(0, 10) }}…</span></div>
           <div class="flex-1"><span class="font-sans text-sm text-foreground">{{ tx.desc }}</span></div>
@@ -135,6 +165,15 @@ onMounted(async () => {
 
       <!-- Mobile -->
       <div class="lg:hidden">
+        <div v-if="filtered.length === 0" class="flex flex-col items-center justify-center py-16 gap-4">
+          <div class="w-16 h-16 rounded-full bg-[#E7E8E5] flex items-center justify-center">
+            <span class="material-symbols-rounded text-[28px] text-muted-foreground">receipt_long</span>
+          </div>
+          <div class="flex flex-col items-center gap-1">
+            <h3 class="font-mono text-base font-semibold text-foreground">No transactions</h3>
+            <p class="font-sans text-sm text-muted-foreground text-center max-w-[320px]">Your payment history will appear here</p>
+          </div>
+        </div>
         <div v-for="tx in filtered" :key="tx.id" class="px-4 py-3.5 border-b border-border last:border-0">
           <div class="flex items-center justify-between mb-1">
             <span class="font-sans text-sm font-medium text-foreground">{{ tx.desc }}</span>
@@ -149,11 +188,11 @@ onMounted(async () => {
 
       <!-- Pagination -->
       <div class="flex items-center justify-between px-5 py-3 border-t border-border">
-        <span class="font-sans text-[12px] text-muted-foreground">Showing 1–{{ resultCount }} of {{ resultCount }} transactions</span>
+        <span class="font-sans text-[12px] text-muted-foreground">Showing {{ resultCount }} of {{ totalTransactions }} transactions</span>
         <div class="flex items-center gap-1.5">
-          <button class="px-2.5 py-1 bg-white border border-border rounded-md text-[12px] font-sans text-foreground">Prev</button>
-          <button class="px-2.5 py-1 bg-foreground rounded-md text-[12px] font-sans text-white">1</button>
-          <button class="px-2.5 py-1 bg-white border border-border rounded-md text-[12px] font-sans text-foreground">Next</button>
+          <button @click="goPage(-1)" :disabled="currentPage <= 1" class="px-2.5 py-1 bg-white border border-border rounded-md text-[12px] font-sans text-foreground disabled:opacity-40">Prev</button>
+          <span class="px-2.5 py-1 bg-foreground rounded-md text-[12px] font-sans text-white">{{ currentPage }}</span>
+          <button @click="goPage(1)" :disabled="currentPage >= totalPages" class="px-2.5 py-1 bg-primary rounded-md text-[12px] font-sans text-white disabled:opacity-40">Next</button>
         </div>
       </div>
     </div>
