@@ -94,7 +94,8 @@ onMounted(async () => {
       updated: s.updatedAt ? new Date(s.updatedAt).toLocaleDateString('en-NG', { month: 'short', day: 'numeric', year: 'numeric' }) : '',
       sla: s.sla ?? '',
     }
-    hasFieldAgent.value = caseData.assignee !== '—' && caseData.assignee !== ''
+    const assigneeName = caseData.value.assignee
+    hasFieldAgent.value = !!assigneeName && assigneeName !== '—' && assigneeName !== 'Unassigned'
 
     // Map verification checklist
     const checklist = s.verificationChecklist ?? s.verificationResults ?? {}
