@@ -8,11 +8,21 @@ const visit = ref<any>(null)
 const checklist = ref<string[]>([])
 const loading = ref(true)
 
+const CHECKLIST_LABELS: Record<string, string> = {
+  identityVerified: 'Identity Verification',
+  employmentVerified: 'Employment Verification',
+  referencesVerified: 'References Check',
+  addressVerified: 'Address Verification',
+  criminalCheckDone: 'Criminal Background Check',
+  fieldVisitCompleted: 'Field Visit',
+}
+
 onMounted(async () => {
   try {
     const res = await getSubmission(visitId)
     visit.value = res.data ?? res
-    checklist.value = visit.value?.checklist ?? []
+    // Build checklist from verificationChecklist labels
+    checklist.value = Object.values(CHECKLIST_LABELS)
   } catch { /* empty */ }
   finally { loading.value = false }
 })
@@ -41,16 +51,16 @@ onMounted(async () => {
         <span class="material-symbols-rounded text-[16px]">location_on</span>
         {{ visit.propertyAddress }}
       </div>
-      <div class="flex items-center gap-2 text-[13px] text-muted-foreground font-sans">
+      <div v-if="visit.fieldAssignments?.[0]?.scheduledDate || visit.createdAt" class="flex items-center gap-2 text-[13px] text-muted-foreground font-sans">
         <span class="material-symbols-rounded text-[16px]">calendar_today</span>
-        {{ visit.time }}
+        {{ visit.fieldAssignments?.[0]?.scheduledDate ? new Date(visit.fieldAssignments[0].scheduledDate).toLocaleDateString('en-NG', { month: 'short', day: 'numeric', year: 'numeric' }) : new Date(visit.createdAt).toLocaleDateString('en-NG', { month: 'short', day: 'numeric', year: 'numeric' }) }}
       </div>
     </div>
     <div class="bg-card border border-border rounded-xl overflow-hidden">
       <div v-for="(item, i) in [
-        { label: 'Agent Company', value: visit.agent },
-        { label: 'Submitted', value: visit.submitted },
-        { label: 'Priority', value: visit.priority },
+        { label: 'Agent', value: visit.agent?.name ?? '—' },
+        { label: 'Submitted', value: visit.createdAt ? new Date(visit.createdAt).toLocaleDateString('en-NG', { month: 'short', day: 'numeric', year: 'numeric' }) : '—' },
+        { label: 'Tenant Phone', value: visit.tenantPhone ?? '—' },
       ]" :key="item.label" class="flex items-center justify-between px-4 py-3" :class="i < 2 ? 'border-b border-border' : ''">
         <span class="font-sans text-[13px] text-muted-foreground">{{ item.label }}</span>
         <span class="font-sans text-[13px] text-foreground">{{ item.value }}</span>

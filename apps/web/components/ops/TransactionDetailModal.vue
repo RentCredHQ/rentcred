@@ -41,17 +41,17 @@ watch(() => show.value, async (open) => {
     txn.value = {
       id: t.id ?? '',
       date: t.createdAt ? new Date(t.createdAt).toLocaleString('en-NG', { month: 'short', day: 'numeric', year: 'numeric', hour: '2-digit', minute: '2-digit' }) : '',
-      amount: `₦${(t.amount ?? 0).toLocaleString('en-NG')}`,
+      amount: `${t.amount ?? 0} credits`,
       status: style.label,
       statusBg: style.bg,
       statusText: style.text,
       type: t.type ?? '',
-      caseId: t.submissionId ?? t.caseId ?? '',
-      tenant: t.tenantName ?? '',
-      agent: t.agentName ?? t.agent?.name ?? '',
-      method: t.method ?? 'Bank Transfer',
-      reference: t.reference ?? t.id ?? '',
-      commission: t.commission ? `₦${t.commission.toLocaleString('en-NG')}` : '',
+      caseId: '',
+      tenant: '',
+      agent: t.agentId ?? '',
+      method: t.paystackRef ? 'Paystack' : '—',
+      reference: t.paystackRef ?? t.id ?? '',
+      commission: '',
     }
   } catch (e: any) {
     error.value = e.data?.message || 'Failed to load transaction details.'

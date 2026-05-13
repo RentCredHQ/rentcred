@@ -21,14 +21,16 @@ const saved = ref(false)
 
 onMounted(async () => {
   try {
-    const profile = await api('/agent/profile')
+    const profile = await api('/agent/profile') as any
     if (profile) {
-      const p = profile as any
-      form.phone = p.phone ?? form.phone
-      form.location = p.location ?? form.location
-      if (p.firstName) form.firstName = p.firstName
-      if (p.lastName) form.lastName = p.lastName
-      if (p.email) form.email = p.email
+      // Backend returns flattened { name, email, phone, ... } — split name into first/last
+      const fullName = profile.name ?? ''
+      const nameParts = fullName.split(' ')
+      form.firstName = nameParts[0] ?? form.firstName
+      form.lastName = nameParts.slice(1).join(' ') ?? form.lastName
+      form.email = profile.email ?? form.email
+      form.phone = profile.phone ?? form.phone
+      form.location = profile.companyAddress ?? profile.location ?? form.location
     }
   } catch { /* empty */ }
   finally { loading.value = false }
@@ -37,14 +39,12 @@ onMounted(async () => {
 async function handleSave() {
   saving.value = true
   try {
+    // Backend expects { name, phone, companyName, companyAddress }
     await api('/agent/profile', {
       method: 'PATCH',
       body: {
-        firstName: form.firstName,
-        lastName: form.lastName,
-        email: form.email,
+        name: `${form.firstName} ${form.lastName}`.trim(),
         phone: form.phone,
-        location: form.location,
       },
     })
     saved.value = true

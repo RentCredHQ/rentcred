@@ -68,7 +68,7 @@ onMounted(async () => {
     kpis.value = [
       { label: 'Total Spent', value: `₦${(s.totalSpent ?? 0).toLocaleString()}`, icon: 'payments' },
       { label: 'This Month', value: `₦${(s.thisMonth ?? 0).toLocaleString()}`, icon: 'calendar_today' },
-      { label: 'Transactions', value: String(s.totalTransactions ?? historyRes.data?.length ?? 0), icon: 'receipt_long' },
+      { label: 'Transactions', value: String(s.transactionCount ?? s.totalTransactions ?? historyRes.data?.length ?? 0), icon: 'receipt_long' },
     ]
 
     rawTransactions.value = historyRes.data ?? []

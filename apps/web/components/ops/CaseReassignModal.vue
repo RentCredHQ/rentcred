@@ -44,7 +44,7 @@ watch(() => props.modelValue, async (open) => {
       initials: getInitials(a.name ?? ''),
       name: a.name ?? '',
       role: a.role ?? 'Agent',
-      activeCases: a.activeCases ?? a.caseCount ?? 0,
+      activeCases: a.activeAssignments ?? a.activeCases ?? 0,
       color: agentColors[i % agentColors.length],
     }))
 
@@ -53,7 +53,7 @@ watch(() => props.modelValue, async (open) => {
       caseInfo.value = {
         id: s.id ?? '',
         tenant: s.tenantName ?? '',
-        currentAgent: s.fieldAssignments?.[0]?.fieldAgent?.name ?? s.fieldAgentName ?? s.fieldAgent?.name ?? '—',
+        currentAgent: s.fieldAssignments?.[0]?.fieldAgent?.name ?? '—',
       }
     }
   } catch (e: any) {

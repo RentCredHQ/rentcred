@@ -3,35 +3,91 @@ definePageMeta({ layout: 'dashboard' })
 
 const route = useRoute()
 const disputeId = computed(() => route.params.id as string)
+const { getDispute } = useDisputes()
 
 useSeoMeta({ title: () => `Dispute ${disputeId.value} — RentCred` })
 
-const dispute = ref({
-  id: 'DSP-0023',
-  status: 'Open',
-  statusBg: 'bg-[#E9E3D8]',
-  statusText: 'text-[#804200]',
-  priority: 'High',
-  priorityBg: 'bg-[#E5DCDA]',
-  priorityText: 'text-[#8C1C00]',
-  caseId: 'RC-2026-00389',
-  filedBy: 'Adesola Okafor',
-  filedDate: 'March 10, 2026',
-  category: 'Data Accuracy',
-  subject: 'Employment verification data outdated',
-  description: 'The employment verification data for this tenant appears to be outdated. The employer listed (Zenith Corp) no longer exists as of January 2026. The company was acquired by Sterling Holdings in Q4 2025, and the tenant has been employed by Sterling Holdings since.',
-  timeline: [
-    { date: 'Mar 10', time: '2:30 PM', title: 'Dispute filed', detail: 'Filed by Adesola Okafor citing employment data inaccuracy', icon: 'flag', color: 'bg-primary' },
-    { date: 'Mar 10', time: '3:15 PM', title: 'Assigned to agent', detail: 'Case assigned to Funke Adeyemi for investigation', icon: 'person', color: 'bg-[#1A56DB]' },
-    { date: 'Mar 11', time: '9:00 AM', title: 'Investigation started', detail: 'Agent began reviewing employment records and contacting employer', icon: 'search', color: 'bg-[#804200]' },
-    { date: 'Mar 12', time: '11:30 AM', title: 'Evidence submitted', detail: 'Tenant provided acquisition letter from Sterling Holdings', icon: 'attach_file', color: 'bg-[#004D1A]' },
-  ],
+function getStatusStyle(status: string) {
+  switch (status) {
+    case 'resolved': case 'closed': return { bg: 'bg-[#DFE6E1]', text: 'text-[#004D1A]', label: status === 'closed' ? 'Closed' : 'Resolved' }
+    case 'under_review': return { bg: 'bg-[#E9E3D8]', text: 'text-[#804200]', label: 'Under Review' }
+    case 'open': return { bg: 'bg-[#E9E3D8]', text: 'text-[#804200]', label: 'Open' }
+    default: return { bg: 'bg-blue-50', text: 'text-blue-600', label: status?.replace(/_/g, ' ').replace(/\b\w/g, (c: string) => c.toUpperCase()) ?? 'Unknown' }
+  }
+}
+
+const dispute = ref<any>({
+  id: '',
+  status: '',
+  statusBg: '',
+  statusText: '',
+  priority: 'Medium',
+  priorityBg: 'bg-[#E9E3D8]',
+  priorityText: 'text-[#804200]',
+  caseId: '',
+  filedBy: '',
+  filedDate: '',
+  category: '',
+  subject: '',
+  description: '',
+  timeline: [],
   info: {
-    assignedTo: 'Funke Adeyemi',
-    tenant: 'Adebayo Okonkwo',
-    relatedCase: 'RC-2026-00389',
-    sla: '48 hours (18h remaining)',
+    assignedTo: '—',
+    tenant: '—',
+    relatedCase: '—',
+    sla: '—',
   },
+})
+const loading = ref(true)
+
+onMounted(async () => {
+  try {
+    const res = await getDispute(disputeId.value) as any
+    const d = res?.data ?? res
+    if (!d) return
+
+    const style = getStatusStyle(d.status)
+    dispute.value = {
+      id: d.id,
+      status: style.label,
+      statusBg: style.bg,
+      statusText: style.text,
+      priority: 'Medium',
+      priorityBg: 'bg-[#E9E3D8]',
+      priorityText: 'text-[#804200]',
+      caseId: d.submissionId ?? '',
+      filedBy: d.raisedBy?.name ?? '—',
+      filedDate: d.createdAt ? new Date(d.createdAt).toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' }) : '—',
+      category: 'Dispute',
+      subject: d.reason ?? '',
+      description: d.description ?? '',
+      timeline: [
+        {
+          date: d.createdAt ? new Date(d.createdAt).toLocaleDateString('en-US', { month: 'short', day: 'numeric' }) : '—',
+          time: d.createdAt ? new Date(d.createdAt).toLocaleTimeString('en-NG', { hour: '2-digit', minute: '2-digit' }) : '',
+          title: 'Dispute filed',
+          detail: `Filed by ${d.raisedBy?.name ?? 'unknown'}: ${d.reason ?? ''}`,
+          icon: 'flag',
+          color: 'bg-primary',
+        },
+        ...(d.resolvedAt ? [{
+          date: new Date(d.resolvedAt).toLocaleDateString('en-US', { month: 'short', day: 'numeric' }),
+          time: new Date(d.resolvedAt).toLocaleTimeString('en-NG', { hour: '2-digit', minute: '2-digit' }),
+          title: `Dispute ${d.status}`,
+          detail: d.resolution ?? '',
+          icon: 'check',
+          color: 'bg-[#004D1A]',
+        }] : []),
+      ],
+      info: {
+        assignedTo: '—',
+        tenant: d.submission?.tenantName ?? '—',
+        relatedCase: d.submissionId ?? '—',
+        sla: '—',
+      },
+    }
+  } catch { /* empty */ }
+  finally { loading.value = false }
 })
 
 const newComment = ref('')

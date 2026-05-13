@@ -2,52 +2,59 @@
 definePageMeta({ layout: 'ops' })
 useSeoMeta({ title: 'Kanban Board — RentCred Ops' })
 
-const columns = ref([
-  {
-    title: 'Pending Assignment',
-    color: 'bg-[#E9E3D8]',
-    textColor: 'text-[#804200]',
-    cards: [
-      { id: 'RC-1042', tenant: 'Ngozi Udom', agent: 'Lagos Homes', priority: 'High', priorityBg: 'bg-[#E5DCDA]', priorityText: 'text-[#8C1C00]', updated: '30 min ago' },
-      { id: 'RC-1043', tenant: 'Segun Adeniyi', agent: 'Premier Realty', priority: 'Medium', priorityBg: 'bg-[#E9E3D8]', priorityText: 'text-[#804200]', updated: '2 hours ago' },
-    ],
-  },
-  {
-    title: 'In Progress',
-    color: 'bg-blue-50',
-    textColor: 'text-blue-600',
-    cards: [
-      { id: 'RC-1041', tenant: 'Amaechi Oguntayo', agent: 'Premier Realty', priority: 'High', priorityBg: 'bg-[#E5DCDA]', priorityText: 'text-[#8C1C00]', updated: '2 hours ago', assignee: 'Chidi Nwosu' },
-      { id: 'RC-1040', tenant: 'Obiorah Eze', agent: 'Lagos Homes', priority: 'Medium', priorityBg: 'bg-[#E9E3D8]', priorityText: 'text-[#804200]', updated: '4 hours ago', assignee: 'Funke Kadiri' },
-      { id: 'RC-1038', tenant: 'Fatima Bello', agent: 'Abuja Lettings', priority: 'Medium', priorityBg: 'bg-[#E9E3D8]', priorityText: 'text-[#804200]', updated: '6 hours ago', assignee: 'Amara Okafor' },
-    ],
-  },
-  {
-    title: 'Field Visit',
-    color: 'bg-[#E9E3D8]',
-    textColor: 'text-[#804200]',
-    cards: [
-      { id: 'RC-1036', tenant: 'Chidera Ibe', agent: 'PHC Properties', priority: 'Low', priorityBg: 'bg-[#DFE6E1]', priorityText: 'text-[#004D1A]', updated: '1 day ago', assignee: 'Bola Adewale' },
-    ],
-  },
-  {
-    title: 'Pending Review',
-    color: 'bg-[#E9E3D8]',
-    textColor: 'text-[#804200]',
-    cards: [
-      { id: 'RC-1039', tenant: 'Nkechi Nwokey', agent: 'Premier Realty', priority: 'Low', priorityBg: 'bg-[#DFE6E1]', priorityText: 'text-[#004D1A]', updated: '1 day ago', assignee: 'Bola Adewale' },
-      { id: 'RC-1037', tenant: 'Tunde Bakare', agent: 'PHC Properties', priority: 'High', priorityBg: 'bg-[#E5DCDA]', priorityText: 'text-[#8C1C00]', updated: '3 days ago', assignee: 'Yemi Ogundimu' },
-    ],
-  },
-  {
-    title: 'Completed',
-    color: 'bg-[#DFE6E1]',
-    textColor: 'text-[#004D1A]',
-    cards: [
-      { id: 'RC-1035', tenant: 'Emeka Nwachukwu', agent: 'Lagos Homes', priority: 'Medium', priorityBg: 'bg-[#E9E3D8]', priorityText: 'text-[#804200]', updated: '2 days ago', assignee: 'Chidi Nwosu' },
-    ],
-  },
-])
+const { getSubmissions } = useSubmissions()
+const loading = ref(true)
+
+const columnDefs = [
+  { status: 'pending', title: 'Pending Assignment', color: 'bg-[#E9E3D8]', textColor: 'text-[#804200]' },
+  { status: 'in_progress', title: 'In Progress', color: 'bg-blue-50', textColor: 'text-blue-600' },
+  { status: 'field_visit', title: 'Field Visit', color: 'bg-[#E9E3D8]', textColor: 'text-[#804200]' },
+  { status: 'report_building', title: 'Pending Review', color: 'bg-[#E9E3D8]', textColor: 'text-[#804200]' },
+  { status: 'completed', title: 'Completed', color: 'bg-[#DFE6E1]', textColor: 'text-[#004D1A]' },
+]
+
+const columns = ref<any[]>(columnDefs.map(c => ({ ...c, cards: [] })))
+
+function timeAgo(dateStr: string) {
+  const diff = Date.now() - new Date(dateStr).getTime()
+  const mins = Math.floor(diff / 60000)
+  if (mins < 60) return `${mins} min ago`
+  const hours = Math.floor(mins / 60)
+  if (hours < 24) return `${hours} hour${hours > 1 ? 's' : ''} ago`
+  const days = Math.floor(hours / 24)
+  return `${days} day${days > 1 ? 's' : ''} ago`
+}
+
+onMounted(async () => {
+  try {
+    const res = await getSubmissions({ limit: 100 })
+    const items = res.data ?? []
+
+    const grouped: Record<string, any[]> = {}
+    for (const col of columnDefs) grouped[col.status] = []
+
+    for (const s of items) {
+      const bucket = grouped[s.status]
+      if (!bucket) continue
+      bucket.push({
+        id: s.id,
+        tenant: s.tenantName ?? '',
+        agent: s.agent?.name ?? '—',
+        priority: '—',
+        priorityBg: 'bg-[#E9E3D8]',
+        priorityText: 'text-[#804200]',
+        updated: s.updatedAt ? timeAgo(s.updatedAt) : '—',
+        assignee: '',
+      })
+    }
+
+    columns.value = columnDefs.map(c => ({
+      ...c,
+      cards: grouped[c.status] ?? [],
+    }))
+  } catch { /* empty */ }
+  finally { loading.value = false }
+})
 </script>
 
 <template>
@@ -96,7 +103,7 @@ const columns = ref([
             </div>
             <div v-if="card.assignee" class="flex items-center gap-1.5 pt-0.5">
               <div class="w-5 h-5 rounded-full bg-primary/20 flex items-center justify-center">
-                <span class="font-mono text-[8px] font-semibold text-primary">{{ card.assignee.split(' ').map((n: string) => n[0]).join('') }}</span>
+                <span class="font-mono text-[8px] font-semibold text-primary">{{ card.assignee.split(' ').map(n => n[0]).join('') }}</span>
               </div>
               <span class="font-sans text-[11px] text-muted-foreground">{{ card.assignee }}</span>
             </div>

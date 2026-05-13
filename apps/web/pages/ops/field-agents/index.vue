@@ -46,30 +46,31 @@ async function fetchAgents() {
     totalAgents.value = items.length
 
     agents.value = items.map((a: any) => {
-      const statusLabel = (a.status ?? 'active').charAt(0).toUpperCase() + (a.status ?? 'active').slice(1)
-      const style = statusStyleMap[a.status ?? 'active'] ?? statusStyleMap.active
+      // Determine status from verification and assignment activity
+      const agentStatus = a.isVerified ? 'active' : 'inactive'
+      const statusLabel = agentStatus.charAt(0).toUpperCase() + agentStatus.slice(1)
+      const style = statusStyleMap[agentStatus] ?? statusStyleMap.active
       return {
         id: a.id,
         name: a.name ?? '',
         phone: a.phone ?? '',
-        location: a.location ?? a.state ?? '',
-        cases: a.activeCases ?? a.caseCount ?? 0,
-        rating: a.rating ?? 0,
+        location: '',
+        cases: a.activeAssignments ?? 0,
+        rating: 0,
         status: statusLabel,
         statusBg: style.bg,
         statusText: style.text,
-        lastActive: a.lastActiveAt ? new Date(a.lastActiveAt).toLocaleDateString('en-NG', { month: 'short', day: 'numeric' }) : '—',
+        lastActive: a.createdAt ? new Date(a.createdAt).toLocaleDateString('en-NG', { month: 'short', day: 'numeric' }) : '—',
       }
     })
 
     // Derive KPIs
-    const activeCount = items.filter((a: any) => a.status === 'active').length
-    const ratings = items.filter((a: any) => a.rating).map((a: any) => a.rating)
-    const avgRating = ratings.length ? (ratings.reduce((s: number, r: number) => s + r, 0) / ratings.length).toFixed(1) : '—'
+    const activeCount = items.filter((a: any) => a.isVerified).length
+    const totalActive = items.reduce((sum: number, a: any) => sum + (a.activeAssignments ?? 0), 0)
     kpis.value = [
       { label: 'TOTAL AGENTS', value: String(totalAgents.value), sub: '', valueColor: 'text-foreground' },
-      { label: 'ACTIVE TODAY', value: String(activeCount), sub: '', valueColor: 'text-[#004D1A]' },
-      { label: 'AVG RATING', value: String(avgRating), sub: '', valueColor: 'text-primary' },
+      { label: 'VERIFIED', value: String(activeCount), sub: '', valueColor: 'text-[#004D1A]' },
+      { label: 'ACTIVE CASES', value: String(totalActive), sub: '', valueColor: 'text-primary' },
       { label: 'PENDING REVIEWS', value: '—', sub: '', valueColor: 'text-[#804200]' },
     ]
   } catch { /* empty */ }

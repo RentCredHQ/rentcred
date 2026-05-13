@@ -38,14 +38,15 @@ onMounted(async () => {
   try {
     const agentProfile = await getProfile() as any
     if (agentProfile) {
-      profile.fullName = agentProfile.fullName ?? profile.fullName
+      // Backend getProfile() returns flattened: { name, email, phone, role, companyName, companyAddress, rcNumber, ... }
+      profile.fullName = agentProfile.name ?? agentProfile.fullName ?? profile.fullName
       profile.email = agentProfile.email ?? profile.email
       profile.phone = agentProfile.phone ?? profile.phone
       profile.role = agentProfile.role ?? profile.role
       company.value = {
         name: agentProfile.companyName ?? '',
         rcNumber: agentProfile.rcNumber ?? '',
-        address: agentProfile.address ?? '',
+        address: agentProfile.companyAddress ?? agentProfile.address ?? '',
         license: agentProfile.license ?? '',
       }
     }

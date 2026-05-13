@@ -25,8 +25,8 @@ watch(() => props.modelValue, async (open) => {
     const r = res.data ?? res
     caseInfo.value = {
       caseId: r.submissionId ?? r.id ?? '',
-      tenantName: r.content?.tenantInfo?.name ?? r.tenantName ?? '',
-      agent: r.fieldAgentName ?? r.agent?.name ?? '',
+      tenantName: r.content?.tenant?.name ?? r.submission?.tenantName ?? '',
+      agent: r.submission?.agent?.name ?? '',
     }
   } catch (e: any) {
     error.value = e.data?.message || 'Failed to load report details.'

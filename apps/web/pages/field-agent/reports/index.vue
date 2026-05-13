@@ -16,8 +16,17 @@ const loading = ref(true)
 
 onMounted(async () => {
   try {
-    const res = await api('/field-agents/assignments', { params: { status: 'completed' } })
-    reports.value = res as any[]
+    const res = await api('/field-agents/assignments', { params: { status: 'completed' } }) as any
+    // Backend returns { data: assignments[], pagination: {...} }
+    const assignments = res?.data ?? res ?? []
+    reports.value = (Array.isArray(assignments) ? assignments : []).map((a: any) => ({
+      id: a.submissionId || a.submission?.id || a.id,
+      tenant: a.submission?.tenantName || a.tenantName || '—',
+      type: a.submission?.propertyType || a.type || '—',
+      location: a.submission?.propertyAddress || a.propertyAddress || '—',
+      date: a.completedAt ? new Date(a.completedAt).toLocaleDateString('en-NG', { month: 'short', day: 'numeric', year: 'numeric' }) : a.createdAt ? new Date(a.createdAt).toLocaleDateString('en-NG', { month: 'short', day: 'numeric', year: 'numeric' }) : '—',
+      result: a.status === 'completed' ? 'Verified' : 'Pending Review',
+    }))
   } catch { /* empty */ }
   finally { loading.value = false }
 })

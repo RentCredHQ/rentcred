@@ -134,9 +134,37 @@ function formatDate(dateStr: string) {
             </div>
             <div class="p-5">
               <div v-if="typeof report.content === 'object'" class="flex flex-col gap-4">
+                <!-- Backend content shape: { tenant, property, employment, verification, fieldVisit, generatedAt } -->
                 <div v-if="report.content.summary" class="font-sans text-[14px] text-foreground leading-relaxed">
                   {{ report.content.summary }}
                 </div>
+
+                <!-- Verification checklist from content.verification -->
+                <div v-if="report.content.verification" class="grid grid-cols-2 sm:grid-cols-3 gap-3">
+                  <div v-for="(checked, label) in {
+                    'Identity': report.content.verification.identityVerified,
+                    'Employment': report.content.verification.employmentVerified,
+                    'References': report.content.verification.referencesVerified,
+                    'Address': report.content.verification.addressVerified,
+                    'Criminal Check': report.content.verification.criminalCheckDone,
+                    'Field Visit': report.content.verification.fieldVisitCompleted,
+                  }" :key="label" class="flex items-center gap-1.5">
+                    <span class="material-symbols-rounded text-[16px]" :class="checked ? 'text-[#004D1A]' : 'text-muted-foreground'">
+                      {{ checked ? 'check_circle' : 'radio_button_unchecked' }}
+                    </span>
+                    <span class="font-sans text-[13px]" :class="checked ? 'text-foreground' : 'text-muted-foreground'">{{ label }}</span>
+                  </div>
+                </div>
+
+                <!-- Employment info from content.employment -->
+                <div v-if="report.content.employment" class="flex flex-col gap-2">
+                  <span class="font-mono text-[11px] font-semibold text-muted-foreground uppercase tracking-wider">Employment</span>
+                  <div class="flex justify-between" v-if="report.content.employment.employer">
+                    <span class="font-sans text-[12px] text-muted-foreground">Employer</span>
+                    <span class="font-sans text-[13px] font-medium text-foreground">{{ report.content.employment.employer }}</span>
+                  </div>
+                </div>
+
                 <div v-if="report.content.recommendations" class="flex flex-col gap-1.5">
                   <span class="font-mono text-[11px] font-semibold text-muted-foreground uppercase tracking-wider">Recommendations</span>
                   <p class="font-sans text-[14px] text-foreground">{{ report.content.recommendations }}</p>

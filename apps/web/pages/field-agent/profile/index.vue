@@ -11,8 +11,13 @@ const loading = ref(true)
 
 onMounted(async () => {
   try {
-    const res = await api('/field-agents/dashboard/stats')
-    stats.value = res
+    const res = await api('/field-agents/dashboard/stats') as any
+    // Backend returns { todaysVisits, activeAssignments, completedVisits, totalAssignments, pending }
+    stats.value = {
+      completed: res?.completedVisits ?? res?.completed ?? 0,
+      rating: res?.rating ?? '—',
+      slaMet: res?.slaMet ?? '—',
+    }
   } catch { /* empty */ }
   finally { loading.value = false }
 })

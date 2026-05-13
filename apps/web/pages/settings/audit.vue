@@ -28,12 +28,32 @@ const loading = ref(true)
 onMounted(async () => {
   try {
     const res = await getAuditLogs() as any
+    // Backend returns { data: auditLogs[], pagination: {...} }
+    // Each log: { id, userId, action, entityType, entityId, metadata, ipAddress, createdAt, user: {id, name, email, role} }
     const logs = Array.isArray(res) ? res : res?.events ?? res?.data ?? []
-    events.value = logs.map((evt: any) => ({
-      ...evt,
-      categoryBg: categoryStyles[evt.category]?.bg ?? 'bg-[#E7E8E5]',
-      categoryText: categoryStyles[evt.category]?.text ?? 'text-foreground',
-    }))
+
+    // Map entityType to display category
+    function mapCategory(entityType: string, action: string): string {
+      if (action?.includes('login') || action?.includes('auth') || action?.includes('password')) return 'Auth'
+      if (entityType === 'submission' || entityType === 'field_visit') return 'Case'
+      if (entityType === 'report') return 'Report'
+      if (entityType === 'transaction') return 'Payment'
+      return 'System'
+    }
+
+    events.value = logs.map((evt: any) => {
+      const category = evt.category ?? mapCategory(evt.entityType ?? '', evt.action ?? '')
+      return {
+        ...evt,
+        user: evt.user?.name ?? evt.user ?? '—',
+        action: evt.action?.replace(/_/g, ' ') ?? '—',
+        category,
+        time: evt.createdAt ? new Date(evt.createdAt).toLocaleString('en-NG', { month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' }) : evt.time ?? '—',
+        ip: evt.ipAddress ?? evt.ip ?? '—',
+        categoryBg: categoryStyles[category]?.bg ?? 'bg-[#E7E8E5]',
+        categoryText: categoryStyles[category]?.text ?? 'text-foreground',
+      }
+    })
     if (res?.summary) {
       summary.value = res.summary
     } else {

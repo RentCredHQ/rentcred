@@ -2,21 +2,63 @@
 definePageMeta({ layout: 'dashboard' })
 useSeoMeta({ title: 'Dispute Resolution — RentCred' })
 
+const { getDisputes } = useDisputes()
+
 const kpis = ref([
-  { label: 'TOTAL DISPUTES', value: '14', sub: '+4 this week · 2 escalated', valueColor: 'text-foreground' },
-  { label: 'OPEN', value: '5', sub: '2 due today · 1 overdue', valueColor: 'text-[#804200]' },
-  { label: 'RESOLVED', value: '9', sub: '64% within SLA', valueColor: 'text-[#004D1A]' },
-  { label: 'AVG RESOLUTION', value: '2.8 days', sub: 'Median 2.1 days', valueColor: 'text-foreground', smallValue: true },
+  { label: 'TOTAL DISPUTES', value: '0', sub: '', valueColor: 'text-foreground' },
+  { label: 'OPEN', value: '0', sub: '', valueColor: 'text-[#804200]' },
+  { label: 'RESOLVED', value: '0', sub: '', valueColor: 'text-[#004D1A]' },
+  { label: 'AVG RESOLUTION', value: '—', sub: '', valueColor: 'text-foreground', smallValue: true },
 ])
 
-const disputes = ref([
-  { id: 'DSP-0023', parties: 'Adesola O. / Bola A.', reason: 'Employment mismatch after employer callback', priority: 'High', priorityBg: 'bg-[#E5DCDA]', priorityText: 'text-[#8C1C00]', status: 'Open', statusBg: 'bg-[#E9E3D8]', statusText: 'text-[#804200]', deadline: '6h left' },
-  { id: 'DSP-0022', parties: 'Chioma E. / Emeka N.', reason: 'Address discrepancy between NIN and utility bill', priority: 'Medium', priorityBg: 'bg-[#E9E3D8]', priorityText: 'text-[#804200]', status: 'Open', statusBg: 'bg-[#E9E3D8]', statusText: 'text-[#804200]', deadline: '12h left' },
-  { id: 'DSP-0021', parties: 'Tunde B. / Fatima B.', reason: 'Reference check returned conflicting information', priority: 'Low', priorityBg: 'bg-[#DFE6E1]', priorityText: 'text-[#004D1A]', status: 'Resolved', statusBg: 'bg-[#DFE6E1]', statusText: 'text-[#004D1A]', deadline: 'Closed' },
-  { id: 'DSP-0020', parties: 'Yemi A. / Ngozi U.', reason: 'Tenant disputes identity verification result', priority: 'High', priorityBg: 'bg-[#E5DCDA]', priorityText: 'text-[#8C1C00]', status: 'Escalated', statusBg: 'bg-[#E5DCDA]', statusText: 'text-[#8C1C00]', deadline: 'Overdue' },
-])
+const disputes = ref<any[]>([])
+const loading = ref(true)
 
 const showNewDispute = ref(false)
+
+function getStatusStyle(status: string) {
+  switch (status) {
+    case 'resolved': case 'closed': return { bg: 'bg-[#DFE6E1]', text: 'text-[#004D1A]', label: status === 'closed' ? 'Closed' : 'Resolved' }
+    case 'under_review': return { bg: 'bg-[#E9E3D8]', text: 'text-[#804200]', label: 'Under Review' }
+    case 'open': return { bg: 'bg-[#E9E3D8]', text: 'text-[#804200]', label: 'Open' }
+    default: return { bg: 'bg-blue-50', text: 'text-blue-600', label: status.replace(/_/g, ' ').replace(/\b\w/g, (c: string) => c.toUpperCase()) }
+  }
+}
+
+onMounted(async () => {
+  try {
+    const res = await getDisputes() as any
+    const rawDisputes = res?.data ?? []
+
+    disputes.value = rawDisputes.map((d: any) => {
+      const style = getStatusStyle(d.status)
+      return {
+        id: d.id,
+        parties: `${d.raisedBy?.name ?? '—'} / ${d.submission?.agent?.name ?? '—'}`,
+        reason: d.reason ?? '—',
+        priority: 'Medium',
+        priorityBg: 'bg-[#E9E3D8]',
+        priorityText: 'text-[#804200]',
+        status: style.label,
+        statusBg: style.bg,
+        statusText: style.text,
+        deadline: d.resolvedAt ? 'Closed' : '—',
+      }
+    })
+
+    const total = rawDisputes.length
+    const open = rawDisputes.filter((d: any) => d.status === 'open' || d.status === 'under_review').length
+    const resolved = rawDisputes.filter((d: any) => d.status === 'resolved' || d.status === 'closed').length
+
+    kpis.value = [
+      { label: 'TOTAL DISPUTES', value: String(total), sub: '', valueColor: 'text-foreground' },
+      { label: 'OPEN', value: String(open), sub: '', valueColor: 'text-[#804200]' },
+      { label: 'RESOLVED', value: String(resolved), sub: '', valueColor: 'text-[#004D1A]' },
+      { label: 'AVG RESOLUTION', value: '—', sub: '', valueColor: 'text-foreground', smallValue: true },
+    ]
+  } catch { /* empty */ }
+  finally { loading.value = false }
+})
 
 const statusTabs = [
   { label: 'All', value: 'all' },

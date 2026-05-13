@@ -12,9 +12,15 @@ const loading = ref(true)
 
 onMounted(async () => {
   try {
-    const res = await getNotifications()
-    allNotifications.value = (Array.isArray(res) ? res : []).map((n: any) => ({
+    const res = await getNotifications() as any
+    // Backend returns { data: notifications[], pagination: {...} }
+    const notifications = res?.data ?? (Array.isArray(res) ? res : [])
+    allNotifications.value = notifications.map((n: any) => ({
       ...n,
+      // Map backend fields to template expectations
+      desc: n.message ?? n.desc ?? '',
+      time: n.createdAt ? new Date(n.createdAt).toLocaleTimeString('en-NG', { hour: '2-digit', minute: '2-digit' }) : n.time ?? '',
+      unread: n.readAt == null && n.read !== true,
       iconBg: n.iconBg ?? 'bg-[#DFDFE6]',
       iconColor: n.iconColor ?? 'text-[#000066]',
       icon: n.icon ?? 'notifications',

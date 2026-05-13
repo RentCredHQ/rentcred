@@ -11,22 +11,22 @@ const loading = ref(true)
 
 onMounted(async () => {
   try {
-    const [dashStats, activity] = await Promise.all([
+    const [dashStats, casesRes] = await Promise.all([
       api<any>('/ops/dashboard/stats'),
-      api<any>('/ops/dashboard/activity'),
+      api<any>('/ops/dashboard/recent-cases'),
     ])
 
-    const s = dashStats.data ?? dashStats
+    const s = dashStats
     stats.value = [
-      { label: 'Total Cases', value: s.totalCases ?? 0, icon: 'folder', change: s.casesChangeLabel ?? '' },
+      { label: 'Total Cases', value: s.totalCases ?? 0, icon: 'folder', change: '' },
       { label: 'Pending Verification', value: s.pendingVerifications ?? 0, icon: 'pending_actions', color: 'text-[#FF8400]' },
       { label: 'Field Visits Today', value: s.fieldVisitsToday ?? 0, icon: 'location_on', color: 'text-blue-600' },
-      { label: 'Reports to Approve', value: s.reportsToApprove ?? 0, icon: 'rate_review', color: 'text-red-500' },
-      { label: 'Active Field Agents', value: s.activeFieldAgents ?? 0, icon: 'groups', color: 'text-green-600' },
-      { label: 'Pending KYB', value: s.pendingKYB ?? 0, icon: 'verified_user' },
+      { label: 'Reports Ready', value: s.reportsReady ?? 0, icon: 'rate_review', color: 'text-green-600' },
+      { label: 'In Progress', value: s.inProgress ?? 0, icon: 'groups', color: 'text-blue-600' },
+      { label: 'Completed This Week', value: s.completedThisWeek ?? 0, icon: 'verified_user', color: 'text-green-600' },
     ]
 
-    const cases = (activity.data ?? activity) as any[]
+    const cases = (Array.isArray(casesRes) ? casesRes : casesRes?.data ?? []) as any[]
     const statusColorMap: Record<string, string> = {
       pending: 'bg-amber-50 text-amber-600',
       in_progress: 'bg-blue-50 text-blue-600',
@@ -38,7 +38,7 @@ onMounted(async () => {
     recentCases.value = cases.map((c: any) => ({
       id: c.id,
       tenant: c.tenantName,
-      agent: c.agentName ?? c.agent?.name ?? '—',
+      agent: c.agent?.name ?? '—',
       status: SUBMISSION_STATUS_LABELS[c.status] ?? c.status,
       statusColor: statusColorMap[c.status] ?? 'bg-gray-50 text-gray-600',
       updated: c.updatedAt ? new Date(c.updatedAt).toLocaleDateString('en-NG', { month: 'short', day: 'numeric' }) : '—',

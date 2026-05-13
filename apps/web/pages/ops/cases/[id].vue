@@ -60,7 +60,7 @@ async function fetchCaseData() {
 
     // Extract field agent from fieldAssignments array
     const latestAssignment = s.fieldAssignments?.[0]
-    const fieldAgentName = latestAssignment?.fieldAgent?.name ?? s.fieldAgentName ?? s.fieldAgent?.name ?? ''
+    const fieldAgentName = latestAssignment?.fieldAgent?.name ?? ''
 
     caseData.value = {
       id: s.id,
@@ -84,9 +84,9 @@ async function fetchCaseData() {
         images: s.propertyImages ?? [],
       },
       agent: {
-        name: s.agentName ?? s.agent?.businessName ?? '',
-        contact: s.agent?.name ?? '',
-        rc: s.agent?.rcNumber ?? '',
+        name: s.agent?.name ?? '',
+        contact: s.agent?.email ?? '',
+        rc: '',
       },
       assignee: fieldAgentName || '—',
       status: SUBMISSION_STATUS_LABELS[s.status] ?? s.status,
@@ -103,13 +103,13 @@ async function fetchCaseData() {
     hasFieldAgent.value = !!assigneeName && assigneeName !== '—' && assigneeName !== 'Unassigned'
 
     // Map verification checklist
-    const checklist = s.verificationChecklist ?? s.verificationResults ?? {}
+    const checklist = s.verificationChecklist ?? {}
     const checkLabels: Record<string, string> = {
       identityVerified: 'NIN Verification',
       addressVerified: 'Address Verification',
       employmentVerified: 'Employment Check',
       referencesVerified: 'Reference Check',
-      criminalCheckClear: 'Criminal Check',
+      criminalCheckDone: 'Criminal Check',
       fieldVisitCompleted: 'Field Visit',
     }
     checks.value = Object.entries(checkLabels).map(([key, label]) => {

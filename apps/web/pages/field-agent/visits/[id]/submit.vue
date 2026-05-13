@@ -12,10 +12,25 @@ const result = ref<'verified' | 'flagged' | null>('verified')
 const loading = ref(true)
 const submitting = ref(false)
 
+const CHECKLIST_LABELS: Record<string, string> = {
+  identityVerified: 'Identity Verification',
+  employmentVerified: 'Employment Verification',
+  referencesVerified: 'References Check',
+  addressVerified: 'Address Verification',
+  criminalCheckDone: 'Criminal Background Check',
+  fieldVisitCompleted: 'Field Visit',
+}
+
 onMounted(async () => {
   try {
-    const res = await getSubmission(visitId)
-    items.value = res?.checklist ?? []
+    const res = await getSubmission(visitId) as any
+    const sub = res?.data ?? res
+    // Backend returns verificationChecklist as object with boolean fields, not a string array
+    if (sub?.verificationChecklist && typeof sub.verificationChecklist === 'object') {
+      items.value = Object.keys(CHECKLIST_LABELS).map(k => CHECKLIST_LABELS[k])
+    } else {
+      items.value = sub?.checklist ?? []
+    }
     checked.value = items.value.map(() => false)
   } catch { /* empty */ }
   finally { loading.value = false }
@@ -26,13 +41,23 @@ function toggle(i: number) { checked.value[i] = !checked.value[i] }
 async function submit() {
   submitting.value = true
   try {
+    // Backend expects SubmitVisitDto: { submissionId, visitDate, notes?, summary?, checklistItems?, photos? }
+    const checklistItems: Record<string, boolean> = {}
+    const checklistKeys = Object.keys(CHECKLIST_LABELS)
+    items.value.forEach((_item: string, i: number) => {
+      if (checklistKeys[i]) {
+        checklistItems[checklistKeys[i]] = checked.value[i] ?? false
+      }
+    })
+
     await api('/field-agents/visit', {
       method: 'POST',
       body: {
-        visitId,
-        checklist: items.value.map((item, i) => ({ item, checked: checked.value[i] })),
+        submissionId: visitId,
+        visitDate: new Date().toISOString(),
         notes: notes.value,
-        result: result.value,
+        summary: `Verification result: ${result.value ?? 'unknown'}. ${notes.value}`.trim(),
+        checklistItems,
       },
     })
     navigateTo('/field-agent')

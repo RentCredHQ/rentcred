@@ -56,7 +56,7 @@ async function fetchCases(page = 1) {
       return {
         id: s.id,
         tenant: s.tenantName,
-        agent: s.agentName ?? s.agent?.name ?? '—',
+        agent: s.agent?.name ?? '—',
         status: SUBMISSION_STATUS_LABELS[s.status] ?? s.status,
         rawStatus: s.status,
         statusBg: style.bg,
@@ -64,7 +64,7 @@ async function fetchCases(page = 1) {
         priority: s.priority ?? '—',
         priorityBg: 'bg-[#E9E3D8]',
         priorityText: 'text-[#804200]',
-        assigned: s.fieldAgentName ?? s.fieldAgent?.name ?? '—',
+        assigned: s.fieldAssignments?.[0]?.fieldAgent?.name ?? '—',
         updated: s.updatedAt ? new Date(s.updatedAt).toLocaleDateString('en-NG', { month: 'short', day: 'numeric' }) : '—',
       }
     })

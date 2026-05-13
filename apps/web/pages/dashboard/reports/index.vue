@@ -58,7 +58,7 @@ const reports = computed(() =>
     const style = getReportStatusStyle(r.status)
     const rec = getRecStyle(r.content?.overallRating)
     return {
-      tenant: r.content?.tenantInfo?.name || '',
+      tenant: r.submission?.tenantName || r.content?.tenant?.name || r.content?.tenantInfo?.name || '',
       caseId: r.submissionId || r.id,
       status: getReportStatusLabel(r.status),
       statusBg: style.bg,

@@ -15,20 +15,30 @@ onMounted(async () => {
       getTransactionHistory(),
     ])
     if (statsRes) {
+      // Backend getStats() returns { totalSpent, thisMonth, transactionCount }
       const s = statsRes as any
       kpis.value = [
-        { label: 'TOTAL SPENT', value: s.totalSpent ?? '—', sub: s.totalSpentPeriod ?? '', valueColor: 'text-foreground' },
-        { label: 'PENDING INVOICES', value: s.pendingInvoices ?? '0', sub: s.pendingSub ?? '', valueColor: 'text-[#804200]' },
-        { label: 'LAST PAYMENT', value: s.lastPaymentAmount ?? '—', sub: s.lastPaymentDesc ?? '', valueColor: 'text-[#004D1A]' },
-        { label: 'PAYMENT METHOD', value: s.paymentMethod ?? '—', sub: s.paymentMethodSub ?? '', valueColor: 'text-foreground', smallValue: true },
+        { label: 'TOTAL SPENT', value: `₦${(s.totalSpent ?? 0).toLocaleString()}`, sub: '', valueColor: 'text-foreground' },
+        { label: 'THIS MONTH', value: `₦${(s.thisMonth ?? 0).toLocaleString()}`, sub: '', valueColor: 'text-[#804200]' },
+        { label: 'TRANSACTIONS', value: String(s.transactionCount ?? 0), sub: '', valueColor: 'text-[#004D1A]' },
+        { label: 'PAYMENT METHOD', value: 'Paystack', sub: '', valueColor: 'text-foreground', smallValue: true },
       ]
     }
     if (historyRes) {
-      invoices.value = (Array.isArray(historyRes) ? historyRes : []).map((inv: any) => ({
-        ...inv,
-        statusBg: inv.status === 'Paid' ? 'bg-[#DFE6E1]' : 'bg-[#E9E3D8]',
-        statusText: inv.status === 'Paid' ? 'text-[#004D1A]' : 'text-[#804200]',
-      }))
+      // Backend getHistory() returns { data: transactions[], pagination: {...} }
+      const txns = (historyRes as any)?.data ?? (Array.isArray(historyRes) ? historyRes : [])
+      invoices.value = txns.map((tx: any) => {
+        const statusLabel = tx.status === 'completed' ? 'Paid' : tx.status === 'pending' ? 'Pending' : tx.status || 'Pending'
+        return {
+          id: tx.id,
+          date: new Date(tx.createdAt).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' }),
+          desc: tx.description || tx.type || '',
+          amount: `₦${(tx.amount ?? 0).toLocaleString()}`,
+          status: statusLabel,
+          statusBg: statusLabel === 'Paid' ? 'bg-[#DFE6E1]' : 'bg-[#E9E3D8]',
+          statusText: statusLabel === 'Paid' ? 'text-[#004D1A]' : 'text-[#804200]',
+        }
+      })
     }
   } catch { /* empty */ }
   finally { loading.value = false }

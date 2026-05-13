@@ -2,31 +2,87 @@
 definePageMeta({ layout: 'ops' })
 useSeoMeta({ title: 'Reports — RentCred Ops' })
 
+const { api } = useApi()
+
 const showApproval = ref(false)
+const selectedReportId = ref<string | null>(null)
+const loading = ref(true)
 
 const statusTabs = [
   { label: 'All', value: 'all' },
-  { label: 'Draft', value: 'draft' },
-  { label: 'Pending Review', value: 'pending review' },
-  { label: 'Approved', value: 'approved' },
-  { label: 'Rejected', value: 'rejected' },
+  { label: 'Draft', value: 'Draft' },
+  { label: 'Pending Approval', value: 'Pending Approval' },
+  { label: 'Approved', value: 'Approved' },
+  { label: 'Rejected', value: 'Rejected' },
 ]
 
+const statusStyleMap: Record<string, { bg: string; text: string; label: string }> = {
+  draft: { bg: 'bg-background', text: 'text-muted-foreground', label: 'Draft' },
+  pending_approval: { bg: 'bg-[#E9E3D8]', text: 'text-[#804200]', label: 'Pending Approval' },
+  approved: { bg: 'bg-[#DFE6E1]', text: 'text-[#004D1A]', label: 'Approved' },
+  rejected: { bg: 'bg-[#E5DCDA]', text: 'text-[#8C1C00]', label: 'Rejected' },
+}
+
 const kpis = ref([
-  { label: 'TOTAL REPORTS', value: '89', sub: '+8 this week', valueColor: 'text-foreground' },
-  { label: 'PENDING REVIEW', value: '14', sub: '5 due today', valueColor: 'text-primary' },
-  { label: 'APPROVED', value: '68', sub: '76% approval rate', valueColor: 'text-[#004D1A]' },
-  { label: 'AVG TURNAROUND', value: '3.2d', sub: 'Median 2.8 days', valueColor: 'text-foreground' },
+  { label: 'TOTAL REPORTS', value: '—', sub: '', valueColor: 'text-foreground' },
+  { label: 'PENDING REVIEW', value: '—', sub: '', valueColor: 'text-primary' },
+  { label: 'APPROVED', value: '—', sub: '', valueColor: 'text-[#004D1A]' },
+  { label: 'REJECTED', value: '—', sub: '', valueColor: 'text-[#8C1C00]' },
 ])
 
-const reports = ref([
-  { id: 'RPT-0089', caseId: 'RC-1041', tenant: 'Amaechi Oguntayo', agent: 'Chidi Nwosu', risk: 'Low', riskBg: 'bg-[#DFE6E1]', riskText: 'text-[#004D1A]', status: 'Pending Review', statusBg: 'bg-[#E9E3D8]', statusText: 'text-[#804200]', date: 'Mar 14' },
-  { id: 'RPT-0088', caseId: 'RC-1040', tenant: 'Obiorah Eze', agent: 'Funke Kadiri', risk: 'Medium', riskBg: 'bg-[#E9E3D8]', riskText: 'text-[#804200]', status: 'Approved', statusBg: 'bg-[#DFE6E1]', statusText: 'text-[#004D1A]', date: 'Mar 13' },
-  { id: 'RPT-0087', caseId: 'RC-1039', tenant: 'Nkechi Nwokey', agent: 'Bola Adewale', risk: 'Low', riskBg: 'bg-[#DFE6E1]', riskText: 'text-[#004D1A]', status: 'Approved', statusBg: 'bg-[#DFE6E1]', statusText: 'text-[#004D1A]', date: 'Mar 12' },
-  { id: 'RPT-0086', caseId: 'RC-1038', tenant: 'Fatima Bello', agent: 'Amara Okafor', risk: 'High', riskBg: 'bg-[#E5DCDA]', riskText: 'text-[#8C1C00]', status: 'Rejected', statusBg: 'bg-[#E5DCDA]', statusText: 'text-[#8C1C00]', date: 'Mar 11' },
-  { id: 'RPT-0085', caseId: 'RC-1037', tenant: 'Tunde Bakare', agent: 'Yemi Ogundimu', risk: 'Low', riskBg: 'bg-[#DFE6E1]', riskText: 'text-[#004D1A]', status: 'Pending Review', statusBg: 'bg-[#E9E3D8]', statusText: 'text-[#804200]', date: 'Mar 10' },
-  { id: 'RPT-0084', caseId: 'RC-1036', tenant: 'Ngozi Udom', agent: 'Chidi Nwosu', risk: 'Medium', riskBg: 'bg-[#E9E3D8]', riskText: 'text-[#804200]', status: 'Draft', statusBg: 'bg-background', statusText: 'text-muted-foreground', date: 'Mar 9' },
-])
+const reports = ref<any[]>([])
+const totalReports = ref(0)
+const currentPage = ref(1)
+const totalPages = ref(1)
+
+async function fetchReports(page = 1) {
+  loading.value = true
+  try {
+    const res = await api<any>('/reports', { params: { page, limit: 20 } })
+    const items = res.data ?? []
+    const pagination = res.pagination ?? {}
+
+    totalReports.value = pagination.total ?? items.length
+    currentPage.value = pagination.page ?? page
+    totalPages.value = pagination.totalPages ?? 1
+
+    reports.value = items.map((r: any) => {
+      const style = statusStyleMap[r.status] ?? statusStyleMap.draft
+      return {
+        id: r.id,
+        caseId: r.submission?.id ?? r.submissionId ?? '',
+        tenant: r.submission?.tenantName ?? '',
+        agent: r.submission?.agent?.name ?? '',
+        risk: '—',
+        riskBg: 'bg-[#E7E8E5]',
+        riskText: 'text-foreground',
+        status: style.label,
+        statusBg: style.bg,
+        statusText: style.text,
+        date: r.createdAt ? new Date(r.createdAt).toLocaleDateString('en-NG', { month: 'short', day: 'numeric' }) : '—',
+      }
+    })
+
+    // Derive KPIs
+    const pendingCount = items.filter((r: any) => ['draft', 'pending_approval'].includes(r.status)).length
+    const approvedCount = items.filter((r: any) => r.status === 'approved').length
+    const rejectedCount = items.filter((r: any) => r.status === 'rejected').length
+    kpis.value = [
+      { label: 'TOTAL REPORTS', value: String(totalReports.value), sub: '', valueColor: 'text-foreground' },
+      { label: 'PENDING REVIEW', value: String(pendingCount), sub: '', valueColor: 'text-primary' },
+      { label: 'APPROVED', value: String(approvedCount), sub: '', valueColor: 'text-[#004D1A]' },
+      { label: 'REJECTED', value: String(rejectedCount), sub: '', valueColor: 'text-[#8C1C00]' },
+    ]
+  } catch { /* empty */ }
+  finally { loading.value = false }
+}
+
+function goPage(page: number) {
+  if (page < 1 || page > totalPages.value) return
+  fetchReports(page)
+}
+
+onMounted(() => fetchReports())
 
 const { searchQuery, activeFilter, filtered, resultCount } = useFilter({
   items: reports,
@@ -121,12 +177,13 @@ const { searchQuery, activeFilter, filtered, resultCount } = useFilter({
 
       <!-- Footer -->
       <div class="flex items-center justify-between px-6 py-3 border-t border-border">
-        <span class="font-sans text-[12px] text-muted-foreground">Showing 6 of 89 reports</span>
+        <span class="font-sans text-[12px] text-muted-foreground">Showing {{ resultCount }} of {{ totalReports }} reports</span>
         <div class="flex items-center gap-1.5">
-          <button class="px-2.5 py-1 bg-white border border-border rounded-md text-[12px] font-sans text-foreground">Prev</button>
-          <button class="px-2.5 py-1 bg-foreground rounded-md text-[12px] font-sans text-white">1</button>
-          <button class="px-2.5 py-1 bg-white border border-border rounded-md text-[12px] font-sans text-foreground">2</button>
-          <button class="px-2.5 py-1 bg-primary rounded-md text-[12px] font-sans text-white">Next</button>
+          <button @click="goPage(currentPage - 1)" :disabled="currentPage <= 1" class="px-2.5 py-1 bg-white border border-border rounded-md text-[12px] font-sans text-foreground disabled:opacity-40">Prev</button>
+          <template v-for="p in totalPages" :key="p">
+            <button @click="goPage(p)" class="px-2.5 py-1 rounded-md text-[12px] font-sans" :class="p === currentPage ? 'bg-foreground text-white' : 'bg-white border border-border text-foreground'">{{ p }}</button>
+          </template>
+          <button @click="goPage(currentPage + 1)" :disabled="currentPage >= totalPages" class="px-2.5 py-1 bg-primary rounded-md text-[12px] font-sans text-white disabled:opacity-40">Next</button>
         </div>
       </div>
     </div>

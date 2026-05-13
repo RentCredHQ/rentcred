@@ -12,8 +12,17 @@ const loading = ref(true)
 
 onMounted(async () => {
   try {
-    const res = await api('/field-agents/assignments')
-    schedule.value = res as any[]
+    const res = await api('/field-agents/assignments') as any
+    // Backend returns { data: assignments[], pagination: {...} }
+    const assignments = res?.data ?? res ?? []
+    schedule.value = (Array.isArray(assignments) ? assignments : []).map((a: any) => ({
+      id: a.submissionId || a.submission?.id || a.id,
+      tenant: a.submission?.tenantName || a.tenantName || '—',
+      type: a.submission?.propertyType || a.type || '—',
+      address: a.submission?.propertyAddress || a.propertyAddress || '—',
+      status: a.status === 'assigned' ? 'Pending' : a.status === 'in_progress' ? 'In Progress' : a.status === 'completed' ? 'Completed' : a.status || '—',
+      time: a.scheduledDate ? new Date(a.scheduledDate).toLocaleTimeString('en-NG', { hour: '2-digit', minute: '2-digit' }) : '—',
+    }))
   } catch { /* empty */ }
   finally { loading.value = false }
 })

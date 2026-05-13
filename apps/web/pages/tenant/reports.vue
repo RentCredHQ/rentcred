@@ -49,7 +49,7 @@ onMounted(async () => {
 
       <NuxtLink
         v-if="report.shareToken"
-        :to="`/report/${report.shareToken}`"
+        :to="`/reports/shared/${report.shareToken}`"
         class="flex items-center justify-center gap-2 w-full py-2.5 border border-border font-sans text-sm font-medium text-foreground hover:bg-surface transition-colors rounded-lg"
       >
         <span class="material-symbols-rounded text-[18px]">visibility</span>

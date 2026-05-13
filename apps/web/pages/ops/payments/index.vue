@@ -50,10 +50,10 @@ async function fetchPayments(page = 1) {
     // Map stats
     const s = statsRes.data ?? statsRes ?? {}
     kpis.value = [
-      { label: 'TOTAL REVENUE', value: formatNaira(s.totalRevenue ?? 0), sub: s.revenueChange ?? '', valueColor: 'text-foreground', subColor: 'text-[#004D1A]' },
-      { label: 'PENDING PAYOUTS', value: formatNaira(s.pendingPayouts ?? 0), sub: s.pendingCount ? `${s.pendingCount} transactions queued` : '', valueColor: 'text-primary', subColor: '' },
-      { label: 'AGENT COMMISSIONS', value: formatNaira(s.agentCommissions ?? 0), sub: s.commissionsLabel ?? '', valueColor: 'text-[#004D1A]', subColor: '' },
-      { label: 'FAILED PAYMENTS', value: String(s.failedCount ?? 0), sub: s.failedCount ? 'Requires attention' : '', valueColor: 'text-[#8C1C00]', subColor: 'text-[#8C1C00]' },
+      { label: 'TOTAL CREDITS', value: String(s.totalSpent ?? 0), sub: '', valueColor: 'text-foreground', subColor: '' },
+      { label: 'THIS MONTH', value: String(s.thisMonth ?? 0), sub: 'credits purchased', valueColor: 'text-primary', subColor: '' },
+      { label: 'TRANSACTIONS', value: String(s.transactionCount ?? 0), sub: '', valueColor: 'text-[#004D1A]', subColor: '' },
+      { label: 'FAILED PAYMENTS', value: '—', sub: '', valueColor: 'text-[#8C1C00]', subColor: 'text-[#8C1C00]' },
     ]
 
     // Map transactions
@@ -71,10 +71,10 @@ async function fetchPayments(page = 1) {
       const style = statusStyleMap[txn.status] ?? statusStyleMap.pending
       return {
         id: txn.id,
-        agent: txn.agentName ?? txn.agent?.name ?? '',
-        business: txn.businessName ?? txn.agent?.businessName ?? '',
+        agent: txn.agentId ?? '',
+        business: '',
         type: typeLabelMap[txn.type] ?? txn.type ?? '',
-        amount: `₦${(txn.amount ?? 0).toLocaleString('en-NG')}`,
+        amount: `${txn.amount ?? 0} credits`,
         status: style.label,
         statusBg: style.bg,
         statusText: style.text,

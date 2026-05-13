@@ -56,8 +56,8 @@ const report = ref({
 const verificationCards = ref<any[]>([])
 
 function buildVerificationCards(content: any) {
-  if (!content?.verificationResults) return []
-  const vr = content.verificationResults
+  const vr = content?.verification
+  if (!vr) return []
   const cards = []
 
   cards.push({
@@ -92,11 +92,12 @@ function buildVerificationCards(content: any) {
     ],
   })
 
+  const criminalCheck = vr.criminalCheckDone ?? false
   cards.push({
     title: 'Criminal Record',
-    status: vr.criminalCheckClear ? 'Passed' : 'Failed',
+    status: criminalCheck ? 'Passed' : 'Failed',
     rows: [
-      { label: 'Criminal Check', value: vr.criminalCheckClear ? 'No records found' : 'Records found', positive: vr.criminalCheckClear },
+      { label: 'Criminal Check', value: criminalCheck ? 'No records found' : 'Records found', positive: criminalCheck },
     ],
   })
 
@@ -110,31 +111,37 @@ onMounted(async () => {
     const content = r.content || {}
     const ratingInfo = getRatingInfo(content.overallRating)
 
+    // Backend content shape: { tenant: {name,email,phone}, property: {address,...}, verification: {...} }
+    // Also available: r.submission with flat fields from the Prisma include
+    const tenantInfo = content.tenant || content.tenantInfo || {}
+    const propertyInfo = content.property || content.propertyInfo || {}
+    const sub = r.submission || {}
+
     report.value = {
-      tenantName: content.tenantInfo?.name || '',
+      tenantName: tenantInfo.name || sub.tenantName || '',
       caseId: r.submissionId || r.id || '',
       generatedDate: new Date(r.createdAt).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' }),
       status: getReportStatusLabel(r.status),
       recommendation: ratingInfo.label,
       recommendationSub: ratingInfo.sub,
       tenant: {
-        phone: content.tenantInfo?.phone || '',
-        email: content.tenantInfo?.email || '',
-        address: content.propertyInfo?.address || '',
+        phone: tenantInfo.phone || sub.tenantPhone || '',
+        email: tenantInfo.email || sub.tenantEmail || '',
+        address: propertyInfo.address || sub.propertyAddress || '',
         submitted: new Date(r.createdAt).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' }),
         package: 'Standard Check',
       },
       property: {
-        type: content.propertyInfo?.propertyType || '',
-        bedrooms: content.propertyInfo?.bedrooms || 0,
-        annualRent: content.propertyInfo?.annualRent || 0,
-        state: content.propertyInfo?.state || '',
-        lga: content.propertyInfo?.lga || '',
-        neighborhood: content.propertyInfo?.neighborhood || '',
-        landlordName: content.propertyInfo?.landlordName || '',
-        landlordPhone: content.propertyInfo?.landlordPhone || '',
-        condition: content.propertyInfo?.propertyCondition || '',
-        images: content.propertyInfo?.propertyImages || [],
+        type: propertyInfo.propertyType || sub.propertyType || '',
+        bedrooms: propertyInfo.bedrooms || sub.bedrooms || 0,
+        annualRent: propertyInfo.annualRent || sub.annualRent || 0,
+        state: propertyInfo.state || sub.state || '',
+        lga: propertyInfo.lga || sub.lga || '',
+        neighborhood: propertyInfo.neighborhood || sub.neighborhood || '',
+        landlordName: propertyInfo.landlordName || sub.landlordName || '',
+        landlordPhone: propertyInfo.landlordPhone || sub.landlordPhone || '',
+        condition: propertyInfo.propertyCondition || sub.propertyCondition || '',
+        images: propertyInfo.propertyImages || sub.propertyImages || [],
       },
     }
 
