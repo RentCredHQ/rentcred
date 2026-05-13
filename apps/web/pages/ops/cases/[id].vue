@@ -8,12 +8,45 @@ const caseId = computed(() => route.params.id as string)
 
 useSeoMeta({ title: `Case ${caseId.value} — RentCred Ops` })
 
-const { getSubmission } = useSubmissions()
+const { getSubmission, updateSubmissionStatus } = useSubmissions()
 const { getAuditLogs } = useAuditLog()
 
 const showReassign = ref(false)
+const showStatusMenu = ref(false)
+const statusUpdating = ref(false)
 const loading = ref(true)
 const hasFieldAgent = ref(false)
+const rawStatus = ref('')
+
+const VALID_TRANSITIONS: Record<string, string[]> = {
+  pending: ['in_progress', 'rejected'],
+  in_progress: ['field_visit', 'report_building', 'rejected'],
+  field_visit: ['report_building', 'rejected'],
+  report_building: ['completed', 'rejected'],
+  completed: [],
+  rejected: ['pending'],
+}
+
+const availableTransitions = computed(() => {
+  return (VALID_TRANSITIONS[rawStatus.value] || []).map(s => ({
+    value: s,
+    label: SUBMISSION_STATUS_LABELS[s] ?? s,
+    style: statusStyleMap[s] ?? { bg: 'bg-[#E9E3D8]', text: 'text-[#804200]' },
+  }))
+})
+
+async function handleStatusUpdate(newStatus: string) {
+  statusUpdating.value = true
+  try {
+    await updateSubmissionStatus(caseId.value, newStatus)
+    showStatusMenu.value = false
+    await fetchCaseData()
+  } catch (e: any) {
+    alert(e.data?.message || 'Failed to update status')
+  } finally {
+    statusUpdating.value = false
+  }
+}
 
 const statusStyleMap: Record<string, { bg: string; text: string }> = {
   pending: { bg: 'bg-[#E9E3D8]', text: 'text-[#804200]' },
@@ -99,6 +132,7 @@ async function fetchCaseData() {
       updated: s.updatedAt ? new Date(s.updatedAt).toLocaleDateString('en-NG', { month: 'short', day: 'numeric', year: 'numeric' }) : '',
       sla: s.sla ?? '',
     }
+    rawStatus.value = s.status ?? ''
     const assigneeName = caseData.value.assignee
     hasFieldAgent.value = !!assigneeName && assigneeName !== '—' && assigneeName !== 'Unassigned'
 
@@ -153,10 +187,29 @@ onMounted(fetchCaseData)
             <span class="material-symbols-rounded text-[16px]">{{ hasFieldAgent ? 'swap_horiz' : 'person_add' }}</span>
             {{ hasFieldAgent ? 'Reassign' : 'Assign Field Agent' }}
           </button>
-          <button class="flex items-center gap-2 px-4 py-2.5 bg-primary text-foreground rounded font-mono text-[13px] font-medium hover:opacity-90 transition-opacity">
-            <span class="material-symbols-rounded text-[16px]">edit_note</span>
-            Update Status
-          </button>
+          <div class="relative">
+            <button
+              v-if="availableTransitions.length > 0"
+              @click="showStatusMenu = !showStatusMenu"
+              :disabled="statusUpdating"
+              class="flex items-center gap-2 px-4 py-2.5 bg-primary text-foreground rounded font-mono text-[13px] font-medium hover:opacity-90 transition-opacity disabled:opacity-50"
+            >
+              <span class="material-symbols-rounded text-[16px]">edit_note</span>
+              {{ statusUpdating ? 'Updating...' : 'Update Status' }}
+            </button>
+            <div v-if="showStatusMenu" class="absolute right-0 mt-1 w-48 bg-white border border-border rounded-lg shadow-lg z-20 py-1">
+              <button
+                v-for="t in availableTransitions"
+                :key="t.value"
+                @click="handleStatusUpdate(t.value)"
+                class="w-full text-left px-4 py-2.5 text-[13px] font-sans hover:bg-surface transition-colors flex items-center gap-2"
+              >
+                <span class="inline-block w-2 h-2 rounded-full" :class="t.style.bg" />
+                {{ t.label }}
+              </button>
+            </div>
+            <div v-if="showStatusMenu" class="fixed inset-0 z-10" @click="showStatusMenu = false" />
+          </div>
         </div>
       </div>
     </div>
