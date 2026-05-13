@@ -28,6 +28,7 @@ const caseData = ref({
   caseId: '',
   package: '',
   status: '',
+  rawStatus: '',
   statusBg: '',
   statusText: '',
   phone: '',
@@ -44,6 +45,8 @@ const caseData = ref({
   landlordPhone: '',
   propertyCondition: '',
   propertyImages: [] as string[],
+  fieldAgent: '',
+  scheduledDate: '',
 })
 
 const CHECKLIST_LABELS: Record<string, string> = {
@@ -75,11 +78,13 @@ onMounted(async () => {
     const res = await getSubmission(caseId.value)
     const s = res.data ?? res
     const style = getStatusStyle(s.status)
+    const latestAssignment = s.fieldAssignments?.[0]
     caseData.value = {
       name: s.tenantName,
       caseId: s.id,
       package: s.propertyType || 'Standard',
       status: SUBMISSION_STATUS_LABELS[s.status] || s.status,
+      rawStatus: s.status || '',
       statusBg: style.bg,
       statusText: style.text,
       phone: s.tenantPhone || '',
@@ -96,6 +101,8 @@ onMounted(async () => {
       landlordPhone: s.landlordPhone || '',
       propertyCondition: s.propertyCondition || '',
       propertyImages: s.propertyImages || [],
+      fieldAgent: latestAssignment?.fieldAgent?.name || '',
+      scheduledDate: latestAssignment?.scheduledDate ? new Date(latestAssignment.scheduledDate).toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' }) : '',
     }
     steps.value = buildSteps(s)
   } catch { /* empty */ }
@@ -168,6 +175,23 @@ onMounted(async () => {
           <div class="flex flex-col gap-1">
             <span class="font-mono text-[11px] font-semibold text-muted-foreground tracking-wider">SUBMITTED</span>
             <span class="font-sans text-sm text-foreground">{{ caseData.submitted }}</span>
+          </div>
+        </div>
+
+        <!-- Assignment Info -->
+        <div v-if="caseData.fieldAgent" class="bg-white border-[1.5px] border-border rounded-lg p-5 lg:p-6 flex flex-col gap-4">
+          <h2 class="font-mono text-base font-semibold text-foreground">Field Assignment</h2>
+          <div class="flex flex-col gap-1">
+            <span class="font-mono text-[11px] font-semibold text-muted-foreground tracking-wider">FIELD AGENT</span>
+            <span class="font-sans text-sm text-foreground">{{ caseData.fieldAgent }}</span>
+          </div>
+          <div v-if="caseData.scheduledDate" class="flex flex-col gap-1">
+            <span class="font-mono text-[11px] font-semibold text-muted-foreground tracking-wider">SCHEDULED DATE</span>
+            <span class="font-sans text-sm text-foreground">{{ caseData.scheduledDate }}</span>
+          </div>
+          <div class="flex items-center gap-2">
+            <span class="w-2 h-2 rounded-full" :class="caseData.rawStatus === 'field_visit' ? 'bg-blue-500' : 'bg-[#004D1A]'" />
+            <span class="font-sans text-[13px] text-muted-foreground">{{ caseData.rawStatus === 'field_visit' ? 'Visit in progress' : 'Agent assigned' }}</span>
           </div>
         </div>
 
