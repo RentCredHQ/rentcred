@@ -157,13 +157,8 @@ onMounted(async () => {
       </NuxtLink>
 
       <!-- Footer -->
-      <div class="flex items-center justify-between px-4 py-2.5 border-t border-border">
-        <span class="font-sans text-[12px] text-muted-foreground">Showing 1–{{ resultCount }} of {{ totalCount }} submissions</span>
-        <div class="flex items-center gap-1.5">
-          <button class="px-2.5 py-1 bg-white border border-border rounded-md text-[12px] font-sans text-foreground hover:bg-surface transition-colors">Prev</button>
-          <button class="px-2.5 py-1 bg-foreground rounded-md text-[12px] font-sans text-white hover:opacity-90 transition-opacity">1</button>
-          <button class="px-2.5 py-1 bg-white border border-border rounded-md text-[12px] font-sans text-foreground hover:bg-surface transition-colors">Next</button>
-        </div>
+      <div v-if="filtered.length > 0" class="flex items-center justify-between px-4 py-2.5 border-t border-border">
+        <span class="font-sans text-[12px] text-muted-foreground">Showing {{ resultCount }} of {{ totalCount }} submissions</span>
       </div>
     </div>
 

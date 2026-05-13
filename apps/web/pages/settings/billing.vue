@@ -114,7 +114,7 @@ onMounted(async () => {
         </div>
 
         <!-- Empty State -->
-        <div v-if="invoices.length === 0" class="flex flex-col items-center justify-center py-16 gap-4">
+        <div v-if="invoices.length === 0 && !loading" class="flex flex-col items-center justify-center py-16 gap-4">
           <div class="w-16 h-16 rounded-full bg-[#E7E8E5] flex items-center justify-center">
             <span class="material-symbols-rounded text-[28px] text-muted-foreground">receipt_long</span>
           </div>
@@ -140,7 +140,7 @@ onMounted(async () => {
 
       <!-- Mobile -->
       <div class="lg:hidden">
-        <div v-if="invoices.length === 0" class="flex flex-col items-center justify-center py-16 gap-4">
+        <div v-if="invoices.length === 0 && !loading" class="flex flex-col items-center justify-center py-16 gap-4">
           <div class="w-16 h-16 rounded-full bg-[#E7E8E5] flex items-center justify-center">
             <span class="material-symbols-rounded text-[28px] text-muted-foreground">receipt_long</span>
           </div>

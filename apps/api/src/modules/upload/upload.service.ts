@@ -17,6 +17,8 @@ const ALLOWED_MIME_TYPES = [
 
 const MAX_FILE_SIZE = 10 * 1024 * 1024; // 10MB
 
+const ALLOWED_FOLDERS = ['property-images', 'kyb-documents', 'field-visit-photos', 'profile-photos', 'documents', 'tenant-documents'];
+
 @Injectable()
 export class UploadService {
   private readonly logger = new Logger(UploadService.name);
@@ -61,7 +63,6 @@ export class UploadService {
       );
     }
 
-    const ALLOWED_FOLDERS = ['property-images', 'kyb-documents', 'field-visit-photos', 'profile-photos', 'documents', 'tenant-documents'];
     const safeFolder = folder.replace(/[^a-zA-Z0-9_-]/g, '');
     if (!ALLOWED_FOLDERS.includes(safeFolder)) {
       throw new BadRequestException(`Invalid upload folder. Allowed: ${ALLOWED_FOLDERS.join(', ')}`);
@@ -104,8 +105,6 @@ export class UploadService {
       throw new BadRequestException('File exceeds 10MB limit');
     }
 
-    // Validate folder against allowlist (same check as presigned URL path)
-    const ALLOWED_FOLDERS = ['property-images', 'kyb-documents', 'field-visit-photos', 'profile-photos', 'documents', 'tenant-documents'];
     const safeFolder = folder.replace(/[^a-zA-Z0-9_-]/g, '');
     if (!ALLOWED_FOLDERS.includes(safeFolder)) {
       throw new BadRequestException(`Invalid upload folder. Allowed: ${ALLOWED_FOLDERS.join(', ')}`);

@@ -278,6 +278,7 @@ onMounted(async () => {
           </NuxtLink>
           <button
             v-else
+            @click="alert('Invite resend is not available yet — email service required')"
             class="px-3 py-1.5 border border-border rounded text-[12px] font-sans text-foreground hover:bg-surface transition-colors"
           >
             Resend Invite
