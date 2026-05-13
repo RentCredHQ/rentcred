@@ -13,11 +13,13 @@ const caseInfo = ref({ caseId: '', tenantName: '', agent: '' })
 const feedback = ref('')
 const loading = ref(false)
 const actionLoading = ref(false)
+const error = ref<string | null>(null)
 
 watch(() => props.modelValue, async (open) => {
   if (!open || !props.reportId) return
   loading.value = true
   feedback.value = ''
+  error.value = null
   try {
     const res = await getReport(props.reportId)
     const r = res.data ?? res
@@ -26,30 +28,35 @@ watch(() => props.modelValue, async (open) => {
       tenantName: r.content?.tenantInfo?.name ?? r.tenantName ?? '',
       agent: r.fieldAgentName ?? r.agent?.name ?? '',
     }
-  } catch { /* empty */ }
-  finally { loading.value = false }
+  } catch (e: any) {
+    error.value = e.data?.message || 'Failed to load report details.'
+  } finally { loading.value = false }
 })
 
 async function approveReport() {
   if (!props.reportId) return
   actionLoading.value = true
+  error.value = null
   try {
     await reviewReport(props.reportId, { status: 'approved', notes: feedback.value })
     emit('reviewed')
     close()
-  } catch { /* empty */ }
-  finally { actionLoading.value = false }
+  } catch (e: any) {
+    error.value = e.data?.message || 'Failed to approve report. Please try again.'
+  } finally { actionLoading.value = false }
 }
 
 async function requestRevisions() {
   if (!feedback.value.trim() || !props.reportId) return
   actionLoading.value = true
+  error.value = null
   try {
     await reviewReport(props.reportId, { status: 'rejected', notes: feedback.value })
     emit('reviewed')
     close()
-  } catch { /* empty */ }
-  finally { actionLoading.value = false }
+  } catch (e: any) {
+    error.value = e.data?.message || 'Failed to request revisions. Please try again.'
+  } finally { actionLoading.value = false }
 }
 </script>
 
@@ -102,10 +109,12 @@ async function requestRevisions() {
               </div>
               <button
                 @click="approveReport"
-                class="flex items-center justify-center gap-2 w-full h-10 bg-[#004D1A] text-white rounded-lg hover:opacity-90 transition-opacity"
+                :disabled="actionLoading"
+                class="flex items-center justify-center gap-2 w-full h-10 bg-[#004D1A] text-white rounded-lg hover:opacity-90 transition-opacity disabled:opacity-50 disabled:cursor-not-allowed"
               >
-                <span class="material-symbols-rounded text-[16px]">check</span>
-                <span class="font-sans text-[13px] font-semibold">Approve Report</span>
+                <span v-if="actionLoading" class="material-symbols-rounded text-[16px] animate-spin">progress_activity</span>
+                <span v-else class="material-symbols-rounded text-[16px]">check</span>
+                <span class="font-sans text-[13px] font-semibold">{{ actionLoading ? 'Approving...' : 'Approve Report' }}</span>
               </button>
             </div>
 
@@ -127,13 +136,17 @@ async function requestRevisions() {
               />
               <button
                 @click="requestRevisions"
-                :disabled="!feedback.trim()"
+                :disabled="!feedback.trim() || actionLoading"
                 class="flex items-center justify-center gap-2 w-full h-10 bg-primary text-white rounded-lg hover:opacity-90 transition-opacity disabled:opacity-50 disabled:cursor-not-allowed"
               >
-                <span class="material-symbols-rounded text-[16px]">send</span>
-                <span class="font-sans text-[13px] font-semibold">Request Revisions</span>
+                <span v-if="actionLoading" class="material-symbols-rounded text-[16px] animate-spin">progress_activity</span>
+                <span v-else class="material-symbols-rounded text-[16px]">send</span>
+                <span class="font-sans text-[13px] font-semibold">{{ actionLoading ? 'Sending...' : 'Request Revisions' }}</span>
               </button>
             </div>
+
+            <!-- Error -->
+            <div v-if="error" class="font-sans text-[13px] text-[#8C1C00]">{{ error }}</div>
 
             <!-- Cancel Link -->
             <div class="flex justify-center py-1">

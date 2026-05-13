@@ -4,6 +4,8 @@ const emit = defineEmits<{ (e: 'update:modelValue', val: boolean): void }>()
 
 const close = () => emit('update:modelValue', false)
 
+const { createDispute } = useDisputes()
+
 const form = ref({
   caseId: '',
   category: 'Data Accuracy',
@@ -15,8 +17,33 @@ const form = ref({
 const categories = ['Data Accuracy', 'Identity Mismatch', 'Employment Discrepancy', 'Address Verification', 'Reference Conflict', 'Other']
 const priorities = ['Low', 'Medium', 'High', 'Critical']
 
-function submit() {
-  close()
+const submitting = ref(false)
+const error = ref<string | null>(null)
+
+const canSubmit = computed(() => form.value.subject && form.value.description)
+
+watch(() => props.modelValue, (val) => {
+  if (val) {
+    error.value = null
+  }
+})
+
+async function submit() {
+  if (!canSubmit.value) return
+  submitting.value = true
+  error.value = null
+  try {
+    await createDispute({
+      submissionId: form.value.caseId,
+      reason: `[${form.value.category}] ${form.value.subject}`,
+      description: form.value.description,
+    })
+    close()
+  } catch (e: any) {
+    error.value = e.data?.message || 'Failed to submit dispute. Please try again.'
+  } finally {
+    submitting.value = false
+  }
 }
 </script>
 
@@ -104,14 +131,20 @@ function submit() {
             </div>
           </div>
 
+          <!-- Error -->
+          <div v-if="error" class="px-5 pb-2">
+            <div class="font-sans text-[13px] text-[#8C1C00]">{{ error }}</div>
+          </div>
+
           <!-- Footer -->
           <div class="flex items-center justify-end gap-3 px-5 py-4 border-t border-border flex-shrink-0">
-            <button @click="close" class="px-4 py-2.5 border border-border rounded-lg text-[13px] font-sans font-medium text-foreground hover:bg-background transition-colors">
+            <button @click="close" :disabled="submitting" class="px-4 py-2.5 border border-border rounded-lg text-[13px] font-sans font-medium text-foreground hover:bg-background transition-colors disabled:opacity-50">
               Cancel
             </button>
-            <button @click="submit" class="flex items-center gap-2 px-5 py-2.5 bg-primary text-foreground rounded-lg text-[13px] font-mono font-semibold hover:opacity-90 transition-opacity">
-              <span class="material-symbols-rounded text-[16px]">send</span>
-              Submit Dispute
+            <button @click="submit" :disabled="submitting || !canSubmit" class="flex items-center gap-2 px-5 py-2.5 bg-primary text-foreground rounded-lg text-[13px] font-mono font-semibold hover:opacity-90 transition-opacity disabled:opacity-50 disabled:cursor-not-allowed">
+              <span v-if="submitting" class="material-symbols-rounded text-[16px] animate-spin">progress_activity</span>
+              <span v-else class="material-symbols-rounded text-[16px]">send</span>
+              {{ submitting ? 'Submitting...' : 'Submit Dispute' }}
             </button>
           </div>
         </div>

@@ -20,6 +20,7 @@ export class AuditController {
   @ApiQuery({ name: 'userId', required: false })
   @ApiQuery({ name: 'action', required: false })
   @ApiQuery({ name: 'entityType', required: false })
+  @ApiQuery({ name: 'entityId', required: false })
   @ApiQuery({ name: 'from', required: false, description: 'ISO date string' })
   @ApiQuery({ name: 'to', required: false, description: 'ISO date string' })
   async findAll(
@@ -28,6 +29,7 @@ export class AuditController {
     @Query('userId') userId?: string,
     @Query('action') action?: string,
     @Query('entityType') entityType?: string,
+    @Query('entityId') entityId?: string,
     @Query('from') from?: string,
     @Query('to') to?: string,
   ) {
@@ -37,6 +39,7 @@ export class AuditController {
       userId,
       action,
       entityType,
+      entityId,
       from,
       to,
     });

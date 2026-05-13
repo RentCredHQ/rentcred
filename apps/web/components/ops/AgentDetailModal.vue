@@ -9,6 +9,8 @@ const { api } = useApi()
 const agent = ref<any>(null)
 const recentCases = ref<any[]>([])
 const loading = ref(false)
+const error = ref<string | null>(null)
+const actionLoading = ref(false)
 
 const statusStyleMap: Record<string, { bg: string; text: string }> = {
   pending: { bg: 'bg-[#E9E3D8]', text: 'text-[#804200]' },
@@ -40,9 +42,30 @@ watch(() => show.value, async (open) => {
         statusText: style.text,
       }
     })
-  } catch { /* empty */ }
-  finally { loading.value = false }
+  } catch (e: any) {
+    error.value = e.data?.message || 'Failed to load agent details.'
+  } finally { loading.value = false }
 })
+
+const suspendLabel = computed(() => {
+  if (!agent.value) return 'Suspend Agent'
+  return agent.value.status === 'suspended' ? 'Reactivate Agent' : 'Suspend Agent'
+})
+
+async function handleSuspendToggle() {
+  if (!props.agentId || !agent.value) return
+  actionLoading.value = true
+  error.value = null
+  const newStatus = agent.value.status === 'suspended' ? 'active' : 'suspended'
+  try {
+    await api(`/field-agents/${props.agentId}/status`, { method: 'PATCH', body: { status: newStatus } })
+    agent.value.status = newStatus
+  } catch (e: any) {
+    error.value = e.data?.message || `Failed to ${newStatus === 'suspended' ? 'suspend' : 'reactivate'} agent.`
+  } finally {
+    actionLoading.value = false
+  }
+}
 </script>
 
 <template>
@@ -139,10 +162,18 @@ watch(() => show.value, async (open) => {
               </div>
             </div>
 
+            <!-- Error -->
+            <div v-if="error" class="font-sans text-[13px] text-[#8C1C00]">{{ error }}</div>
+
             <!-- Actions -->
             <div class="flex flex-col sm:flex-row items-center gap-3 pt-2">
-              <button class="flex-1 px-4 py-2.5 bg-[#8C1C00] text-white rounded-lg text-[13px] font-mono font-semibold hover:opacity-90 transition-opacity">
-                Suspend Agent
+              <button
+                @click="handleSuspendToggle"
+                :disabled="actionLoading"
+                class="flex-1 px-4 py-2.5 rounded-lg text-[13px] font-mono font-semibold hover:opacity-90 transition-opacity disabled:opacity-50 disabled:cursor-not-allowed"
+                :class="agent.status === 'suspended' ? 'bg-[#004D1A] text-white' : 'bg-[#8C1C00] text-white'"
+              >
+                {{ actionLoading ? 'Processing...' : suspendLabel }}
               </button>
               <button @click="show = false" class="flex-1 px-4 py-2.5 border border-border rounded-lg text-[13px] font-sans text-foreground hover:bg-surface transition-colors">
                 Close

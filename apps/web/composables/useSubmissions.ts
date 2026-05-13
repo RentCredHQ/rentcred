@@ -42,7 +42,7 @@ export function useSubmissions() {
     })
   }
 
-  async function reassignCase(id: string, data: { fieldAgentId: string; reason?: string }) {
+  async function reassignCase(id: string, data: { fieldAgentId: string; reason?: string; scheduledDate?: string }) {
     return api<any>(`/submissions/${id}/reassign`, { method: 'POST', body: data })
   }
 

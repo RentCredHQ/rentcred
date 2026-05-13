@@ -15,11 +15,13 @@ const reviewNotes = ref('')
 const loading = ref(false)
 const actionLoading = ref(false)
 const canAction = ref(false)
+const error = ref<string | null>(null)
 
 watch(() => props.modelValue, async (open) => {
   if (!open || !props.applicationId) return
   loading.value = true
   reviewNotes.value = ''
+  error.value = null
   try {
     const res = await getKybApplication(props.applicationId)
     const app = res.data ?? res
@@ -48,30 +50,35 @@ watch(() => props.modelValue, async (open) => {
         iconColor: uploaded ? 'text-[#004D1A]' : 'text-[#991B1B]',
       }
     })
-  } catch { /* empty */ }
-  finally { loading.value = false }
+  } catch (e: any) {
+    error.value = e.data?.message || 'Failed to load KYB application details.'
+  } finally { loading.value = false }
 })
 
 async function approve() {
   if (!props.applicationId) return
   actionLoading.value = true
+  error.value = null
   try {
     await reviewKyb(props.applicationId, { status: 'approved', reviewNotes: reviewNotes.value })
     emit('reviewed')
     close()
-  } catch { /* empty */ }
-  finally { actionLoading.value = false }
+  } catch (e: any) {
+    error.value = e.data?.message || 'Failed to approve application. Please try again.'
+  } finally { actionLoading.value = false }
 }
 
 async function reject() {
   if (!props.applicationId) return
   actionLoading.value = true
+  error.value = null
   try {
     await reviewKyb(props.applicationId, { status: 'rejected', reviewNotes: reviewNotes.value })
     emit('reviewed')
     close()
-  } catch { /* empty */ }
-  finally { actionLoading.value = false }
+  } catch (e: any) {
+    error.value = e.data?.message || 'Failed to reject application. Please try again.'
+  } finally { actionLoading.value = false }
 }
 </script>
 
@@ -147,15 +154,20 @@ async function reject() {
               />
             </div>
 
+            <!-- Error -->
+            <div v-if="error" class="font-sans text-[13px] text-[#8C1C00]">{{ error }}</div>
+
             <!-- Action Buttons (only when pending/submitted/under_review) -->
             <div v-if="canAction" class="flex gap-3">
-              <button @click="reject" class="flex-1 flex items-center justify-center gap-2 h-12 border-[1.5px] border-[#991B1B] rounded-lg text-[13px] font-mono font-semibold text-[#991B1B] hover:bg-[#FDECEC] transition-colors">
-                <span class="material-symbols-rounded text-[18px]">close</span>
-                Reject
+              <button @click="reject" :disabled="actionLoading" class="flex-1 flex items-center justify-center gap-2 h-12 border-[1.5px] border-[#991B1B] rounded-lg text-[13px] font-mono font-semibold text-[#991B1B] hover:bg-[#FDECEC] transition-colors disabled:opacity-50 disabled:cursor-not-allowed">
+                <span v-if="actionLoading" class="material-symbols-rounded text-[18px] animate-spin">progress_activity</span>
+                <span v-else class="material-symbols-rounded text-[18px]">close</span>
+                {{ actionLoading ? 'Processing...' : 'Reject' }}
               </button>
-              <button @click="approve" class="flex-1 flex items-center justify-center gap-2 h-12 bg-[#004D1A] rounded-lg text-[13px] font-mono font-semibold text-white hover:opacity-90 transition-opacity">
-                <span class="material-symbols-rounded text-[18px]">check</span>
-                Approve
+              <button @click="approve" :disabled="actionLoading" class="flex-1 flex items-center justify-center gap-2 h-12 bg-[#004D1A] rounded-lg text-[13px] font-mono font-semibold text-white hover:opacity-90 transition-opacity disabled:opacity-50 disabled:cursor-not-allowed">
+                <span v-if="actionLoading" class="material-symbols-rounded text-[18px] animate-spin">progress_activity</span>
+                <span v-else class="material-symbols-rounded text-[18px]">check</span>
+                {{ actionLoading ? 'Processing...' : 'Approve' }}
               </button>
             </div>
           </div>

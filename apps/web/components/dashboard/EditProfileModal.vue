@@ -25,6 +25,7 @@ const form = reactive({
 
 const saving = ref(false)
 const saved = ref(false)
+const error = ref<string | null>(null)
 
 watch(() => props.modelValue, (open) => {
   if (open) {
@@ -34,6 +35,7 @@ watch(() => props.modelValue, (open) => {
     form.phone = props.profile.phone
     saving.value = false
     saved.value = false
+    error.value = null
   }
 })
 
@@ -41,6 +43,7 @@ const { updateProfile } = useAgents()
 
 async function handleSave() {
   saving.value = true
+  error.value = null
   try {
     await updateProfile({
       firstName: form.firstName,
@@ -54,8 +57,9 @@ async function handleSave() {
     setTimeout(() => {
       close()
     }, 1500)
-  } catch { /* empty */ }
-  finally { saving.value = false }
+  } catch (e: any) {
+    error.value = e.data?.message || 'Failed to update profile. Please try again.'
+  } finally { saving.value = false }
 }
 </script>
 
@@ -80,6 +84,12 @@ async function handleSave() {
             <div v-if="saved" class="flex items-center gap-2.5 px-4 py-3 rounded-lg bg-[#DFE6E1]">
               <span class="material-symbols-rounded text-[20px] text-[#004D1A]">check_circle</span>
               <span class="font-sans text-[13px] font-medium text-[#004D1A]">Profile updated successfully</span>
+            </div>
+
+            <!-- Error Toast -->
+            <div v-if="error" class="flex items-center gap-2.5 px-4 py-3 rounded-lg bg-[#E5DCDA]">
+              <span class="material-symbols-rounded text-[20px] text-[#8C1C00]">error</span>
+              <span class="font-sans text-[13px] font-medium text-[#8C1C00]">{{ error }}</span>
             </div>
 
             <!-- Avatar Section -->

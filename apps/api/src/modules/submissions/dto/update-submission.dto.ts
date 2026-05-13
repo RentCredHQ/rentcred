@@ -23,4 +23,9 @@ export class AssignFieldAgentDto {
   @IsOptional()
   @IsString()
   scheduledDate?: string;
+
+  @ApiPropertyOptional({ description: 'Reason for reassignment (used when reassigning)' })
+  @IsOptional()
+  @IsString()
+  reason?: string;
 }

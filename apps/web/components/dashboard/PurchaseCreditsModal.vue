@@ -19,6 +19,7 @@ interface CreditPackage {
 const packages = ref<CreditPackage[]>([])
 const loadingBundles = ref(true)
 const purchasing = ref(false)
+const error = ref<string | null>(null)
 
 const selectedPkg = ref(0)
 const paymentMethod = ref<'bank' | 'card'>('bank')
@@ -41,8 +42,9 @@ watch(() => props.modelValue, async (open: boolean) => {
         popular: i === 1,
       }))
       if (packages.value.length > 1) selectedPkg.value = 1
-    } catch { /* empty */ }
-    finally { loadingBundles.value = false }
+    } catch (e: any) {
+      error.value = e.data?.message || 'Failed to load bundles.'
+    } finally { loadingBundles.value = false }
   }
 })
 
@@ -50,11 +52,13 @@ async function handlePurchase() {
   const pkg = packages.value[selectedPkg.value]
   if (!pkg) return
   purchasing.value = true
+  error.value = null
   try {
     await purchaseBundle(pkg.id)
     close()
-  } catch { /* empty */ }
-  finally { purchasing.value = false }
+  } catch (e: any) {
+    error.value = e.data?.message || 'Purchase failed. Please try again.'
+  } finally { purchasing.value = false }
 }
 </script>
 

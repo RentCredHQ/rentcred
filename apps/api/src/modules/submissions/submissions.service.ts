@@ -275,7 +275,7 @@ export class SubmissionsService {
       action: 'field_agent_assigned',
       entityType: 'submission',
       entityId: submissionId,
-      metadata: { fieldAgentId: dto.fieldAgentId },
+      metadata: { fieldAgentId: dto.fieldAgentId, ...(dto.reason ? { reason: dto.reason } : {}) },
     });
 
     return assignment;

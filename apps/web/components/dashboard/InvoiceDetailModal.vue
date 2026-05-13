@@ -1,22 +1,50 @@
 <script setup lang="ts">
-const props = defineProps<{ modelValue: boolean }>()
+const props = defineProps<{ modelValue: boolean; invoiceId?: string | null }>()
 const emit = defineEmits<{ (e: 'update:modelValue', val: boolean): void }>()
 
 const close = () => emit('update:modelValue', false)
 
+const { api } = useApi()
+const loading = ref(false)
+const error = ref<string | null>(null)
+
 const invoice = ref({
-  id: 'INV-2026-0034',
+  id: '',
   status: 'Paid',
-  date: 'March 10, 2026',
-  amount: '₦45,000',
-  dueDate: 'March 10, 2026',
-  paymentMethod: 'Bank Transfer',
-  lineItems: [
-    { description: 'Verification Credits (Starter)', qty: 5, unitPrice: '₦9,000', total: '₦45,000' },
-  ],
-  subtotal: '₦45,000',
-  vat: '₦3,375',
-  total: '₦48,375',
+  date: '',
+  amount: '₦0',
+  dueDate: '',
+  paymentMethod: '',
+  lineItems: [] as { description: string; qty: number; unitPrice: string; total: string }[],
+  subtotal: '₦0',
+  vat: '₦0',
+  total: '₦0',
+})
+
+watch(() => props.modelValue, async (open) => {
+  if (!open || !props.invoiceId) return
+  loading.value = true
+  error.value = null
+  try {
+    const res = await api<any>(`/payments/${props.invoiceId}`)
+    const inv = res.data ?? res
+    const amount = inv.amount ?? 0
+    const vat = Math.round(amount * 0.075)
+    invoice.value = {
+      id: inv.id ?? '',
+      status: inv.status === 'completed' ? 'Paid' : inv.status ?? 'Pending',
+      date: inv.createdAt ? new Date(inv.createdAt).toLocaleDateString('en-NG', { month: 'long', day: 'numeric', year: 'numeric' }) : '',
+      amount: `₦${amount.toLocaleString('en-NG')}`,
+      dueDate: inv.dueDate ? new Date(inv.dueDate).toLocaleDateString('en-NG', { month: 'long', day: 'numeric', year: 'numeric' }) : '',
+      paymentMethod: inv.method ?? 'Bank Transfer',
+      lineItems: inv.lineItems ?? [{ description: inv.description || inv.type || 'Verification Credits', qty: 1, unitPrice: `₦${amount.toLocaleString('en-NG')}`, total: `₦${amount.toLocaleString('en-NG')}` }],
+      subtotal: `₦${amount.toLocaleString('en-NG')}`,
+      vat: `₦${vat.toLocaleString('en-NG')}`,
+      total: `₦${(amount + vat).toLocaleString('en-NG')}`,
+    }
+  } catch (e: any) {
+    error.value = e.data?.message || 'Failed to load invoice details.'
+  } finally { loading.value = false }
 })
 </script>
 
@@ -40,8 +68,18 @@ const invoice = ref({
             </button>
           </div>
 
+          <!-- Loading -->
+          <div v-if="loading" class="flex items-center justify-center py-12">
+            <span class="material-symbols-rounded text-[24px] text-muted-foreground animate-spin">progress_activity</span>
+          </div>
+
+          <!-- Error -->
+          <div v-else-if="error" class="p-6">
+            <div class="font-sans text-[13px] text-[#8C1C00]">{{ error }}</div>
+          </div>
+
           <!-- Body -->
-          <div class="flex-1 overflow-y-auto px-6 py-6 flex flex-col gap-5">
+          <div v-else class="flex-1 overflow-y-auto px-6 py-6 flex flex-col gap-5">
             <!-- Detail Grid -->
             <div class="grid grid-cols-2 gap-4">
               <div class="flex flex-col gap-1">

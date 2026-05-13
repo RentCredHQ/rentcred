@@ -17,6 +17,7 @@ const selectedAgent = ref<string | null>(null)
 const reason = ref('')
 const loading = ref(false)
 const actionLoading = ref(false)
+const error = ref<string | null>(null)
 
 const agentColors = ['bg-primary', 'bg-[#1A56DB]', 'bg-[#004D1A]', 'bg-[#804200]', 'bg-[#8C1C00]']
 
@@ -29,6 +30,7 @@ watch(() => props.modelValue, async (open) => {
   loading.value = true
   selectedAgent.value = null
   reason.value = ''
+  error.value = null
   try {
     const fetches: Promise<any>[] = [api<any>('/field-agents')]
     if (props.submissionId) fetches.push(getSubmission(props.submissionId))
@@ -54,13 +56,15 @@ watch(() => props.modelValue, async (open) => {
         currentAgent: s.fieldAgentName ?? s.fieldAgent?.name ?? '—',
       }
     }
-  } catch { /* empty */ }
-  finally { loading.value = false }
+  } catch (e: any) {
+    error.value = e.data?.message || 'Failed to load data.'
+  } finally { loading.value = false }
 })
 
 async function handleAssign() {
   if (!selectedAgent.value || !props.submissionId) return
   actionLoading.value = true
+  error.value = null
   try {
     if (isNewAssignment.value) {
       await assignFieldAgent(props.submissionId, selectedAgent.value)
@@ -70,7 +74,7 @@ async function handleAssign() {
     emit('reassigned')
     close()
   } catch (e: any) {
-    console.error('Assignment failed:', e)
+    error.value = e.data?.message || 'Assignment failed. Please try again.'
   } finally {
     actionLoading.value = false
   }
@@ -150,9 +154,14 @@ async function handleAssign() {
             </div>
           </div>
 
+          <!-- Error -->
+          <div v-if="error" class="px-5 pb-2">
+            <div class="font-sans text-[13px] text-[#8C1C00]">{{ error }}</div>
+          </div>
+
           <!-- Footer -->
           <div class="flex items-center justify-end gap-3 px-5 py-4 border-t border-border flex-shrink-0">
-            <button @click="close" class="px-4 py-2.5 border border-border rounded-lg text-[13px] font-sans font-medium text-foreground hover:bg-background transition-colors">
+            <button @click="close" :disabled="actionLoading" class="px-4 py-2.5 border border-border rounded-lg text-[13px] font-sans font-medium text-foreground hover:bg-background transition-colors disabled:opacity-50">
               Cancel
             </button>
             <button @click="handleAssign" :disabled="!selectedAgent || actionLoading" class="flex items-center gap-2 px-5 py-2.5 bg-primary text-foreground rounded-lg text-[13px] font-mono font-semibold hover:opacity-90 transition-opacity disabled:opacity-40 disabled:cursor-not-allowed">

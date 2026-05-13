@@ -45,6 +45,7 @@ export class AuditService {
     userId?: string;
     action?: string;
     entityType?: string;
+    entityId?: string;
     from?: string;
     to?: string;
   }) {
@@ -56,6 +57,7 @@ export class AuditService {
     if (filters.userId) where.userId = filters.userId;
     if (filters.action) where.action = { contains: filters.action, mode: 'insensitive' };
     if (filters.entityType) where.entityType = filters.entityType;
+    if (filters.entityId) where.entityId = filters.entityId;
     if (filters.from || filters.to) {
       where.createdAt = {};
       if (filters.from) where.createdAt.gte = new Date(filters.from);
