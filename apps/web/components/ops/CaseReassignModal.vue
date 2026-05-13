@@ -6,11 +6,12 @@ const emit = defineEmits<{
 }>()
 
 const { api } = useApi()
-const { getSubmission, reassignCase } = useSubmissions()
+const { getSubmission, assignFieldAgent, reassignCase } = useSubmissions()
 
 const close = () => emit('update:modelValue', false)
 
-const caseInfo = ref({ id: '', tenant: '', currentAgent: '' })
+const caseInfo = ref({ id: '', tenant: '', currentAgent: '—' })
+const isNewAssignment = computed(() => caseInfo.value.currentAgent === '—' || caseInfo.value.currentAgent === '')
 const agents = ref<any[]>([])
 const selectedAgent = ref<string | null>(null)
 const reason = ref('')
@@ -57,15 +58,22 @@ watch(() => props.modelValue, async (open) => {
   finally { loading.value = false }
 })
 
-async function reassign() {
+async function handleAssign() {
   if (!selectedAgent.value || !props.submissionId) return
   actionLoading.value = true
   try {
-    await reassignCase(props.submissionId, { fieldAgentId: selectedAgent.value, reason: reason.value })
+    if (isNewAssignment.value) {
+      await assignFieldAgent(props.submissionId, selectedAgent.value)
+    } else {
+      await reassignCase(props.submissionId, { fieldAgentId: selectedAgent.value, reason: reason.value })
+    }
     emit('reassigned')
     close()
-  } catch { /* empty */ }
-  finally { actionLoading.value = false }
+  } catch (e: any) {
+    console.error('Assignment failed:', e)
+  } finally {
+    actionLoading.value = false
+  }
 }
 </script>
 
@@ -147,8 +155,8 @@ async function reassign() {
             <button @click="close" class="px-4 py-2.5 border border-border rounded-lg text-[13px] font-sans font-medium text-foreground hover:bg-background transition-colors">
               Cancel
             </button>
-            <button @click="reassign" :disabled="!selectedAgent" class="flex items-center gap-2 px-5 py-2.5 bg-primary text-foreground rounded-lg text-[13px] font-mono font-semibold hover:opacity-90 transition-opacity disabled:opacity-40 disabled:cursor-not-allowed">
-              Reassign
+            <button @click="handleAssign" :disabled="!selectedAgent || actionLoading" class="flex items-center gap-2 px-5 py-2.5 bg-primary text-foreground rounded-lg text-[13px] font-mono font-semibold hover:opacity-90 transition-opacity disabled:opacity-40 disabled:cursor-not-allowed">
+              {{ actionLoading ? 'Processing...' : isNewAssignment ? 'Assign' : 'Reassign' }}
             </button>
           </div>
         </div>
