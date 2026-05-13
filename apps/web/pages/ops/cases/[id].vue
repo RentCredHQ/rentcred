@@ -10,6 +10,7 @@ useSeoMeta({ title: `Case ${caseId.value} — RentCred Ops` })
 
 const { getSubmission, updateSubmissionStatus } = useSubmissions()
 const { getAuditLogs } = useAuditLog()
+const { api } = useApi()
 
 const showReassign = ref(false)
 const showStatusMenu = ref(false)
@@ -45,6 +46,19 @@ async function handleStatusUpdate(newStatus: string) {
     alert(e.data?.message || 'Failed to update status')
   } finally {
     statusUpdating.value = false
+  }
+}
+
+async function toggleCheck(check: any) {
+  const newValue = !check.checked
+  try {
+    await api(`/verification/checklist/${caseId.value}`, {
+      method: 'PATCH',
+      body: { [check.key]: newValue },
+    })
+    await fetchCaseData()
+  } catch (e: any) {
+    alert(e.data?.message || 'Failed to update checklist')
   }
 }
 
@@ -154,8 +168,8 @@ async function fetchCaseData() {
     }
     checks.value = Object.entries(checkLabels).map(([key, label]) => {
       const val = checklist[key]
-      if (val === true) return { label, status: 'Verified', icon: 'check_circle', color: 'text-[#004D1A]' }
-      return { label, status: 'Pending', icon: 'schedule', color: 'text-muted-foreground' }
+      if (val === true) return { key, label, checked: true, status: 'Verified', icon: 'check_circle', color: 'text-[#004D1A]' }
+      return { key, label, checked: false, status: 'Pending', icon: 'schedule', color: 'text-muted-foreground' }
     })
 
     // Map audit logs to timeline
@@ -324,13 +338,13 @@ onMounted(fetchCaseData)
             <span class="font-mono text-sm font-semibold text-foreground">Verification Checks</span>
           </div>
           <div class="divide-y divide-border">
-            <div v-for="check in checks" :key="check.label" class="flex items-center justify-between px-6 py-3.5">
+            <button v-for="check in checks" :key="check.key" @click="toggleCheck(check)" class="flex items-center justify-between px-6 py-3.5 w-full text-left hover:bg-surface transition-colors cursor-pointer">
               <div class="flex items-center gap-3">
                 <span class="material-symbols-rounded text-[20px]" :class="check.color">{{ check.icon }}</span>
                 <span class="font-sans text-[13px] text-foreground">{{ check.label }}</span>
               </div>
               <span class="font-mono text-[12px] font-semibold" :class="check.color">{{ check.status }}</span>
-            </div>
+            </button>
           </div>
         </div>
 
