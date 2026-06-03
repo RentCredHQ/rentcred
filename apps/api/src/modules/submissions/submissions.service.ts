@@ -9,6 +9,7 @@ import { NotificationsService } from '../notifications/notifications.service';
 import { AuditService } from '../audit/audit.service';
 import { CreateSubmissionDto } from './dto/create-submission.dto';
 import { UpdateSubmissionStatusDto, AssignFieldAgentDto } from './dto/update-submission.dto';
+import { MailService } from '../mail/mail.service';
 
 const VALID_TRANSITIONS: Record<string, string[]> = {
   pending: ['in_progress', 'rejected'],
@@ -25,6 +26,7 @@ export class SubmissionsService {
     private prisma: PrismaService,
     private notifications: NotificationsService,
     private audit: AuditService,
+    private mail: MailService,
   ) {}
 
   async create(agentId: string, dto: CreateSubmissionDto) {
@@ -107,6 +109,15 @@ export class SubmissionsService {
       entityType: 'submission',
       entityId: submission.id,
     });
+
+    // Send tenant invite email (fire-and-forget)
+    const agent = await this.prisma.user.findUnique({ where: { id: agentId }, select: { name: true } });
+    this.mail.sendTenantInvite(
+      dto.tenantEmail,
+      dto.tenantName,
+      agent?.name ?? 'Your agent',
+      dto.propertyAddress,
+    );
 
     return submission;
   }

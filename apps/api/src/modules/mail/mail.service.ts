@@ -71,6 +71,38 @@ export class MailService {
     }
   }
 
+  async sendTenantInvite(to: string, tenantName: string, agentName: string, propertyAddress: string) {
+    const registerUrl = `${this.frontendUrl}/auth/register?email=${encodeURIComponent(to)}&role=tenant`;
+
+    try {
+      await this.resend.emails.send({
+        from: `RentCred <${this.fromEmail}>`,
+        to,
+        subject: `${agentName} has initiated a tenant verification for you`,
+        html: `
+          <div style="font-family: 'Geist', Arial, sans-serif; max-width: 480px; margin: 0 auto; padding: 32px;">
+            <h2 style="color: #111; font-family: 'JetBrains Mono', monospace;">RentCred</h2>
+            <p>Hi ${tenantName},</p>
+            <p><strong>${agentName}</strong> has submitted a tenant verification request on your behalf for the property at:</p>
+            <div style="background: #f5f5f0; padding: 16px; border-radius: 8px; margin: 16px 0;">
+              <p style="margin: 0; font-weight: 600; color: #111;">${propertyAddress}</p>
+            </div>
+            <p>To complete the verification process, please create your RentCred account and fill in your profile:</p>
+            <a href="${registerUrl}" style="display: inline-block; background: #FF8400; color: #fff; padding: 12px 24px; border-radius: 6px; text-decoration: none; font-weight: 600; margin: 16px 0;">
+              Complete Verification
+            </a>
+            <p style="color: #666; font-size: 14px;">This process typically takes 5-15 minutes. Your information is protected under NDPR guidelines.</p>
+            <hr style="border: none; border-top: 1px solid #e0e0e0; margin: 24px 0;" />
+            <p style="color: #999; font-size: 12px;">RentCred — Tenant Verification Made Simple</p>
+          </div>
+        `,
+      });
+      this.logger.log(`Tenant invite sent to ${to}`);
+    } catch (error) {
+      this.logger.error(`Failed to send tenant invite to ${to}`, error);
+    }
+  }
+
   async sendWelcome(to: string, name: string) {
     try {
       await this.resend.emails.send({

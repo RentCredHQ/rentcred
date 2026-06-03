@@ -8,6 +8,7 @@ import { SubmissionsService } from './submissions.service';
 import { PrismaService } from '../../prisma/prisma.service';
 import { NotificationsService } from '../notifications/notifications.service';
 import { AuditService } from '../audit/audit.service';
+import { MailService } from '../mail/mail.service';
 
 describe('SubmissionsService', () => {
   let service: SubmissionsService;
@@ -51,6 +52,10 @@ describe('SubmissionsService', () => {
     log: jest.fn(),
   };
 
+  const mockMailService = {
+    sendTenantInvite: jest.fn(),
+  };
+
   beforeEach(async () => {
     process.env.R2_PUBLIC_URL = 'https://test.r2.dev';
 
@@ -68,6 +73,10 @@ describe('SubmissionsService', () => {
         {
           provide: AuditService,
           useValue: mockAuditService,
+        },
+        {
+          provide: MailService,
+          useValue: mockMailService,
         },
       ],
     }).compile();
