@@ -127,7 +127,7 @@ onMounted(async () => {
         </div>
       </div>
 
-      <div v-for="report in filtered" :key="report.caseId" class="flex items-center px-4 py-3.5 border-b border-border hover:bg-surface/30 transition-colors min-w-[860px]">
+      <NuxtLink v-for="report in filtered" :key="report.caseId" :to="`/dashboard/reports/${report.caseId}`" class="flex items-center px-4 py-3.5 border-b border-border hover:bg-surface/30 transition-colors min-w-[860px] cursor-pointer">
         <div class="w-[170px] flex-shrink-0"><span class="font-sans text-sm font-medium text-foreground truncate block">{{ report.tenant }}</span></div>
         <div class="w-[120px] flex-shrink-0"><span class="font-mono text-[13px] text-muted-foreground truncate block" :title="report.caseId">{{ report.caseId?.slice(0, 10) }}…</span></div>
         <div class="w-[140px]">
@@ -140,7 +140,7 @@ onMounted(async () => {
           <button @click="openShare(report.caseId)" class="material-symbols-rounded text-[18px] text-muted-foreground hover:text-foreground cursor-pointer">share</button>
           <button class="material-symbols-rounded text-[18px] text-muted-foreground hover:text-foreground cursor-pointer">download</button>
         </div>
-      </div>
+      </NuxtLink>
     </div>
 
     <!-- Mobile Card List -->
@@ -154,7 +154,7 @@ onMounted(async () => {
           <p class="font-sans text-sm text-muted-foreground text-center max-w-[320px]">Reports will appear here once verifications are complete</p>
         </div>
       </div>
-      <div v-for="report in filtered" :key="report.caseId" class="bg-white border border-border rounded-xl p-4 flex flex-col gap-3">
+      <NuxtLink v-for="report in filtered" :key="report.caseId" :to="`/dashboard/reports/${report.caseId}`" class="bg-white border border-border rounded-xl p-4 flex flex-col gap-3 cursor-pointer hover:border-primary/40 transition-colors">
         <div class="flex items-center justify-between">
           <span class="font-sans text-sm font-semibold text-foreground">{{ report.tenant }}</span>
           <span class="inline-flex px-2 py-0.5 rounded-full text-[11px] font-medium" :class="[report.statusBg, report.statusText]">{{ report.status }}</span>
@@ -170,7 +170,7 @@ onMounted(async () => {
             <button @click="openShare(report.caseId)" class="material-symbols-rounded text-[18px] text-muted-foreground">share</button>
           </div>
         </div>
-      </div>
+      </NuxtLink>
     </div>
     <DashboardShareReportModal v-model="showShare" />
     </template>
