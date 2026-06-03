@@ -25,6 +25,15 @@ const assignmentStatus = computed(() => {
   return visit.value?.fieldAssignments?.[0]?.status || 'assigned'
 })
 
+const caseCompleted = computed(() => {
+  const s = visit.value?.status
+  return s === 'completed' || s === 'report_building'
+})
+
+const visitDone = computed(() => {
+  return hasVisitReport.value || assignmentStatus.value === 'completed' || caseCompleted.value
+})
+
 onMounted(async () => {
   try {
     const res = await getSubmission(visitId)
@@ -90,17 +99,17 @@ onMounted(async () => {
       </div>
     </div>
 
-    <!-- Show submit button only if no visit report has been submitted -->
-    <NuxtLink v-if="!hasVisitReport && assignmentStatus !== 'completed'" :to="`/field-agent/visits/${visitId}/submit`"
+    <!-- Show submit button only if visit is not done -->
+    <NuxtLink v-if="!visitDone" :to="`/field-agent/visits/${visitId}/submit`"
       class="flex items-center justify-center gap-2 h-12 bg-primary text-foreground rounded-xl font-mono text-sm font-semibold">
       <span class="material-symbols-rounded text-[18px]">assignment_turned_in</span>
       Submit Visit Report
     </NuxtLink>
 
-    <!-- Show completed state if visit already submitted -->
-    <div v-else-if="hasVisitReport" class="flex items-center justify-center gap-2 h-12 bg-[#DFE6E1] text-[#004D1A] rounded-xl font-mono text-sm font-semibold">
+    <!-- Show completed state -->
+    <div v-else class="flex items-center justify-center gap-2 h-12 bg-[#DFE6E1] text-[#004D1A] rounded-xl font-mono text-sm font-semibold">
       <span class="material-symbols-rounded text-[18px]">check_circle</span>
-      Visit Report Submitted
+      {{ hasVisitReport ? 'Visit Report Submitted' : 'Case Completed' }}
     </div>
     </template>
   </div>
