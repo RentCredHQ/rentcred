@@ -34,9 +34,7 @@ const menuItems = [
   { label: 'Notifications', icon: 'notifications', to: '/field-agent/notifications' },
 ]
 
-function handleLogout() {
-  authStore.logout()
-}
+
 </script>
 
 <template>
@@ -81,15 +79,6 @@ function handleLogout() {
         <span class="material-symbols-rounded text-[18px] text-muted-foreground">chevron_right</span>
       </NuxtLink>
     </div>
-
-    <!-- Sign Out -->
-    <button
-      @click="handleLogout"
-      class="flex items-center justify-center gap-2 h-12 border border-[#8C1C00] text-[#8C1C00] rounded-xl font-mono text-[13px] font-semibold hover:bg-red-50 transition-colors"
-    >
-      <span class="material-symbols-rounded text-[18px]">logout</span>
-      Sign Out
-    </button>
 
     <span class="text-center font-sans text-[11px] text-muted-foreground mt-2">RentCred v1.0.0</span>
   </div>
