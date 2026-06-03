@@ -15,6 +15,10 @@ const { api } = useApi()
 const showReassign = ref(false)
 const showStatusMenu = ref(false)
 const statusUpdating = ref(false)
+const generatingReport = ref(false)
+const reportExists = ref(false)
+const reportId = ref('')
+const reportStatus = ref('')
 const loading = ref(true)
 const hasFieldAgent = ref(false)
 const rawStatus = ref('')
@@ -46,6 +50,30 @@ async function handleStatusUpdate(newStatus: string) {
     alert(e.data?.message || 'Failed to update status')
   } finally {
     statusUpdating.value = false
+  }
+}
+
+async function generateReport() {
+  generatingReport.value = true
+  try {
+    await api(`/reports/generate/${caseId.value}`, { method: 'POST' })
+    await fetchCaseData()
+  } catch (e: any) {
+    alert(e.data?.message || 'Failed to generate report')
+  } finally {
+    generatingReport.value = false
+  }
+}
+
+async function approveReport() {
+  try {
+    await api(`/reports/${reportId.value}/review`, {
+      method: 'PATCH',
+      body: { status: 'approved', notes: 'Approved' },
+    })
+    await fetchCaseData()
+  } catch (e: any) {
+    alert(e.data?.message || 'Failed to approve report')
   }
 }
 
@@ -153,6 +181,9 @@ async function fetchCaseData() {
       sla: s.sla ?? '',
     }
     rawStatus.value = s.status ?? ''
+    reportExists.value = !!s.report
+    reportId.value = s.report?.id ?? ''
+    reportStatus.value = s.report?.status ?? ''
     const assigneeName = caseData.value.assignee
     hasFieldAgent.value = !!assigneeName && assigneeName !== '—' && assigneeName !== 'Unassigned'
 
@@ -359,6 +390,53 @@ onMounted(fetchCaseData)
                 <span class="font-mono text-[12px] font-semibold" :class="check.color">{{ check.status }}</span>
               </button>
             </template>
+          </div>
+        </div>
+
+        <!-- Report Section -->
+        <div class="bg-card border border-border rounded-xl overflow-hidden">
+          <div class="px-6 py-4 border-b border-border flex items-center justify-between">
+            <span class="font-mono text-sm font-semibold text-foreground">Verification Report</span>
+            <span v-if="reportExists" class="inline-flex px-2.5 py-0.5 rounded-full text-[11px] font-semibold" :class="reportStatus === 'approved' ? 'bg-[#DFE6E1] text-[#004D1A]' : reportStatus === 'rejected' ? 'bg-red-50 text-red-600' : 'bg-[#E9E3D8] text-[#804200]'">
+              {{ reportStatus === 'approved' ? 'Approved' : reportStatus === 'rejected' ? 'Rejected' : reportStatus === 'pending_approval' ? 'Pending Approval' : 'Draft' }}
+            </span>
+          </div>
+          <div class="px-6 py-5">
+            <!-- No report yet -->
+            <div v-if="!reportExists" class="flex flex-col items-center gap-3 py-4">
+              <span class="material-symbols-rounded text-[32px] text-muted-foreground">description</span>
+              <p class="font-sans text-sm text-muted-foreground text-center max-w-[320px]">No report generated yet. Generate a report once all verification checks are complete.</p>
+              <button
+                @click="generateReport"
+                :disabled="generatingReport"
+                class="flex items-center gap-2 px-5 py-2.5 bg-primary text-foreground rounded font-mono text-[13px] font-medium hover:opacity-90 transition-opacity disabled:opacity-50"
+              >
+                <span v-if="generatingReport" class="material-symbols-rounded text-[16px] animate-spin">progress_activity</span>
+                <span v-else class="material-symbols-rounded text-[16px]">auto_awesome</span>
+                {{ generatingReport ? 'Generating...' : 'Generate Report' }}
+              </button>
+            </div>
+
+            <!-- Report exists -->
+            <div v-else class="flex flex-col gap-3">
+              <div class="flex items-center justify-between">
+                <span class="font-sans text-sm text-foreground">Report ID: <span class="font-mono text-muted-foreground">{{ reportId.slice(0, 12) }}…</span></span>
+              </div>
+              <div class="flex items-center gap-3">
+                <NuxtLink :to="`/ops/reports`" class="flex items-center gap-2 px-4 py-2 border border-border rounded-lg text-[13px] font-sans text-foreground hover:bg-surface transition-colors">
+                  <span class="material-symbols-rounded text-[16px]">visibility</span>
+                  View Report
+                </NuxtLink>
+                <button
+                  v-if="reportStatus === 'draft' || reportStatus === 'pending_approval'"
+                  @click="approveReport"
+                  class="flex items-center gap-2 px-4 py-2 bg-[#004D1A] text-white rounded-lg text-[13px] font-mono font-medium hover:opacity-90 transition-opacity"
+                >
+                  <span class="material-symbols-rounded text-[16px]">check_circle</span>
+                  Approve Report
+                </button>
+              </div>
+            </div>
           </div>
         </div>
 
