@@ -153,6 +153,13 @@ export class SubmissionsService {
         include: {
           agent: { select: { id: true, name: true, email: true } },
           report: { select: { id: true, status: true } },
+          fieldAssignments: {
+            orderBy: { createdAt: 'desc' },
+            take: 1,
+            include: {
+              fieldAgent: { select: { id: true, name: true } },
+            },
+          },
           verificationChecklist: {
             select: {
               identityVerified: true,
