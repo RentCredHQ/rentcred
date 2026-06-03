@@ -175,22 +175,36 @@ describe('VerificationService', () => {
       });
     });
 
-    it('should set completedAt when all 6 items are complete', async () => {
+    it('should reject fieldVisitCompleted from ops (only set by field agent visit)', async () => {
       const dto = { fieldVisitCompleted: true };
 
+      mockPrismaService.verificationChecklist.findUnique.mockResolvedValueOnce(baseChecklist);
+
+      await expect(
+        service.updateChecklist(submissionId, userId, dto),
+      ).rejects.toThrow('Field Visit is automatically verified when the field agent submits their visit report');
+    });
+
+    it('should set completedAt when all 6 items are complete', async () => {
+      const dto = { criminalCheckDone: true };
+      // fieldVisitCompleted already true in this scenario (set by field agent)
+      const checklistWithVisit = {
+        ...baseChecklist,
+        fieldVisitCompleted: true,
+      };
+
       mockPrismaService.verificationChecklist.findUnique
-        .mockResolvedValueOnce(baseChecklist) // for updateChecklist lookup
-        .mockResolvedValueOnce({ // for getChecklist call at end
-          ...baseChecklist,
-          fieldVisitCompleted: true,
+        .mockResolvedValueOnce(checklistWithVisit)
+        .mockResolvedValueOnce({
+          ...checklistWithVisit,
+          criminalCheckDone: true,
           completedAt: new Date(),
           submission: { id: submissionId, tenantName: 'John Doe', status: 'report_building', agentId: 'agent-1' },
         });
 
-      // The update returns all items complete
       mockPrismaService.verificationChecklist.update.mockResolvedValue({
-        ...baseChecklist,
-        fieldVisitCompleted: true,
+        ...checklistWithVisit,
+        criminalCheckDone: true,
       });
 
       mockPrismaService.submission.update.mockResolvedValue({});
@@ -199,9 +213,7 @@ describe('VerificationService', () => {
 
       await service.updateChecklist(submissionId, userId, dto);
 
-      // Should set completedAt
       expect(mockPrismaService.verificationChecklist.update).toHaveBeenCalledTimes(2);
-      // Second call sets completedAt
       expect(mockPrismaService.verificationChecklist.update).toHaveBeenNthCalledWith(2, {
         where: { submissionId },
         data: { completedAt: expect.any(Date) },
@@ -209,19 +221,23 @@ describe('VerificationService', () => {
     });
 
     it('should transition submission to report_building when all complete', async () => {
-      const dto = { fieldVisitCompleted: true };
+      const dto = { criminalCheckDone: true };
+      const checklistWithVisit = {
+        ...baseChecklist,
+        fieldVisitCompleted: true,
+      };
 
       mockPrismaService.verificationChecklist.findUnique
-        .mockResolvedValueOnce(baseChecklist)
+        .mockResolvedValueOnce(checklistWithVisit)
         .mockResolvedValueOnce({
-          ...baseChecklist,
-          fieldVisitCompleted: true,
+          ...checklistWithVisit,
+          criminalCheckDone: true,
           submission: { id: submissionId, tenantName: 'John Doe', status: 'report_building', agentId: 'agent-1' },
         });
 
       mockPrismaService.verificationChecklist.update.mockResolvedValue({
-        ...baseChecklist,
-        fieldVisitCompleted: true,
+        ...checklistWithVisit,
+        criminalCheckDone: true,
       });
       mockPrismaService.submission.update.mockResolvedValue({});
       mockNotificationsService.emit.mockResolvedValue({});
@@ -236,19 +252,23 @@ describe('VerificationService', () => {
     });
 
     it('should notify agent on full completion', async () => {
-      const dto = { fieldVisitCompleted: true };
+      const dto = { criminalCheckDone: true };
+      const checklistWithVisit = {
+        ...baseChecklist,
+        fieldVisitCompleted: true,
+      };
 
       mockPrismaService.verificationChecklist.findUnique
-        .mockResolvedValueOnce(baseChecklist)
+        .mockResolvedValueOnce(checklistWithVisit)
         .mockResolvedValueOnce({
-          ...baseChecklist,
-          fieldVisitCompleted: true,
+          ...checklistWithVisit,
+          criminalCheckDone: true,
           submission: { id: submissionId, tenantName: 'John Doe', status: 'report_building', agentId: 'agent-1' },
         });
 
       mockPrismaService.verificationChecklist.update.mockResolvedValue({
-        ...baseChecklist,
-        fieldVisitCompleted: true,
+        ...checklistWithVisit,
+        criminalCheckDone: true,
       });
       mockPrismaService.submission.update.mockResolvedValue({});
       mockNotificationsService.emit.mockResolvedValue({});
