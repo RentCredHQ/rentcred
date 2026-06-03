@@ -18,6 +18,7 @@ async function handleLogin() {
     const role = authStore.user?.role
     if (role === 'agent') router.push('/dashboard')
     else if (role === 'ops' || role === 'admin') router.push('/ops')
+    else if (role === 'field_agent') router.push('/field-agent')
     else if (role === 'tenant') router.push('/tenant')
     else router.push('/')
   } catch (e: any) {
