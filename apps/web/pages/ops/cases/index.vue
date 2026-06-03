@@ -61,9 +61,6 @@ async function fetchCases(page = 1) {
         rawStatus: s.status,
         statusBg: style.bg,
         statusText: style.text,
-        priority: s.priority ?? '—',
-        priorityBg: 'bg-[#E9E3D8]',
-        priorityText: 'text-[#804200]',
         assigned: s.fieldAssignments?.[0]?.fieldAgent?.name ?? '—',
         updated: s.updatedAt ? new Date(s.updatedAt).toLocaleDateString('en-NG', { month: 'short', day: 'numeric' }) : '—',
       }
@@ -143,8 +140,7 @@ const { searchQuery, activeFilter, filtered, resultCount } = useFilter({
           <div class="w-[150px] flex-shrink-0"><span class="font-mono text-[11px] font-semibold text-muted-foreground tracking-wider">Tenant</span></div>
           <div class="w-[140px] flex-shrink-0"><span class="font-mono text-[11px] font-semibold text-muted-foreground tracking-wider">Agent / Business</span></div>
           <div class="w-[120px] flex-shrink-0"><span class="font-mono text-[11px] font-semibold text-muted-foreground tracking-wider">Status</span></div>
-          <div class="w-[90px] flex-shrink-0"><span class="font-mono text-[11px] font-semibold text-muted-foreground tracking-wider">Priority</span></div>
-          <div class="w-[110px] flex-shrink-0"><span class="font-mono text-[11px] font-semibold text-muted-foreground tracking-wider">Assigned To</span></div>
+          <div class="w-[130px] flex-shrink-0"><span class="font-mono text-[11px] font-semibold text-muted-foreground tracking-wider">Assigned To</span></div>
           <div class="w-[90px] flex-shrink-0"><span class="font-mono text-[11px] font-semibold text-muted-foreground tracking-wider">Updated</span></div>
           <div class="flex-1"><span class="font-mono text-[11px] font-semibold text-muted-foreground tracking-wider">Action</span></div>
         </div>
@@ -167,10 +163,7 @@ const { searchQuery, activeFilter, filtered, resultCount } = useFilter({
           <div class="w-[120px] flex-shrink-0">
             <span class="inline-flex px-2.5 py-0.5 rounded-full text-[11px] font-semibold whitespace-nowrap" :class="[c.statusBg, c.statusText]">{{ c.status }}</span>
           </div>
-          <div class="w-[90px] flex-shrink-0">
-            <span class="inline-flex px-2.5 py-0.5 rounded-full text-[11px] font-semibold" :class="[c.priorityBg, c.priorityText]">{{ c.priority }}</span>
-          </div>
-          <div class="w-[110px] flex-shrink-0"><span class="font-sans text-[13px] text-foreground truncate block">{{ c.assigned }}</span></div>
+          <div class="w-[130px] flex-shrink-0"><span class="font-sans text-[13px] text-foreground truncate block">{{ c.assigned }}</span></div>
           <div class="w-[90px] flex-shrink-0"><span class="font-sans text-[13px] text-muted-foreground">{{ c.updated }}</span></div>
           <div class="flex-1 flex items-center gap-1">
             <NuxtLink :to="`/ops/cases/${c.id}`" class="flex items-center justify-center min-w-[36px] min-h-[36px] rounded-lg hover:bg-surface transition-colors" title="View"><span class="material-symbols-rounded text-[18px] text-muted-foreground hover:text-foreground">visibility</span></NuxtLink>
@@ -194,7 +187,6 @@ const { searchQuery, activeFilter, filtered, resultCount } = useFilter({
           <div class="flex items-center justify-between mb-1.5">
             <div class="flex items-center gap-2">
               <span class="font-mono text-[13px] font-medium text-foreground">{{ c.id.slice(0, 10) }}…</span>
-              <span class="inline-flex px-2 py-0.5 rounded-full text-[10px] font-semibold" :class="[c.priorityBg, c.priorityText]">{{ c.priority }}</span>
             </div>
             <span class="inline-flex px-2 py-0.5 rounded-full text-[10px] font-semibold" :class="[c.statusBg, c.statusText]">{{ c.status }}</span>
           </div>
