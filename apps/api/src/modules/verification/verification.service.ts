@@ -54,13 +54,17 @@ export class VerificationService {
       throw new BadRequestException('Checklist has been finalized and cannot be modified');
     }
 
+    // Field Visit can only be marked by the field agent submitting a visit report
+    if (dto.fieldVisitCompleted !== undefined) {
+      throw new BadRequestException('Field Visit is automatically verified when the field agent submits their visit report');
+    }
+
     const updateData: any = {};
     if (dto.identityVerified !== undefined) updateData.identityVerified = dto.identityVerified;
     if (dto.employmentVerified !== undefined) updateData.employmentVerified = dto.employmentVerified;
     if (dto.referencesVerified !== undefined) updateData.referencesVerified = dto.referencesVerified;
     if (dto.addressVerified !== undefined) updateData.addressVerified = dto.addressVerified;
     if (dto.criminalCheckDone !== undefined) updateData.criminalCheckDone = dto.criminalCheckDone;
-    if (dto.fieldVisitCompleted !== undefined) updateData.fieldVisitCompleted = dto.fieldVisitCompleted;
     if (dto.notes !== undefined) updateData.notes = dto.notes;
 
     const updated = await this.prisma.verificationChecklist.update({

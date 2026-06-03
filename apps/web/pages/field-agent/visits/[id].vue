@@ -17,12 +17,24 @@ const CHECKLIST_LABELS: Record<string, string> = {
   fieldVisitCompleted: 'Field Visit',
 }
 
+const hasVisitReport = computed(() => {
+  return visit.value?.fieldVisits?.length > 0
+})
+
+const assignmentStatus = computed(() => {
+  return visit.value?.fieldAssignments?.[0]?.status || 'assigned'
+})
+
 onMounted(async () => {
   try {
     const res = await getSubmission(visitId)
     visit.value = res.data ?? res
-    // Build checklist from verificationChecklist labels
-    checklist.value = Object.values(CHECKLIST_LABELS)
+    const vc = visit.value?.verificationChecklist ?? {}
+    checklist.value = Object.entries(CHECKLIST_LABELS).map(([key, label]) => ({
+      key,
+      label,
+      checked: vc[key] === true,
+    }))
   } catch { /* empty */ }
   finally { loading.value = false }
 })
@@ -69,17 +81,27 @@ onMounted(async () => {
     <div class="flex flex-col gap-3">
       <span class="font-mono text-[13px] font-semibold text-foreground">Verification Checklist</span>
       <div class="bg-card border border-border rounded-xl overflow-hidden">
-        <div v-for="(item, i) in checklist" :key="item" class="flex items-center gap-3 px-4 py-3.5" :class="i < checklist.length - 1 ? 'border-b border-border' : ''">
-          <span class="material-symbols-rounded text-[20px] text-muted-foreground">radio_button_unchecked</span>
-          <span class="font-sans text-[13px] text-foreground">{{ item }}</span>
+        <div v-for="(item, i) in checklist" :key="item.key" class="flex items-center gap-3 px-4 py-3.5" :class="i < checklist.length - 1 ? 'border-b border-border' : ''">
+          <span class="material-symbols-rounded text-[20px]" :class="item.checked ? 'text-[#004D1A]' : 'text-muted-foreground'">
+            {{ item.checked ? 'check_circle' : 'radio_button_unchecked' }}
+          </span>
+          <span class="font-sans text-[13px] text-foreground">{{ item.label }}</span>
         </div>
       </div>
     </div>
-    <NuxtLink :to="`/field-agent/visits/${visitId}/submit`"
-      class="flex items-center justify-center gap-2 h-12 bg-primary text-white rounded-xl font-mono text-sm font-semibold">
-      <span class="material-symbols-rounded text-[18px]">play_arrow</span>
-      Start Verification
+
+    <!-- Show submit button only if no visit report has been submitted -->
+    <NuxtLink v-if="!hasVisitReport && assignmentStatus !== 'completed'" :to="`/field-agent/visits/${visitId}/submit`"
+      class="flex items-center justify-center gap-2 h-12 bg-primary text-foreground rounded-xl font-mono text-sm font-semibold">
+      <span class="material-symbols-rounded text-[18px]">assignment_turned_in</span>
+      Submit Visit Report
     </NuxtLink>
+
+    <!-- Show completed state if visit already submitted -->
+    <div v-else-if="hasVisitReport" class="flex items-center justify-center gap-2 h-12 bg-[#DFE6E1] text-[#004D1A] rounded-xl font-mono text-sm font-semibold">
+      <span class="material-symbols-rounded text-[18px]">check_circle</span>
+      Visit Report Submitted
+    </div>
     </template>
   </div>
 </template>

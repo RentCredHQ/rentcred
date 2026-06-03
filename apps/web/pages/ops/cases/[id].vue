@@ -338,13 +338,27 @@ onMounted(fetchCaseData)
             <span class="font-mono text-sm font-semibold text-foreground">Verification Checks</span>
           </div>
           <div class="divide-y divide-border">
-            <button v-for="check in checks" :key="check.key" @click="toggleCheck(check)" class="flex items-center justify-between px-6 py-3.5 w-full text-left hover:bg-surface transition-colors cursor-pointer">
-              <div class="flex items-center gap-3">
-                <span class="material-symbols-rounded text-[20px]" :class="check.color">{{ check.icon }}</span>
-                <span class="font-sans text-[13px] text-foreground">{{ check.label }}</span>
+            <template v-for="check in checks" :key="check.key">
+              <!-- Field Visit is auto-verified by field agent, not clickable by ops -->
+              <div v-if="check.key === 'fieldVisitCompleted'" class="flex items-center justify-between px-6 py-3.5">
+                <div class="flex items-center gap-3">
+                  <span class="material-symbols-rounded text-[20px]" :class="check.color">{{ check.icon }}</span>
+                  <div class="flex flex-col">
+                    <span class="font-sans text-[13px] text-foreground">{{ check.label }}</span>
+                    <span class="font-sans text-[11px] text-muted-foreground">{{ check.checked ? 'Completed by field agent' : 'Awaiting field agent visit report' }}</span>
+                  </div>
+                </div>
+                <span class="font-mono text-[12px] font-semibold" :class="check.color">{{ check.status }}</span>
               </div>
-              <span class="font-mono text-[12px] font-semibold" :class="check.color">{{ check.status }}</span>
-            </button>
+              <!-- Other checks are clickable by ops -->
+              <button v-else @click="toggleCheck(check)" class="flex items-center justify-between px-6 py-3.5 w-full text-left hover:bg-surface transition-colors cursor-pointer">
+                <div class="flex items-center gap-3">
+                  <span class="material-symbols-rounded text-[20px]" :class="check.color">{{ check.icon }}</span>
+                  <span class="font-sans text-[13px] text-foreground">{{ check.label }}</span>
+                </div>
+                <span class="font-mono text-[12px] font-semibold" :class="check.color">{{ check.status }}</span>
+              </button>
+            </template>
           </div>
         </div>
 
