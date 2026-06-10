@@ -169,7 +169,7 @@ const { searchQuery, activeFilter, filtered, resultCount } = useFilter({
           <div class="w-[100px]"><span class="font-sans text-[13px] text-foreground">{{ txn.type }}</span></div>
           <div class="w-[100px]"><span class="font-mono text-[13px] font-medium text-foreground">{{ txn.amount }}</span></div>
           <div class="w-[100px]">
-            <span class="inline-flex px-2.5 py-0.5 rounded-full text-[11px] font-semibold" :class="[txn.statusBg, txn.statusText]">{{ txn.status }}</span>
+            <UiStatusPill :status="txn.status" :label="txn.status" />
           </div>
           <div class="w-[90px]"><span class="font-sans text-[13px] text-foreground">{{ txn.date }}</span></div>
           <div class="flex-1">
@@ -192,7 +192,7 @@ const { searchQuery, activeFilter, filtered, resultCount } = useFilter({
         <div v-for="txn in filtered" :key="txn.id" class="px-4 py-3.5 border-b border-border last:border-0">
           <div class="flex items-center justify-between mb-1.5">
             <span class="font-mono text-[13px] font-medium text-foreground truncate block" :title="txn.id">{{ txn.id.slice(0, 10) }}…</span>
-            <span class="inline-flex px-2 py-0.5 rounded-full text-[10px] font-semibold" :class="[txn.statusBg, txn.statusText]">{{ txn.status }}</span>
+            <UiStatusPill :status="txn.status" :label="txn.status" />
           </div>
           <div class="flex items-center justify-between">
             <span class="font-sans text-sm text-foreground">{{ txn.agent }}</span>

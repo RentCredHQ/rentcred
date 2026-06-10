@@ -17,31 +17,17 @@ const statusTabs = [
   { label: 'Completed', value: 'Completed' },
 ]
 
-function getStatusStyle(status: string) {
-  const map: Record<string, { bg: string; text: string }> = {
-    completed: { bg: 'bg-[#DFE6E1]', text: 'text-[#004D1A]' },
-    in_progress: { bg: 'bg-[#DFDFE6]', text: 'text-[#000066]' },
-    pending: { bg: 'bg-[#E9E3D8]', text: 'text-[#804200]' },
-    field_visit: { bg: 'bg-[#DFDFE6]', text: 'text-[#000066]' },
-    report_building: { bg: 'bg-[#E9E3D8]', text: 'text-[#804200]' },
-    rejected: { bg: 'bg-[#E5DCDA]', text: 'text-[#8C1C00]' },
-  }
-  return map[status] || { bg: 'bg-[#E7E8E5]', text: 'text-foreground' }
-}
-
 const submissions = ref<any[]>([])
 
 const mappedSubmissions = computed(() =>
   submissions.value.map((s: any) => {
-    const style = getStatusStyle(s.status)
     const label = SUBMISSION_STATUS_LABELS[s.status] || s.status
     return {
       name: s.tenantName,
       caseId: s.id,
       package: s.propertyType || 'Standard',
+      rawStatus: s.status,
       status: label,
-      statusBg: style.bg,
-      statusText: style.text,
       date: new Date(s.createdAt).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' }),
     }
   })
@@ -146,7 +132,7 @@ onMounted(async () => {
         <div class="w-[120px] flex-shrink-0"><span class="font-mono text-[13px] text-muted-foreground truncate block" :title="sub.caseId">{{ sub.caseId?.slice(0, 10) }}…</span></div>
         <div class="w-[130px] flex-shrink-0"><span class="font-sans text-sm text-foreground">{{ sub.package }}</span></div>
         <div class="w-[140px] flex-shrink-0">
-          <span class="inline-flex px-2.5 py-1 rounded-full text-[12px] font-medium whitespace-nowrap" :class="[sub.statusBg, sub.statusText]">{{ sub.status }}</span>
+          <UiStatusPill :status="sub.rawStatus" :label="sub.status" />
         </div>
         <div class="w-[120px] flex-shrink-0"><span class="font-sans text-[13px] text-muted-foreground">{{ sub.date }}</span></div>
         <div class="flex-1 flex items-center gap-2" @click.prevent.stop>
@@ -181,7 +167,7 @@ onMounted(async () => {
       >
         <div class="flex items-center justify-between">
           <span class="font-sans text-sm font-semibold text-foreground">{{ sub.name }}</span>
-          <span class="inline-flex px-2 py-0.5 rounded-full text-[11px] font-medium" :class="[sub.statusBg, sub.statusText]">{{ sub.status }}</span>
+          <UiStatusPill :status="sub.rawStatus" :label="sub.status" />
         </div>
         <div class="flex items-center gap-4 text-[12px] text-muted-foreground font-sans">
           <span class="font-mono">{{ sub.caseId?.slice(0, 10) }}…</span>

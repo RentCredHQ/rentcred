@@ -20,16 +20,6 @@ const statusTabs = [
   { label: 'Draft', value: 'Draft' },
 ]
 
-function getReportStatusStyle(status: string) {
-  const map: Record<string, { bg: string; text: string }> = {
-    approved: { bg: 'bg-[#DFE6E1]', text: 'text-[#004D1A]' },
-    pending_approval: { bg: 'bg-[#E9E3D8]', text: 'text-[#804200]' },
-    draft: { bg: 'bg-[#E7E8E5]', text: 'text-foreground' },
-    rejected: { bg: 'bg-[#E5DCDA]', text: 'text-[#8C1C00]' },
-  }
-  return map[status] || { bg: 'bg-[#E7E8E5]', text: 'text-foreground' }
-}
-
 function getReportStatusLabel(status: string) {
   const map: Record<string, string> = {
     approved: 'Ready',
@@ -55,14 +45,12 @@ const rawReports = ref<any[]>([])
 
 const reports = computed(() =>
   rawReports.value.map((r: any) => {
-    const style = getReportStatusStyle(r.status)
     const rec = getRecStyle(r.content?.overallRating)
     return {
       tenant: r.submission?.tenantName || r.content?.tenant?.name || r.content?.tenantInfo?.name || '',
       caseId: r.submissionId || r.id,
+      rawStatus: r.status,
       status: getReportStatusLabel(r.status),
-      statusBg: style.bg,
-      statusText: style.text,
       recommendation: rec.label,
       recColor: rec.color,
       generated: new Date(r.createdAt).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' }),
@@ -131,7 +119,7 @@ onMounted(async () => {
         <div class="w-[170px] flex-shrink-0"><span class="font-sans text-sm font-medium text-foreground truncate block">{{ report.tenant }}</span></div>
         <div class="w-[120px] flex-shrink-0"><span class="font-mono text-[13px] text-muted-foreground truncate block" :title="report.caseId">{{ report.caseId?.slice(0, 10) }}…</span></div>
         <div class="w-[140px]">
-          <span class="inline-flex px-2.5 py-1 rounded-full text-[12px] font-medium" :class="[report.statusBg, report.statusText]">{{ report.status }}</span>
+          <UiStatusPill :status="report.rawStatus" :label="report.status" />
         </div>
         <div class="w-[160px]"><span class="font-sans text-sm font-medium" :class="report.recColor">{{ report.recommendation }}</span></div>
         <div class="w-[110px]"><span class="font-sans text-[13px] text-muted-foreground">{{ report.generated }}</span></div>
@@ -157,7 +145,7 @@ onMounted(async () => {
       <NuxtLink v-for="report in filtered" :key="report.caseId" :to="`/dashboard/reports/${report.caseId}`" class="bg-white border border-border rounded-xl p-4 flex flex-col gap-3 cursor-pointer hover:border-primary/40 transition-colors">
         <div class="flex items-center justify-between">
           <span class="font-sans text-sm font-semibold text-foreground">{{ report.tenant }}</span>
-          <span class="inline-flex px-2 py-0.5 rounded-full text-[11px] font-medium" :class="[report.statusBg, report.statusText]">{{ report.status }}</span>
+          <UiStatusPill :status="report.rawStatus" :label="report.status" />
         </div>
         <div class="flex items-center justify-between">
           <span class="font-mono text-[12px] text-muted-foreground">{{ report.caseId?.slice(0, 10) }}…</span>

@@ -19,6 +19,14 @@
   --color-success: #004D1A;
   --color-warning: #804200;
   --color-error: #8C1C00;
+
+  /* Unified status scale — light. 5 hues × 3 tiers (vivid / bg / text).
+     Every bg+text pair meets WCAG AA (>=4.5:1) at 11px. */
+  --color-st-green-vivid: #22C55E;  --color-st-green-bg: #DCEAE0;  --color-st-green-text: #11572E;
+  --color-st-amber-vivid: #F59E0B;  --color-st-amber-bg: #EFE5D0;  --color-st-amber-text: #6B4A04;
+  --color-st-red-vivid: #EF4444;    --color-st-red-bg: #ECDCDA;    --color-st-red-text: #8F1D1D;
+  --color-st-blue-vivid: #3B82F6;   --color-st-blue-bg: #DDDFEA;   --color-st-blue-text: #1E3A8A;
+  --color-st-neutral-bg: #E7E8E5;   --color-st-neutral-text: #3F4440;
 }
 
 .dark {
@@ -35,8 +43,16 @@
   --color-primary-foreground: #111111;
   --color-accent: #FF8400;
   --color-success: #B6FFCE;
-  --color-warning: #FF8400;
+  /* warning no longer collapses into the brand orange — distinct amber */
+  --color-warning: #FFC95C;
   --color-error: #FF5C33;
+
+  /* Unified status scale — dark. Vivid tier is shared (defined in :root). */
+  --color-st-green-bg: #15301F;   --color-st-green-text: #7DE6A4;
+  --color-st-amber-bg: #332A12;   --color-st-amber-text: #FFCE6B;
+  --color-st-red-bg: #371616;     --color-st-red-text: #FF9C8F;
+  --color-st-blue-bg: #16203A;    --color-st-blue-text: #93B4FF;
+  --color-st-neutral-bg: #2E2E2E; --color-st-neutral-text: #C9CBC6;
 }
 
 @layer base {
@@ -61,6 +77,13 @@
            hover:bg-surface hover:text-foreground;
   }
 
+  /* Approve / positive action — green, distinct from the brand-orange primary */
+  .btn-approve {
+    @apply text-white px-6 py-3 font-semibold transition-all duration-200
+           hover:opacity-90 active:scale-[0.98] disabled:opacity-50 disabled:cursor-not-allowed;
+    background: var(--color-st-green-text);
+  }
+
   .input-field {
     @apply w-full px-4 py-3 rounded-lg border border-border bg-background text-foreground
            placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary focus:border-primary
@@ -71,4 +94,69 @@
   .card {
     @apply bg-card border border-border p-6;
   }
+
+  /* Unified status pill — hue-locked to the status scale */
+  .rc-pill {
+    @apply inline-flex items-center gap-1.5 w-fit rounded-full font-mono font-semibold;
+    font-size: 11px;
+    letter-spacing: 0.3px;
+    line-height: 1.3;
+    padding: 4px 11px;
+    white-space: nowrap;
+  }
+  .rc-pill-green   { background: var(--color-st-green-bg);   color: var(--color-st-green-text); }
+  .rc-pill-amber   { background: var(--color-st-amber-bg);   color: var(--color-st-amber-text); }
+  .rc-pill-red     { background: var(--color-st-red-bg);     color: var(--color-st-red-text); }
+  .rc-pill-blue    { background: var(--color-st-blue-bg);    color: var(--color-st-blue-text); }
+  .rc-pill-neutral { background: var(--color-st-neutral-bg); color: var(--color-st-neutral-text); }
 }
+
+/* Visible focus ring for keyboard users — buttons, nav, inputs, links */
+@layer base {
+  .btn-primary:focus-visible,
+  .btn-secondary:focus-visible,
+  .btn-ghost:focus-visible,
+  .btn-approve:focus-visible,
+  a:focus-visible,
+  button:focus-visible,
+  [role='button']:focus-visible,
+  input:focus-visible,
+  select:focus-visible,
+  textarea:focus-visible {
+    outline: 2px solid var(--color-primary);
+    outline-offset: 2px;
+    border-radius: 6px;
+  }
+}
+
+/* Skeleton loader — shimmer for tables/KPIs/cards (replaces lone spinner) */
+@keyframes rc-shimmer { 0% { background-position: 100% 0; } 100% { background-position: 0 0; } }
+.rc-skel {
+  border-radius: 6px;
+  background: linear-gradient(90deg, var(--color-surface) 25%, var(--color-border) 37%, var(--color-surface) 63%);
+  background-size: 400% 100%;
+  animation: rc-shimmer 1.4s ease infinite;
+}
+@media (prefers-reduced-motion: reduce) { .rc-skel { animation: none; } }
+
+/* Toast notifications (replaces native alert) */
+.rc-toast-stack {
+  position: fixed; bottom: 24px; right: 24px; left: auto;
+  display: flex; flex-direction: column; gap: 10px; z-index: 1000;
+  max-width: calc(100vw - 48px);
+}
+.rc-toast {
+  display: flex; align-items: flex-start; gap: 10px;
+  min-width: 280px; max-width: 400px;
+  background: #161616; color: #fff;
+  border: 1px solid #2A2A2A; border-radius: 12px;
+  padding: 13px 16px;
+  font-family: 'Geist', system-ui, sans-serif; font-size: 13.5px; line-height: 1.45;
+  box-shadow: 0 8px 30px rgba(0, 0, 0, 0.4);
+  animation: rc-toast-in 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+}
+@keyframes rc-toast-in { from { opacity: 0; transform: translateY(12px); } to { opacity: 1; transform: translateY(0); } }
+.rc-toast .material-symbols-rounded { font-size: 19px; flex: none; margin-top: 1px; }
+.rc-toast.success .material-symbols-rounded { color: #4ADE80; }
+.rc-toast.error   .material-symbols-rounded { color: #FF8F84; }
+.rc-toast.info    .material-symbols-rounded { color: #93B4FF; }

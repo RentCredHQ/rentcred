@@ -53,7 +53,7 @@ async function handleSubmit() {
           <!-- Header -->
           <div class="flex items-center justify-between px-6 py-4 border-b border-border sticky top-0 bg-card z-10">
             <h3 class="font-mono text-base font-semibold text-foreground">Add Field Agent</h3>
-            <button @click="show = false" class="text-muted-foreground hover:text-foreground">
+            <button @click="show = false" class="text-muted-foreground hover:text-foreground" aria-label="Close">
               <span class="material-symbols-rounded text-[20px]">close</span>
             </button>
           </div>

@@ -7,6 +7,7 @@ useSeoMeta({ title: 'Dashboard — RentCred' })
 const authStore = useAuthStore()
 const { getDashboardStats } = useAgents()
 const { getSubmissions } = useSubmissions()
+const { info } = useToast()
 
 const greetingName = computed(() => {
   const name = authStore.user?.name || ''
@@ -24,8 +25,8 @@ const loading = ref(true)
 
 const stats = ref({
   bundleCredits: { value: 0, total: 0, label: 'Bundle Credits', icon: 'inventory_2' },
-  activeChecks: { value: 0, label: 'Active Checks', icon: 'pending_actions', badge: '', badgeBg: 'bg-[#E9E3D8]', badgeText: 'text-[#804200]' },
-  reportsReady: { value: 0, label: 'Reports Ready', icon: 'task', badge: 'Ready to share', badgeBg: 'bg-[#DFE6E1]', badgeText: 'text-[#004D1A]' },
+  activeChecks: { value: 0, label: 'Active Checks', icon: 'pending_actions', badge: '', badgeHue: 'amber' as const },
+  reportsReady: { value: 0, label: 'Reports Ready', icon: 'task', badge: 'Ready to share', badgeHue: 'green' as const },
 })
 
 const submissions = ref<any[]>([])
@@ -34,18 +35,6 @@ const searchQuery = ref('')
 const currentPage = ref(1)
 const totalSubmissions = ref(0)
 const pageSize = 5
-
-function getStatusStyle(status: string) {
-  const map: Record<string, { bg: string; text: string }> = {
-    completed: { bg: 'bg-[#DFE6E1]', text: 'text-[#004D1A]' },
-    in_progress: { bg: 'bg-[#E9E3D8]', text: 'text-[#804200]' },
-    pending: { bg: 'bg-[#E7E8E5]', text: 'text-foreground' },
-    field_visit: { bg: 'bg-[#DFDFE6]', text: 'text-[#000066]' },
-    report_building: { bg: 'bg-[#E9E3D8]', text: 'text-[#804200]' },
-    rejected: { bg: 'bg-[#E5DCDA]', text: 'text-[#8C1C00]' },
-  }
-  return map[status] || { bg: 'bg-[#E7E8E5]', text: 'text-foreground' }
-}
 
 function getAction(status: string) {
   if (status === 'completed') return 'share'
@@ -61,15 +50,13 @@ const mappedSubmissions = computed(() => {
   const query = searchQuery.value.toLowerCase().trim()
   return submissions.value
     .map((s: any) => {
-      const style = getStatusStyle(s.status)
       return {
         id: s.id,
         tenant: { name: s.tenantName, detail: `${s.neighborhood || ''} • ${s.propertyType || ''}` },
         package: 'Standard',
         packageColor: 'text-foreground',
+        statusRaw: s.status,
         status: SUBMISSION_STATUS_LABELS[s.status] || s.status,
-        statusBg: style.bg,
-        statusText: style.text,
         date: formatDate(s.createdAt),
         action: getAction(s.status),
       }
@@ -84,13 +71,11 @@ const totalPages = computed(() => Math.max(1, Math.ceil(totalSubmissions.value /
 
 const recentActivity = computed(() =>
   submissions.value.slice(0, 4).map((s: any) => {
-    const style = getStatusStyle(s.status)
     return {
       name: s.tenantName,
       date: new Date(s.createdAt).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' }),
+      statusRaw: s.status,
       status: SUBMISSION_STATUS_LABELS[s.status] || s.status,
-      statusBg: style.bg,
-      statusText: style.text,
     }
   })
 )
@@ -113,8 +98,8 @@ onMounted(async () => {
     const d = statsRes.data ?? statsRes
     stats.value = {
       bundleCredits: { value: d.creditBalance ?? 0, total: d.creditBalance ?? 0, label: 'Bundle Credits', icon: 'inventory_2' },
-      activeChecks: { value: d.pendingSubmissions ?? 0, label: 'Active Checks', icon: 'pending_actions', badge: `${d.pendingSubmissions ?? 0} awaiting review`, badgeBg: 'bg-[#E9E3D8]', badgeText: 'text-[#804200]' },
-      reportsReady: { value: d.reportsReady ?? 0, label: 'Reports Ready', icon: 'task', badge: 'Ready to share', badgeBg: 'bg-[#DFE6E1]', badgeText: 'text-[#004D1A]' },
+      activeChecks: { value: d.pendingSubmissions ?? 0, label: 'Active Checks', icon: 'pending_actions', badge: `${d.pendingSubmissions ?? 0} awaiting review`, badgeHue: 'amber' },
+      reportsReady: { value: d.reportsReady ?? 0, label: 'Reports Ready', icon: 'task', badge: 'Ready to share', badgeHue: 'green' },
     }
 
     submissions.value = subsRes.data ?? []
@@ -126,9 +111,19 @@ onMounted(async () => {
 
 <template>
   <div class="flex flex-col gap-6">
-    <!-- Loading State -->
-    <div v-if="loading" class="flex items-center justify-center py-20">
-      <span class="material-symbols-rounded text-[28px] text-muted-foreground animate-spin">progress_activity</span>
+    <!-- Loading State — skeletons -->
+    <div v-if="loading" class="flex flex-col gap-6">
+      <div class="grid grid-cols-1 lg:grid-cols-3 gap-4">
+        <div v-for="i in 3" :key="i" class="bg-white border border-border rounded-xl p-5 flex flex-col gap-3 shadow-sm">
+          <UiSkeleton w="44%" h="12px" />
+          <UiSkeleton w="64px" h="28px" />
+          <UiSkeleton w="60%" h="10px" />
+        </div>
+      </div>
+      <div class="bg-white border border-border rounded-xl overflow-hidden shadow-sm">
+        <div class="px-5 py-4 border-b border-border"><UiSkeleton w="140px" h="16px" /></div>
+        <UiSkeletonRows :rows="5" />
+      </div>
     </div>
 
     <template v-else>
@@ -192,9 +187,7 @@ onMounted(async () => {
           <span class="material-symbols-rounded text-[18px] text-muted-foreground">{{ stats.activeChecks.icon }}</span>
         </div>
         <span class="font-mono text-[28px] font-bold text-foreground leading-none">{{ stats.activeChecks.value }}</span>
-        <span class="inline-block w-fit px-2 py-1 rounded-full text-[11px] font-medium" :class="[stats.activeChecks.badgeBg, stats.activeChecks.badgeText]">
-          {{ stats.activeChecks.badge }}
-        </span>
+        <UiStatusPill v-if="stats.activeChecks.badge" :hue="stats.activeChecks.badgeHue" :label="stats.activeChecks.badge" />
       </div>
 
       <!-- Reports Ready -->
@@ -203,10 +196,8 @@ onMounted(async () => {
           <span class="font-sans text-[13px] text-muted-foreground">{{ stats.reportsReady.label }}</span>
           <span class="material-symbols-rounded text-[18px] text-muted-foreground">{{ stats.reportsReady.icon }}</span>
         </div>
-        <span class="font-mono text-[28px] font-bold text-foreground leading-none text-[#004D1A]">{{ stats.reportsReady.value }}</span>
-        <span class="inline-block w-fit px-2 py-1 rounded-full text-[11px] font-medium" :class="[stats.reportsReady.badgeBg, stats.reportsReady.badgeText]">
-          {{ stats.reportsReady.badge }}
-        </span>
+        <span class="font-mono text-[28px] font-bold leading-none text-st-green-text">{{ stats.reportsReady.value }}</span>
+        <UiStatusPill v-if="stats.reportsReady.badge" :hue="stats.reportsReady.badgeHue" :label="stats.reportsReady.badge" />
       </div>
     </div>
 
@@ -257,7 +248,7 @@ onMounted(async () => {
         </div>
         <div class="w-[100px] px-4 py-3"><span class="font-sans text-[13px] font-medium" :class="sub.packageColor">{{ sub.package }}</span></div>
         <div class="w-[140px] px-4 py-3">
-          <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-[11px] font-medium" :class="[sub.statusBg, sub.statusText]">{{ sub.status }}</span>
+          <UiStatusPill :status="sub.statusRaw" :label="sub.status" />
         </div>
         <div class="w-[100px] px-4 py-3"><span class="font-sans text-[13px] text-muted-foreground">{{ sub.date }}</span></div>
         <div class="w-[120px] px-4 py-3">
@@ -278,7 +269,7 @@ onMounted(async () => {
           </NuxtLink>
           <button
             v-else
-            @click="alert('Invite resend is not available yet — email service required')"
+            @click="info('Invite resend is not available yet — email service required')"
             class="px-3 py-1.5 border border-border rounded text-[12px] font-sans text-foreground hover:bg-surface transition-colors"
           >
             Resend Invite
@@ -320,9 +311,7 @@ onMounted(async () => {
             <span class="font-sans text-sm font-semibold text-foreground">{{ item.name }}</span>
             <span class="font-sans text-[11px] text-muted-foreground">{{ item.date }}</span>
           </div>
-          <span class="px-2.5 py-1 rounded-full text-[11px] font-semibold" :class="[item.statusBg, item.statusText]">
-            {{ item.status }}
-          </span>
+          <UiStatusPill :status="item.statusRaw" :label="item.status" />
         </div>
       </div>
     </div>

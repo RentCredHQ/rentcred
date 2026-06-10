@@ -109,7 +109,7 @@ const newComment = ref('')
             <span class="material-symbols-rounded text-[20px] text-foreground">arrow_back</span>
           </NuxtLink>
           <h1 class="font-mono text-xl lg:text-2xl font-bold text-foreground">{{ dispute.id }}</h1>
-          <span class="inline-flex px-2.5 py-0.5 rounded-full text-[11px] font-semibold" :class="[dispute.statusBg, dispute.statusText]">{{ dispute.status }}</span>
+          <UiStatusPill :status="dispute.status" :label="dispute.status" />
           <span class="inline-flex px-2.5 py-0.5 rounded-full text-[11px] font-semibold" :class="[dispute.priorityBg, dispute.priorityText]">{{ dispute.priority }}</span>
         </div>
         <div class="flex items-center gap-2">

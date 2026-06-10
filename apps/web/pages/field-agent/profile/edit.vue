@@ -120,7 +120,7 @@ async function handleSave() {
             @click="fileInput?.click()"
             class="absolute -bottom-1 -right-1 w-7 h-7 rounded-full bg-foreground border-2 border-white flex items-center justify-center"
             :class="{ 'opacity-50': uploading }"
-          >
+           aria-label="Take photo">
             <span class="material-symbols-rounded text-[14px] text-white">photo_camera</span>
           </button>
         </div>

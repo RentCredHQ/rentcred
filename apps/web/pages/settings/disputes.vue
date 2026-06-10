@@ -155,7 +155,7 @@ const { searchQuery, activeFilter, filtered, resultCount } = useFilter({
             <span class="inline-flex px-2.5 py-0.5 rounded-full text-[11px] font-semibold" :class="[d.priorityBg, d.priorityText]">{{ d.priority }}</span>
           </div>
           <div class="w-[100px]">
-            <span class="inline-flex px-2.5 py-0.5 rounded-full text-[11px] font-semibold" :class="[d.statusBg, d.statusText]">{{ d.status }}</span>
+            <UiStatusPill :status="d.status" :label="d.status" />
           </div>
           <div class="w-[110px]"><span class="font-sans text-[13px] text-foreground">{{ d.deadline }}</span></div>
           <div class="w-[70px]">
@@ -180,7 +180,7 @@ const { searchQuery, activeFilter, filtered, resultCount } = useFilter({
         <div v-for="d in filtered" :key="d.id" class="px-4 py-3.5 border-b border-border last:border-0">
           <div class="flex items-center justify-between mb-1.5">
             <span class="font-mono text-[13px] font-medium text-foreground truncate block" :title="d.id">{{ d.id.slice(0, 10) }}…</span>
-            <span class="inline-flex px-2 py-0.5 rounded-full text-[10px] font-semibold" :class="[d.statusBg, d.statusText]">{{ d.status }}</span>
+            <UiStatusPill :status="d.status" :label="d.status" />
           </div>
           <span class="font-sans text-sm text-foreground block mb-1">{{ d.reason }}</span>
           <div class="flex items-center gap-3 text-[12px] text-muted-foreground font-sans">

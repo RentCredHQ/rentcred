@@ -112,7 +112,7 @@ const { searchQuery, activeFilter, filtered, resultCount } = useFilter({
     </div>
 
     <!-- Mobile Add Agent FAB -->
-    <button @click="showAddAgent = true" class="lg:hidden fixed bottom-24 right-5 z-30 w-14 h-14 bg-primary text-white rounded-full flex items-center justify-center shadow-lg hover:opacity-90 transition-opacity">
+    <button @click="showAddAgent = true" class="lg:hidden fixed bottom-24 right-5 z-30 w-14 h-14 bg-primary text-white rounded-full flex items-center justify-center shadow-lg hover:opacity-90 transition-opacity" aria-label="Add">
       <span class="material-symbols-rounded text-[24px]">add</span>
     </button>
 
@@ -176,7 +176,7 @@ const { searchQuery, activeFilter, filtered, resultCount } = useFilter({
             </div>
           </div>
           <div class="w-[100px]">
-            <span class="inline-flex px-2.5 py-0.5 rounded-full text-[11px] font-semibold" :class="[a.statusBg, a.statusText]">{{ a.status }}</span>
+            <UiStatusPill :status="a.status" :label="a.status" />
           </div>
           <div class="w-[100px]"><span class="font-sans text-[13px] text-muted-foreground">{{ a.lastActive }}</span></div>
           <div class="flex-1">
@@ -199,7 +199,7 @@ const { searchQuery, activeFilter, filtered, resultCount } = useFilter({
         <div v-for="a in filtered" :key="a.name" class="px-4 py-3.5 border-b border-border last:border-0">
           <div class="flex items-center justify-between mb-1.5">
             <span class="font-sans text-sm font-medium text-foreground">{{ a.name }}</span>
-            <span class="inline-flex px-2 py-0.5 rounded-full text-[10px] font-semibold" :class="[a.statusBg, a.statusText]">{{ a.status }}</span>
+            <UiStatusPill :status="a.status" :label="a.status" />
           </div>
           <div class="flex items-center gap-3 text-[12px] text-muted-foreground font-sans">
             <span>{{ a.location }}</span>

@@ -11,6 +11,7 @@ useSeoMeta({ title: `Case ${caseId.value} — RentCred Ops` })
 const { getSubmission, updateSubmissionStatus } = useSubmissions()
 const { getAuditLogs } = useAuditLog()
 const { api } = useApi()
+const { success, error: showError } = useToast()
 
 const showReassign = ref(false)
 const showStatusMenu = ref(false)
@@ -46,8 +47,9 @@ async function handleStatusUpdate(newStatus: string) {
     await updateSubmissionStatus(caseId.value, newStatus)
     showStatusMenu.value = false
     await fetchCaseData()
+    success(`Status updated to ${SUBMISSION_STATUS_LABELS[newStatus] ?? newStatus}`)
   } catch (e: any) {
-    alert(e.data?.message || 'Failed to update status')
+    showError(e.data?.message || 'Failed to update status')
   } finally {
     statusUpdating.value = false
   }
@@ -58,8 +60,9 @@ async function generateReport() {
   try {
     await api(`/reports/generate/${caseId.value}`, { method: 'POST' })
     await fetchCaseData()
+    success('Report generated — ready for approval')
   } catch (e: any) {
-    alert(e.data?.message || 'Failed to generate report')
+    showError(e.data?.message || 'Failed to generate report')
   } finally {
     generatingReport.value = false
   }
@@ -72,8 +75,9 @@ async function approveReport() {
       body: { status: 'approved', notes: 'Approved' },
     })
     await fetchCaseData()
+    success('Report approved — agent and tenant notified')
   } catch (e: any) {
-    alert(e.data?.message || 'Failed to approve report')
+    showError(e.data?.message || 'Failed to approve report')
   }
 }
 
@@ -86,7 +90,7 @@ async function toggleCheck(check: any) {
     })
     await fetchCaseData()
   } catch (e: any) {
-    alert(e.data?.message || 'Failed to update checklist')
+    showError(e.data?.message || 'Failed to update checklist')
   }
 }
 
@@ -214,6 +218,42 @@ async function fetchCaseData() {
   finally { loading.value = false }
 }
 
+// ── "Current action" model — always surface the single next move ──
+const CASE_FLOW = ['pending', 'in_progress', 'field_visit', 'report_building', 'completed']
+const stageIndex = computed(() => CASE_FLOW.indexOf(rawStatus.value))
+const actionBusy = computed(() => statusUpdating.value || generatingReport.value)
+
+interface NextAction {
+  icon: string
+  label: string
+  desc: string
+  cta: { text: string; run: () => void; approve?: boolean } | null
+}
+
+const nextAction = computed<NextAction>(() => {
+  const who = caseData.value.assignee !== '—' ? caseData.value.assignee : 'The field agent'
+  switch (rawStatus.value) {
+    case 'pending':
+      return hasFieldAgent.value
+        ? { icon: 'play_arrow', label: 'Start verification', desc: 'A field agent is assigned. Begin verification to start working the checklist.', cta: { text: 'Start Verification', run: () => handleStatusUpdate('in_progress') } }
+        : { icon: 'person_add', label: 'Assign a field agent', desc: 'This case is new. Assign a field agent to begin verification.', cta: { text: 'Assign Field Agent', run: () => { showReassign.value = true } } }
+    case 'in_progress':
+      return { icon: 'checklist', label: 'Complete the verification checklist', desc: 'Work through the checks below as evidence arrives. Send for a field visit if the address needs physical confirmation.', cta: { text: 'Send for Field Visit', run: () => handleStatusUpdate('field_visit') } }
+    case 'field_visit':
+      return { icon: 'person_pin_circle', label: 'Awaiting field visit report', desc: `${who} is verifying the property on-site. The visit report completes the checklist.`, cta: { text: 'Move to Report Building', run: () => handleStatusUpdate('report_building') } }
+    case 'report_building':
+      return reportExists.value
+        ? { icon: 'rate_review', label: 'Approve the report', desc: 'A report is drafted and all checks are in. Review and approve it to publish to the agent.', cta: { text: 'Approve Report', run: approveReport, approve: true } }
+        : { icon: 'auto_awesome', label: 'Generate the report', desc: 'All checks are complete. Generate the verification report, then approve it to publish.', cta: { text: 'Generate Report', run: generateReport } }
+    case 'completed':
+      return { icon: 'check_circle', label: 'Approved & published', desc: 'The report is approved. The agent and tenant have been notified.', cta: null }
+    case 'rejected':
+      return { icon: 'cancel', label: 'Case rejected', desc: 'This case was rejected. Reopen it to pending if it needs another look.', cta: { text: 'Reopen Case', run: () => handleStatusUpdate('pending') } }
+    default:
+      return { icon: 'pending', label: 'In progress', desc: '', cta: null }
+  }
+})
+
 onMounted(fetchCaseData)
 </script>
 
@@ -230,8 +270,8 @@ onMounted(fetchCaseData)
       <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
         <div class="flex items-center gap-4">
           <h1 class="font-mono text-xl font-bold text-foreground">{{ caseData.id }}</h1>
-          <span class="inline-flex px-2.5 py-0.5 rounded-full text-[11px] font-semibold" :class="[caseData.statusBg, caseData.statusText]">{{ caseData.status }}</span>
-          <span class="inline-flex px-2.5 py-0.5 rounded-full text-[11px] font-semibold" :class="[caseData.priorityBg, caseData.priorityText]">{{ caseData.priority }}</span>
+          <UiStatusPill :status="rawStatus" :label="caseData.status" />
+          <span v-if="caseData.priority && caseData.priority !== '—'" class="inline-flex px-2.5 py-0.5 rounded-full text-[11px] font-semibold" :class="[caseData.priorityBg, caseData.priorityText]">{{ caseData.priority }}</span>
         </div>
         <div class="flex items-center gap-3">
           <button @click="showReassign = true" class="flex items-center gap-2 px-4 py-2.5 border border-border rounded-lg text-[13px] font-sans text-foreground hover:bg-surface transition-colors">
@@ -282,6 +322,62 @@ onMounted(fetchCaseData)
       <div class="flex items-center gap-1.5">
         <span class="material-symbols-rounded text-[16px]">update</span>
         Updated: {{ caseData.updated }}
+      </div>
+    </div>
+
+    <!-- Pipeline strip + Current Action — the "next move" model -->
+    <div class="flex flex-col gap-4">
+      <!-- Pipeline -->
+      <div class="bg-card border border-border rounded-xl px-5 py-4 flex items-center gap-0 overflow-x-auto">
+        <template v-for="(stage, i) in CASE_FLOW" :key="stage">
+          <div class="flex items-center gap-2 flex-shrink-0">
+            <span
+              class="w-6 h-6 rounded-full flex items-center justify-center font-mono text-[11px] font-semibold flex-shrink-0"
+              :class="rawStatus === 'rejected' ? 'bg-st-red-bg text-st-red-text'
+                : i < stageIndex ? 'bg-st-green-bg text-st-green-text'
+                : i === stageIndex ? 'bg-primary text-primary-foreground'
+                : 'bg-surface text-muted-foreground'"
+            >
+              <span v-if="i < stageIndex && rawStatus !== 'rejected'" class="material-symbols-rounded text-[13px]">check</span>
+              <span v-else>{{ i + 1 }}</span>
+            </span>
+            <span
+              class="font-sans text-[12px] whitespace-nowrap"
+              :class="i === stageIndex && rawStatus !== 'rejected' ? 'text-foreground font-semibold' : 'text-muted-foreground'"
+            >{{ SUBMISSION_STATUS_LABELS[stage] || stage }}</span>
+          </div>
+          <span v-if="i < CASE_FLOW.length - 1" class="w-5 h-px bg-border mx-1.5 flex-shrink-0" />
+        </template>
+      </div>
+
+      <!-- Current Action -->
+      <div
+        class="bg-card rounded-xl p-5 flex flex-col sm:flex-row items-start gap-4"
+        :class="rawStatus === 'completed' ? 'border border-st-green-text' : 'border-2 border-primary'"
+      >
+        <div
+          class="w-11 h-11 rounded-lg flex items-center justify-center flex-shrink-0"
+          :class="rawStatus === 'completed' ? 'bg-st-green-bg' : 'bg-[#FF84001F]'"
+        >
+          <span class="material-symbols-rounded text-[24px]" :class="rawStatus === 'completed' ? 'text-st-green-text' : 'text-primary'">{{ nextAction.icon }}</span>
+        </div>
+        <div class="flex-1 min-w-0">
+          <span class="font-mono text-[11px] uppercase tracking-[1.5px] text-muted-foreground">Current action</span>
+          <h2 class="font-mono text-[17px] font-bold text-foreground mt-1">{{ nextAction.label }}</h2>
+          <p v-if="nextAction.desc" class="font-sans text-[13.5px] text-muted-foreground mt-1.5 max-w-[560px]">{{ nextAction.desc }}</p>
+        </div>
+        <button
+          v-if="nextAction.cta"
+          :disabled="actionBusy"
+          class="flex items-center gap-2 px-4 py-2.5 rounded-lg font-sans text-[13px] font-semibold text-white hover:opacity-90 transition-opacity disabled:opacity-50 disabled:cursor-not-allowed flex-shrink-0 w-full sm:w-auto justify-center"
+          :class="nextAction.cta.approve ? '' : 'bg-primary !text-primary-foreground'"
+          :style="nextAction.cta.approve ? 'background: var(--color-st-green-text)' : ''"
+          @click="nextAction.cta.run()"
+        >
+          <span v-if="actionBusy" class="material-symbols-rounded text-[16px] animate-spin">progress_activity</span>
+          <span v-else class="material-symbols-rounded text-[16px]">{{ nextAction.icon }}</span>
+          {{ nextAction.cta.text }}
+        </button>
       </div>
     </div>
 
@@ -397,9 +493,7 @@ onMounted(fetchCaseData)
         <div class="bg-card border border-border rounded-xl overflow-hidden">
           <div class="px-6 py-4 border-b border-border flex items-center justify-between">
             <span class="font-mono text-sm font-semibold text-foreground">Verification Report</span>
-            <span v-if="reportExists" class="inline-flex px-2.5 py-0.5 rounded-full text-[11px] font-semibold" :class="reportStatus === 'approved' ? 'bg-[#DFE6E1] text-[#004D1A]' : reportStatus === 'rejected' ? 'bg-red-50 text-red-600' : 'bg-[#E9E3D8] text-[#804200]'">
-              {{ reportStatus === 'approved' ? 'Approved' : reportStatus === 'rejected' ? 'Rejected' : reportStatus === 'pending_approval' ? 'Pending Approval' : 'Draft' }}
-            </span>
+            <UiStatusPill v-if="reportExists" :status="reportStatus" />
           </div>
           <div class="px-6 py-5">
             <!-- No report yet -->

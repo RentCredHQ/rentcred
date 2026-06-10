@@ -166,8 +166,7 @@ async function handleSubmit() {
           type="button"
           class="w-full py-6 border-2 border-dashed border-border rounded-xl flex flex-col items-center gap-2 hover:border-primary hover:bg-[#FFF8F0] transition-colors"
           :class="{ 'opacity-50 pointer-events-none': uploading }"
-          @click="fileInput?.click()"
-        >
+          @click="fileInput?.click()">
           <span class="material-symbols-rounded text-[28px] text-muted-foreground">add_a_photo</span>
           <span class="font-sans text-sm text-muted-foreground">
             {{ uploading ? `Uploading... ${progress}%` : 'Click to upload visit photos' }}
@@ -187,7 +186,7 @@ async function handleSubmit() {
               type="button"
               class="absolute top-1 right-1 w-6 h-6 rounded-full bg-black/60 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity"
               @click="removePhoto(i)"
-            >
+             aria-label="Close">
               <span class="material-symbols-rounded text-[14px] text-white">close</span>
             </button>
           </div>

@@ -48,8 +48,7 @@ onBeforeUnmount(() => document.removeEventListener('click', onClickOutside))
   <div ref="dropdownRef" :class="['relative', props.width]">
     <button
       class="flex items-center gap-2 px-3 py-2 bg-white border border-[#CBCCC9] rounded-lg text-sm cursor-pointer hover:border-[#111111]/20 transition-colors w-full"
-      @click="open = !open"
-    >
+      @click="open = !open">
       <span v-if="props.icon" class="material-symbols-rounded text-[#666666] text-[18px]">{{ props.icon }}</span>
       <span class="flex-1 text-left">{{ selectedLabel }}</span>
       <span class="material-symbols-rounded text-[#666666] text-[18px]">keyboard_arrow_down</span>

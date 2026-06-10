@@ -130,7 +130,7 @@ onMounted(async () => {
           <div class="flex-1"><span class="font-sans text-[13px] text-foreground">{{ inv.desc }}</span></div>
           <div class="w-[120px]"><span class="font-mono text-sm font-medium text-foreground">{{ inv.amount }}</span></div>
           <div class="w-[100px]">
-            <span class="inline-flex px-2.5 py-1 rounded-full text-[11px] font-medium" :class="[inv.statusBg, inv.statusText]">{{ inv.status }}</span>
+            <UiStatusPill :status="inv.status" :label="inv.status" />
           </div>
           <div class="w-[80px]">
             <span class="material-symbols-rounded text-[18px] text-muted-foreground hover:text-foreground cursor-pointer">download</span>
@@ -156,7 +156,7 @@ onMounted(async () => {
           </div>
           <div class="flex items-center justify-between">
             <span class="font-sans text-[12px] text-muted-foreground">{{ inv.date }} · {{ inv.id }}</span>
-            <span class="inline-flex px-2 py-0.5 rounded-full text-[10px] font-medium" :class="[inv.statusBg, inv.statusText]">{{ inv.status }}</span>
+            <UiStatusPill :status="inv.status" :label="inv.status" />
           </div>
         </div>
       </div>

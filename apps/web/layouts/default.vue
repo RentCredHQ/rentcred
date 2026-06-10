@@ -73,7 +73,7 @@ const navLinks = [
           <!-- Menu Header -->
           <div class="flex items-center justify-between px-5 py-5 border-b border-[#2E2E2E]">
             <UiRentCredLogo :size="22" variant="dark" :show-text="true" :horizontal="true" />
-            <button class="text-white/60 hover:text-white" @click="mobileMenuOpen = false">
+            <button class="text-white/60 hover:text-white" @click="mobileMenuOpen = false" aria-label="Close">
               <span class="material-symbols-rounded text-[20px]">close</span>
             </button>
           </div>

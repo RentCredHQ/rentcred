@@ -63,7 +63,7 @@ watch(() => props.modelValue, async (open) => {
               <h2 class="font-mono text-[16px] font-bold text-foreground">Invoice #{{ invoice.id }}</h2>
               <span class="inline-flex px-2.5 py-1 rounded-full bg-[#DFE6E1] text-[11px] font-semibold text-[#004D1A]">{{ invoice.status }}</span>
             </div>
-            <button @click="close" class="w-8 h-8 flex items-center justify-center rounded-lg bg-[#E7E8E5] hover:bg-border transition-colors">
+            <button @click="close" class="w-8 h-8 flex items-center justify-center rounded-lg bg-[#E7E8E5] hover:bg-border transition-colors" aria-label="Close">
               <span class="material-symbols-rounded text-[18px] text-muted-foreground">close</span>
             </button>
           </div>

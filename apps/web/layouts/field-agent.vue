@@ -91,11 +91,11 @@ watch(() => route.path, () => {
     <!-- Mobile Top Nav -->
     <div class="lg:hidden fixed top-0 left-0 right-0 z-50 bg-background border-b border-border">
       <div class="flex items-center justify-between px-5 h-14">
-        <button @click="mobileMenuOpen = !mobileMenuOpen" class="text-foreground">
+        <button @click="mobileMenuOpen = !mobileMenuOpen" class="text-foreground" aria-label="Open menu">
           <span class="material-symbols-rounded text-[24px]">menu</span>
         </button>
         <span class="font-mono text-lg font-bold text-primary">RentCred</span>
-        <button class="flex items-center justify-center w-10 h-10 rounded-full border border-border bg-card">
+        <button class="flex items-center justify-center w-10 h-10 rounded-full border border-border bg-card" aria-label="Notifications">
           <span class="material-symbols-rounded text-[20px] text-muted-foreground">notifications</span>
         </button>
       </div>
@@ -110,7 +110,7 @@ watch(() => route.path, () => {
         <aside v-if="mobileMenuOpen" class="lg:hidden fixed top-0 left-0 bottom-0 w-[280px] bg-[#E7E8E5] z-50 flex flex-col overflow-y-auto">
           <div class="flex items-center justify-between px-5 py-5 border-b border-border">
             <UiRentCredLogo :size="24" variant="light" :show-text="true" :horizontal="true" />
-            <button @click="mobileMenuOpen = false" class="text-muted-foreground">
+            <button @click="mobileMenuOpen = false" class="text-muted-foreground" aria-label="Close">
               <span class="material-symbols-rounded text-[20px]">close</span>
             </button>
           </div>
@@ -164,10 +164,10 @@ watch(() => route.path, () => {
           <span class="font-sans text-[13px] text-muted-foreground">{{ user?.email || '' }} &bull; Field Agent</span>
         </div>
         <div class="flex items-center gap-3">
-          <button class="flex items-center justify-center w-10 h-10 rounded-lg border border-border hover:bg-surface transition-colors">
+          <button class="flex items-center justify-center w-10 h-10 rounded-lg border border-border hover:bg-surface transition-colors" aria-label="Notifications">
             <span class="material-symbols-rounded text-[20px] text-muted-foreground">notifications</span>
           </button>
-          <button @click="authStore.logout()" class="flex items-center justify-center w-10 h-10 rounded-lg border border-border hover:bg-surface transition-colors" title="Logout">
+          <button @click="authStore.logout()" class="flex items-center justify-center w-10 h-10 rounded-lg border border-border hover:bg-surface transition-colors" title="Logout" aria-label="Sign out">
             <span class="material-symbols-rounded text-[20px] text-muted-foreground">logout</span>
           </button>
         </div>

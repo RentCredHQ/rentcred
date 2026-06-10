@@ -44,6 +44,11 @@ const packages = [
   { id: 'premium', name: 'Premium Check', price: '₦25,000', checks: 'Full verification + Field visit', sla: '5 business days' },
 ]
 
+const wizardSteps = ['Tenant Info', 'Property', 'Package', 'Review']
+const authStore = useAuthStore()
+const creditBalance = computed(() => authStore.user?.creditBalance ?? 0)
+const selectedPrice = computed(() => packages.find(p => p.id === selectedPackage.value)?.price || '₦12,000')
+
 // LGA filtering based on selected state
 const availableLgas = computed(() => {
   if (!step2.state) return []
@@ -114,7 +119,6 @@ const reviewRows = computed(() => [
   { label: 'Photos', value: step2.propertyImages.length > 0 ? `${step2.propertyImages.length} photo${step2.propertyImages.length !== 1 ? 's' : ''} uploaded` : 'None' },
   { label: 'Package', value: packages.find(p => p.id === selectedPackage.value)?.name || 'Standard Check' },
   { label: 'SLA', value: packages.find(p => p.id === selectedPackage.value)?.sla || '60 hours' },
-  { label: 'Payment', value: useBundleCredit.value ? 'Bundle Credit' : packages.find(p => p.id === selectedPackage.value)?.price || '₦12,000', sub: useBundleCredit.value ? '1 credit will be deducted' : undefined },
 ])
 
 function nextStep() {
@@ -214,19 +218,33 @@ async function handleSubmit() {
     <!-- Form Steps -->
     <div v-else class="flex flex-col items-center">
       <!-- Step Indicator -->
-      <div class="w-full max-w-[600px] mb-6">
-        <div class="flex items-center justify-between mb-2">
-          <div class="flex items-center gap-1.5">
-            <span class="font-sans text-[13px] text-muted-foreground">Dashboard</span>
-            <span class="font-sans text-[13px] text-muted-foreground">/</span>
-            <span class="font-sans text-[13px] font-medium text-foreground">Submit Tenant</span>
-          </div>
-          <div class="flex items-center gap-2">
-            <div class="flex gap-1">
-              <div v-for="i in 4" :key="i" class="w-2 h-2 rounded-full" :class="i <= currentStep ? 'bg-primary' : 'bg-border'" />
+      <div class="w-full max-w-[600px] mb-6 flex flex-col gap-4">
+        <div class="flex items-center gap-1.5">
+          <NuxtLink to="/dashboard" class="font-sans text-[13px] text-muted-foreground hover:text-foreground transition-colors">Dashboard</NuxtLink>
+          <span class="font-sans text-[13px] text-muted-foreground">/</span>
+          <span class="font-sans text-[13px] font-medium text-foreground">Submit Tenant</span>
+        </div>
+        <div class="flex items-center">
+          <template v-for="(label, i) in wizardSteps" :key="label">
+            <div class="flex items-center gap-2">
+              <span
+                class="w-7 h-7 rounded-full flex items-center justify-center font-mono text-[12px] font-semibold border transition-colors flex-shrink-0"
+                :class="currentStep === i + 1
+                  ? 'bg-primary border-primary text-primary-foreground'
+                  : currentStep > i + 1
+                    ? 'bg-st-green-bg border-transparent text-st-green-text'
+                    : 'bg-card border-border text-muted-foreground'"
+              >
+                <span v-if="currentStep > i + 1" class="material-symbols-rounded text-[15px]">check</span>
+                <span v-else>{{ i + 1 }}</span>
+              </span>
+              <span
+                class="font-sans text-[13px] whitespace-nowrap hidden sm:inline"
+                :class="currentStep === i + 1 ? 'text-foreground font-semibold' : 'text-muted-foreground'"
+              >{{ label }}</span>
             </div>
-            <span class="font-sans text-[13px] text-muted-foreground">Step {{ currentStep }} of 4</span>
-          </div>
+            <span v-if="i < wizardSteps.length - 1" class="flex-1 h-px bg-border mx-2 sm:mx-3" />
+          </template>
         </div>
       </div>
 
@@ -353,8 +371,7 @@ async function handleSubmit() {
               type="button"
               class="w-full py-6 border-2 border-dashed border-border rounded-lg flex flex-col items-center gap-2 hover:border-primary hover:bg-[#FFF8F0] transition-colors"
               :class="{ 'opacity-50 pointer-events-none': uploading }"
-              @click="fileInput?.click()"
-            >
+              @click="fileInput?.click()">
               <span class="material-symbols-rounded text-[28px] text-muted-foreground">add_a_photo</span>
               <span class="font-sans text-sm text-muted-foreground">
                 {{ uploading ? `Uploading... ${progress}%` : 'Click to upload property photos' }}
@@ -377,7 +394,7 @@ async function handleSubmit() {
                   type="button"
                   class="absolute top-1 right-1 w-6 h-6 rounded-full bg-black/60 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity"
                   @click="removeImage(i)"
-                >
+                 aria-label="Close">
                   <span class="material-symbols-rounded text-[14px] text-white">close</span>
                 </button>
               </div>
@@ -441,7 +458,7 @@ async function handleSubmit() {
             </button>
             <span class="font-sans text-sm font-medium text-foreground">Use bundle credit</span>
           </div>
-          <span class="font-sans text-[13px] text-muted-foreground">{{ useAuthStore().user?.creditBalance ?? 0 }} credits remaining</span>
+          <span class="font-sans text-[13px] text-muted-foreground">{{ creditBalance }} credits remaining</span>
         </div>
 
         <div class="flex flex-col-reverse sm:flex-row items-stretch sm:items-center sm:justify-between gap-3 pt-2">
@@ -477,6 +494,29 @@ async function handleSubmit() {
           </div>
         </div>
 
+        <!-- Cost confirmation — the credit-spend moment -->
+        <div
+          class="rounded-lg border p-4"
+          :class="useBundleCredit && creditBalance < 1
+            ? 'border-st-amber-text/40 bg-st-amber-bg'
+            : useBundleCredit
+              ? 'border-[#FF840059] bg-[#FF84000F]'
+              : 'border-border bg-background'"
+        >
+          <div class="flex items-center justify-between">
+            <span class="font-sans text-sm font-semibold text-foreground">Payment</span>
+            <span class="font-mono text-base font-bold text-foreground">{{ useBundleCredit ? '1 credit' : selectedPrice }}</span>
+          </div>
+          <p
+            class="font-sans text-[12.5px] mt-1"
+            :class="useBundleCredit && creditBalance < 1 ? 'text-st-amber-text' : 'text-muted-foreground'"
+          >
+            <template v-if="useBundleCredit && creditBalance < 1">No bundle credits available — purchase credits to submit, or turn off bundle credit to pay per check.</template>
+            <template v-else-if="useBundleCredit">1 bundle credit will be deducted when you submit. {{ Math.max(0, creditBalance - 1) }} will remain.</template>
+            <template v-else>You'll be redirected to Paystack to complete payment for this check.</template>
+          </p>
+        </div>
+
         <!-- Info Note -->
         <div class="flex items-start gap-2.5 bg-[#DFDFE6] p-3.5 rounded">
           <span class="material-symbols-rounded text-[18px] text-[#000066] mt-0.5">info</span>
@@ -492,12 +532,11 @@ async function handleSubmit() {
         <div class="flex flex-col-reverse sm:flex-row items-stretch sm:items-center sm:justify-between gap-3 pt-2">
           <button class="px-6 py-2.5 border border-border font-sans text-sm font-medium text-foreground hover:bg-surface transition-colors" @click="prevStep">Back</button>
           <button
-            class="flex items-center gap-2 px-6 py-2.5 bg-primary font-sans text-sm font-medium text-foreground hover:opacity-90 transition-opacity disabled:opacity-50"
-            :disabled="isLoading"
-            @click="handleSubmit"
-          >
+            class="flex items-center gap-2 px-6 py-2.5 bg-primary font-sans text-sm font-medium text-foreground hover:opacity-90 transition-opacity disabled:opacity-50 disabled:cursor-not-allowed"
+            :disabled="isLoading || (useBundleCredit && creditBalance < 1)"
+            @click="handleSubmit">
             <span class="material-symbols-rounded text-[16px]">send</span>
-            {{ isLoading ? 'Submitting...' : 'Submit & Send Invite' }}
+            {{ isLoading ? 'Submitting...' : useBundleCredit ? 'Submit — spend 1 credit' : 'Submit & Pay' }}
           </button>
         </div>
       </div>

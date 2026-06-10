@@ -158,7 +158,7 @@ onMounted(async () => {
           <div class="w-[100px]"><span class="font-mono text-sm font-medium text-foreground">{{ tx.amount }}</span></div>
           <div class="w-[120px]"><span class="font-sans text-[13px] text-muted-foreground">{{ tx.method }}</span></div>
           <div class="w-[100px]">
-            <span class="inline-flex px-2.5 py-1 rounded-full text-[11px] font-medium" :class="[tx.statusBg, tx.statusText]">{{ tx.status }}</span>
+            <UiStatusPill :status="tx.status" :label="tx.status" />
           </div>
         </div>
       </div>
@@ -181,7 +181,7 @@ onMounted(async () => {
           </div>
           <div class="flex items-center justify-between">
             <span class="font-sans text-[12px] text-muted-foreground">{{ tx.date }} · {{ tx.method }}</span>
-            <span class="inline-flex px-2 py-0.5 rounded-full text-[10px] font-medium" :class="[tx.statusBg, tx.statusText]">{{ tx.status }}</span>
+            <UiStatusPill :status="tx.status" :label="tx.status" />
           </div>
         </div>
       </div>

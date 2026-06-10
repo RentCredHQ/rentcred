@@ -161,7 +161,7 @@ const { searchQuery, activeFilter, filtered, resultCount } = useFilter({
           <div class="w-[150px] flex-shrink-0"><span class="font-sans text-[13px] text-foreground truncate block">{{ c.tenant }}</span></div>
           <div class="w-[140px] flex-shrink-0"><span class="font-sans text-[13px] text-foreground truncate block">{{ c.agent }}</span></div>
           <div class="w-[120px] flex-shrink-0">
-            <span class="inline-flex px-2.5 py-0.5 rounded-full text-[11px] font-semibold whitespace-nowrap" :class="[c.statusBg, c.statusText]">{{ c.status }}</span>
+            <UiStatusPill :status="c.rawStatus" :label="c.status" />
           </div>
           <div class="w-[130px] flex-shrink-0"><span class="font-sans text-[13px] text-foreground truncate block">{{ c.assigned }}</span></div>
           <div class="w-[90px] flex-shrink-0"><span class="font-sans text-[13px] text-muted-foreground">{{ c.updated }}</span></div>
@@ -188,7 +188,7 @@ const { searchQuery, activeFilter, filtered, resultCount } = useFilter({
             <div class="flex items-center gap-2">
               <span class="font-mono text-[13px] font-medium text-foreground">{{ c.id.slice(0, 10) }}…</span>
             </div>
-            <span class="inline-flex px-2 py-0.5 rounded-full text-[10px] font-semibold" :class="[c.statusBg, c.statusText]">{{ c.status }}</span>
+            <UiStatusPill :status="c.rawStatus" :label="c.status" />
           </div>
           <span class="font-sans text-sm text-foreground block mb-1">{{ c.tenant }}</span>
           <div class="flex items-center gap-3 text-[12px] text-muted-foreground font-sans">

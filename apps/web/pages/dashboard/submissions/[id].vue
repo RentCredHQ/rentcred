@@ -9,6 +9,7 @@ useSeoMeta({ title: `Case ${caseId.value} — RentCred` })
 
 const { getSubmission, updateSubmissionStatus } = useSubmissions()
 const { shareReport } = useReports()
+const { success, error: showError, info } = useToast()
 
 const loading = ref(true)
 const hasReport = ref(false)
@@ -81,9 +82,10 @@ async function handleShareReport() {
   sharingReport.value = true
   try {
     const res = await shareReport(caseId.value)
-    alert(`Share URL: ${res.shareUrl}`)
+    try { await navigator.clipboard.writeText(res.shareUrl) } catch { /* clipboard may be blocked */ }
+    success('Report link copied — ready to share')
   } catch (e: any) {
-    alert(e.data?.message || 'Failed to share report')
+    showError(e.data?.message || 'Failed to share report')
   } finally {
     sharingReport.value = false
   }
@@ -91,16 +93,17 @@ async function handleShareReport() {
 
 function handleResendInvite() {
   // TODO: Wire to email service when available
-  alert('Invite resend is not available yet — email service required')
+  info('Invite resend is not available yet — email service required')
 }
 
 async function handleCancelCase() {
   if (!confirm('Are you sure you want to cancel this case? This action cannot be undone.')) return
   try {
     await updateSubmissionStatus(caseId.value, 'rejected')
+    success('Case cancelled')
     navigateTo('/dashboard/submissions')
   } catch (e: any) {
-    alert(e.data?.message || 'Failed to cancel case')
+    showError(e.data?.message || 'Failed to cancel case')
   }
 }
 
@@ -161,7 +164,7 @@ onMounted(async () => {
     <div class="flex flex-col gap-1">
       <div class="flex items-center gap-3 flex-wrap">
         <h1 class="font-mono text-xl lg:text-2xl font-semibold text-foreground" style="letter-spacing: -0.5px">{{ caseData.name }}</h1>
-        <span class="inline-flex px-2.5 py-1 rounded-full text-[12px] font-medium" :class="[caseData.statusBg, caseData.statusText]">{{ caseData.status }}</span>
+        <UiStatusPill :status="caseData.status" :label="caseData.status" />
       </div>
       <span class="font-mono text-[13px] text-muted-foreground">{{ caseData.caseId }}  ·  {{ caseData.package }} Package</span>
     </div>
@@ -268,8 +271,7 @@ onMounted(async () => {
           <button
             @click="handleShareReport"
             :disabled="!hasReport || sharingReport"
-            class="flex items-center justify-center gap-2 w-full py-2.5 bg-primary text-foreground font-sans text-sm font-semibold hover:opacity-90 transition-opacity disabled:opacity-40 disabled:cursor-not-allowed"
-          >
+            class="flex items-center justify-center gap-2 w-full py-2.5 bg-primary text-foreground font-sans text-sm font-semibold hover:opacity-90 transition-opacity disabled:opacity-40 disabled:cursor-not-allowed">
             <span class="material-symbols-rounded text-[18px]">share</span>
             {{ sharingReport ? 'Sharing...' : 'Share Report' }}
           </button>

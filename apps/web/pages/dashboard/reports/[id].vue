@@ -6,6 +6,7 @@ const route = useRoute()
 const caseId = computed(() => route.params.id as string)
 
 const { getReport, shareReport } = useReports()
+const { success, error: showError, info } = useToast()
 
 const loading = ref(true)
 const sharingReport = ref(false)
@@ -14,9 +15,10 @@ async function handleShareReport() {
   sharingReport.value = true
   try {
     const res = await shareReport(caseId.value)
-    alert(`Share URL: ${res.shareUrl}`)
+    try { await navigator.clipboard.writeText(res.shareUrl) } catch { /* clipboard may be blocked */ }
+    success('Report link copied — ready to share')
   } catch (e: any) {
-    alert(e.data?.message || 'Failed to share report')
+    showError(e.data?.message || 'Failed to share report')
   } finally {
     sharingReport.value = false
   }
@@ -24,7 +26,7 @@ async function handleShareReport() {
 
 function handleDownload() {
   // TODO: Implement PDF download when backend supports it
-  alert('PDF download coming soon')
+  info('PDF download coming soon')
 }
 
 function getReportStatusLabel(status: string) {

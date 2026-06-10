@@ -85,7 +85,7 @@ async function handleSuspendToggle() {
                 <span class="font-sans text-[12px] text-muted-foreground">{{ agent?.phone ?? '' }}</span>
               </div>
             </div>
-            <button @click="show = false" class="text-muted-foreground hover:text-foreground">
+            <button @click="show = false" class="text-muted-foreground hover:text-foreground" aria-label="Close">
               <span class="material-symbols-rounded text-[20px]">close</span>
             </button>
           </div>
@@ -154,7 +154,7 @@ async function handleSuspendToggle() {
                 <div v-for="c in recentCases" :key="c.id" class="flex items-center justify-between py-1.5">
                   <span class="font-mono text-[12px] text-foreground">{{ c.id }}</span>
                   <span class="font-sans text-[12px] text-muted-foreground">{{ c.tenant }}</span>
-                  <span class="inline-flex px-2 py-0.5 rounded-full text-[10px] font-semibold" :class="[c.statusBg, c.statusText]">{{ c.status }}</span>
+                  <UiStatusPill :status="c.status" :label="c.status" />
                 </div>
                 <div v-if="recentCases.length === 0" class="py-2 text-center">
                   <span class="font-sans text-[12px] text-muted-foreground">No recent cases</span>

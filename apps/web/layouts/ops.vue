@@ -107,11 +107,11 @@ watch(() => route.path, () => {
     <!-- Mobile Top Nav -->
     <div class="lg:hidden fixed top-0 left-0 right-0 z-50 bg-background border-b border-border">
       <div class="flex items-center justify-between px-5 h-14">
-        <button @click="mobileMenuOpen = !mobileMenuOpen" class="text-foreground">
+        <button @click="mobileMenuOpen = !mobileMenuOpen" class="text-foreground" aria-label="Open menu">
           <span class="material-symbols-rounded text-[24px]">menu</span>
         </button>
         <span class="font-mono text-lg font-bold text-primary">RentCred</span>
-        <button class="text-foreground">
+        <button class="text-foreground" aria-label="Notifications">
           <span class="material-symbols-rounded text-[24px]">notifications</span>
         </button>
       </div>
@@ -127,7 +127,7 @@ watch(() => route.path, () => {
           <!-- Logo -->
           <div class="flex items-center justify-between px-5 py-5 border-b border-border">
             <UiRentCredLogo :size="24" variant="light" :show-text="true" :horizontal="true" />
-            <button @click="mobileMenuOpen = false" class="text-muted-foreground">
+            <button @click="mobileMenuOpen = false" class="text-muted-foreground" aria-label="Close">
               <span class="material-symbols-rounded text-[20px]">close</span>
             </button>
           </div>
@@ -186,7 +186,7 @@ watch(() => route.path, () => {
         </div>
         <div class="flex items-center gap-3">
           <div class="relative">
-            <button @click="notificationsOpen = !notificationsOpen" class="flex items-center justify-center w-10 h-10 rounded-lg border border-border hover:bg-surface transition-colors">
+            <button @click="notificationsOpen = !notificationsOpen" class="flex items-center justify-center w-10 h-10 rounded-lg border border-border hover:bg-surface transition-colors" aria-label="Notifications">
               <span class="material-symbols-rounded text-[20px] text-muted-foreground">notifications</span>
             </button>
             <OpsNotificationDropdown v-model="notificationsOpen" />

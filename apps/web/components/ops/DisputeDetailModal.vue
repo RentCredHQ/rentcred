@@ -62,7 +62,7 @@ watch(show, (val) => {
                 <span class="font-sans text-[12px] text-muted-foreground">Filed {{ new Date(dispute.createdAt).toLocaleDateString('en-NG', { month: 'short', day: 'numeric', year: 'numeric' }) }}</span>
               </div>
             </div>
-            <button @click="show = false" class="text-muted-foreground hover:text-foreground">
+            <button @click="show = false" class="text-muted-foreground hover:text-foreground" aria-label="Close">
               <span class="material-symbols-rounded text-[20px]">close</span>
             </button>
           </div>

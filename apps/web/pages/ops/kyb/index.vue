@@ -18,14 +18,6 @@ const confirmAction = ref<'approve' | 'reject'>('approve')
 const selectedConfirmId = ref<string | null>(null)
 const confirmLoading = ref(false)
 
-const statusStyleMap: Record<string, { bg: string; text: string }> = {
-  pending: { bg: 'bg-[#E9E3D8]', text: 'text-[#804200]' },
-  submitted: { bg: 'bg-[#E9E3D8]', text: 'text-[#804200]' },
-  under_review: { bg: 'bg-[#E9E3D8]', text: 'text-[#804200]' },
-  approved: { bg: 'bg-[#DFE6E1]', text: 'text-[#004D1A]' },
-  rejected: { bg: 'bg-[#E5DCDA]', text: 'text-[#8C1C00]' },
-}
-
 function openReview(id: string) {
   selectedAppId.value = id
   showReview.value = true
@@ -79,16 +71,14 @@ async function fetchApplications(page = 1) {
 
     applications.value = items.map((app: any) => {
       const label = statusLabelMap[app.status] ?? app.status
-      const style = statusStyleMap[app.status] ?? { bg: 'bg-[#E9E3D8]', text: 'text-[#804200]' }
       return {
         id: app.id,
         business: app.companyName ?? app.agentProfile?.companyName ?? '',
         email: app.agentProfile?.user?.email ?? '',
         agent: app.agentProfile?.user?.name ?? '',
         rc: app.rcNumber ?? '',
+        rawStatus: app.status,
         status: label,
-        statusBg: style.bg,
-        statusText: style.text,
         date: app.createdAt ? new Date(app.createdAt).toLocaleDateString('en-NG', { month: 'short', day: 'numeric' }) : '—',
         canAction: ['pending', 'submitted', 'under_review'].includes(app.status),
       }
@@ -186,7 +176,7 @@ const { searchQuery, activeFilter, filtered, resultCount } = useFilter({
           <div class="w-[130px]"><span class="font-sans text-[13px] text-foreground">{{ app.agent }}</span></div>
           <div class="w-[110px]"><span class="font-mono text-[12px] text-foreground">{{ app.rc }}</span></div>
           <div class="w-[100px]">
-            <span class="inline-flex px-2.5 py-0.5 rounded-full text-[11px] font-semibold" :class="[app.statusBg, app.statusText]">{{ app.status }}</span>
+            <UiStatusPill :status="app.rawStatus" :label="app.status" />
           </div>
           <div class="w-[100px]"><span class="font-sans text-[13px] text-foreground">{{ app.date }}</span></div>
           <div class="flex-1 flex items-center gap-2">
@@ -213,7 +203,7 @@ const { searchQuery, activeFilter, filtered, resultCount } = useFilter({
         <div v-for="app in filtered" :key="app.rc" class="px-4 py-3.5 border-b border-border last:border-0">
           <div class="flex items-center justify-between mb-1.5">
             <span class="font-sans text-sm font-medium text-foreground">{{ app.business }}</span>
-            <span class="inline-flex px-2 py-0.5 rounded-full text-[10px] font-semibold" :class="[app.statusBg, app.statusText]">{{ app.status }}</span>
+            <UiStatusPill :status="app.rawStatus" :label="app.status" />
           </div>
           <div class="flex items-center gap-3 text-[12px] text-muted-foreground font-sans">
             <span>{{ app.agent }}</span>

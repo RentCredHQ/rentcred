@@ -59,7 +59,7 @@ async function submit() {
           <!-- Header -->
           <div class="flex items-center justify-between px-5 py-4 border-b border-border flex-shrink-0">
             <h2 class="font-mono text-[16px] font-bold text-foreground">File a Dispute</h2>
-            <button @click="close" class="w-8 h-8 flex items-center justify-center rounded-lg bg-[#E7E8E5] hover:bg-border transition-colors">
+            <button @click="close" class="w-8 h-8 flex items-center justify-center rounded-lg bg-[#E7E8E5] hover:bg-border transition-colors" aria-label="Close">
               <span class="material-symbols-rounded text-[18px] text-muted-foreground">close</span>
             </button>
           </div>

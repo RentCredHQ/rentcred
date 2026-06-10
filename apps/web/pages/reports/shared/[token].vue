@@ -29,6 +29,18 @@ function formatNaira(amount: number) {
 function formatDate(dateStr: string) {
   return new Date(dateStr).toLocaleDateString('en-NG', { day: 'numeric', month: 'long', year: 'numeric' })
 }
+
+// Verdict band — one segment per check, green when verified, amber when not.
+const VERDICT_KEYS = [
+  'identityVerified', 'employmentVerified', 'referencesVerified',
+  'addressVerified', 'criminalCheckDone', 'fieldVisitCompleted',
+]
+const verdictBand = computed<string[]>(() => {
+  const v = report.value?.content?.verification
+  if (!v) return []
+  return VERDICT_KEYS.filter(k => k in v).map(k => (v[k] ? 'green' : 'amber'))
+})
+const verifiedCount = computed(() => verdictBand.value.filter((h: string) => h === 'green').length)
 </script>
 
 <template>
@@ -46,12 +58,21 @@ function formatDate(dateStr: string) {
       </div>
     </section>
 
-    <!-- Loading -->
+    <!-- Loading — skeleton mirroring the report shape -->
     <section v-if="loading" class="bg-background">
-      <div class="max-w-[1440px] mx-auto px-5 sm:px-8 lg:px-20 py-16 lg:py-28 flex justify-center">
-        <div class="flex flex-col items-center gap-3">
-          <span class="material-symbols-rounded text-[40px] text-muted-foreground animate-spin">progress_activity</span>
-          <p class="font-sans text-sm text-muted-foreground">Loading report...</p>
+      <div class="max-w-[1440px] mx-auto px-5 sm:px-8 lg:px-20 py-16 lg:py-28">
+        <div class="max-w-[900px] mx-auto flex flex-col gap-6">
+          <UiSkeleton h="60px" rounded="8px" />
+          <UiSkeleton h="8px" rounded="999px" />
+          <div class="grid grid-cols-2 sm:grid-cols-4 gap-4">
+            <UiSkeleton v-for="i in 4" :key="i" h="44px" rounded="8px" />
+          </div>
+          <div class="border border-border rounded-lg p-5 flex flex-col gap-4">
+            <UiSkeleton w="40%" h="16px" />
+            <div class="grid grid-cols-2 sm:grid-cols-3 gap-3">
+              <UiSkeleton v-for="i in 6" :key="i" h="20px" />
+            </div>
+          </div>
         </div>
       </div>
     </section>
@@ -82,6 +103,21 @@ function formatDate(dateStr: string) {
               <p class="font-mono text-sm font-bold text-[#004D1A]">Verification Complete</p>
               <p class="font-sans text-[13px] text-[#004D1A]">This report was reviewed and approved by RentCred Operations</p>
             </div>
+          </div>
+
+          <!-- Verdict band — at-a-glance check outcomes -->
+          <div v-if="verdictBand.length" class="flex flex-col gap-2">
+            <div class="flex h-2 overflow-hidden rounded-full">
+              <span
+                v-for="(hue, i) in verdictBand"
+                :key="i"
+                class="flex-1"
+                :style="{ background: `var(--color-st-${hue}-vivid)` }"
+              />
+            </div>
+            <span class="font-mono text-[11px] text-muted-foreground tracking-wider uppercase">
+              {{ verifiedCount }} of {{ verdictBand.length }} checks fully verified
+            </span>
           </div>
 
           <!-- Property Details -->
@@ -149,7 +185,7 @@ function formatDate(dateStr: string) {
                     'Criminal Check': report.content.verification.criminalCheckDone,
                     'Field Visit': report.content.verification.fieldVisitCompleted,
                   }" :key="label" class="flex items-center gap-1.5">
-                    <span class="material-symbols-rounded text-[16px]" :class="checked ? 'text-[#004D1A]' : 'text-muted-foreground'">
+                    <span class="material-symbols-rounded text-[16px]" :class="checked ? 'text-st-green-text' : 'text-muted-foreground'">
                       {{ checked ? 'check_circle' : 'radio_button_unchecked' }}
                     </span>
                     <span class="font-sans text-[13px]" :class="checked ? 'text-foreground' : 'text-muted-foreground'">{{ label }}</span>
@@ -171,16 +207,10 @@ function formatDate(dateStr: string) {
                 </div>
                 <div v-if="report.content.riskLevel" class="flex items-center gap-2">
                   <span class="font-mono text-[11px] font-semibold text-muted-foreground uppercase tracking-wider">Risk Level</span>
-                  <span
-                    class="px-2.5 py-0.5 text-[11px] font-semibold font-mono"
-                    :class="{
-                      'bg-[#DFE6E1] text-[#004D1A]': report.content.riskLevel === 'low',
-                      'bg-[#FFF3CD] text-[#856404]': report.content.riskLevel === 'medium',
-                      'bg-[#F8D7DA] text-[#721C24]': report.content.riskLevel === 'high',
-                    }"
-                  >
-                    {{ report.content.riskLevel?.toUpperCase() }}
-                  </span>
+                  <UiStatusPill
+                    :hue="report.content.riskLevel === 'low' ? 'green' : report.content.riskLevel === 'high' ? 'red' : 'amber'"
+                    :label="`${report.content.riskLevel?.toUpperCase()} RISK`"
+                  />
                 </div>
               </div>
               <p v-else class="font-sans text-[14px] text-foreground leading-relaxed">{{ report.content }}</p>

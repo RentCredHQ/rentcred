@@ -158,7 +158,7 @@ const { searchQuery, activeFilter, filtered, resultCount } = useFilter({
             <span class="inline-flex px-2.5 py-0.5 rounded-full text-[11px] font-semibold" :class="[rpt.riskBg, rpt.riskText]">{{ rpt.risk }}</span>
           </div>
           <div class="w-[120px]">
-            <span class="inline-flex px-2.5 py-0.5 rounded-full text-[11px] font-semibold" :class="[rpt.statusBg, rpt.statusText]">{{ rpt.status }}</span>
+            <UiStatusPill :status="rpt.status" :label="rpt.status" />
           </div>
           <div class="w-[80px]"><span class="font-sans text-[13px] text-foreground">{{ rpt.date }}</span></div>
           <div class="flex-1">
@@ -184,7 +184,7 @@ const { searchQuery, activeFilter, filtered, resultCount } = useFilter({
               <span class="font-mono text-[13px] font-medium text-foreground">{{ rpt.id.slice(0, 10) }}…</span>
               <span class="inline-flex px-2 py-0.5 rounded-full text-[10px] font-semibold" :class="[rpt.riskBg, rpt.riskText]">{{ rpt.risk }}</span>
             </div>
-            <span class="inline-flex px-2 py-0.5 rounded-full text-[10px] font-semibold" :class="[rpt.statusBg, rpt.statusText]">{{ rpt.status }}</span>
+            <UiStatusPill :status="rpt.status" :label="rpt.status" />
           </div>
           <span class="font-sans text-sm text-foreground block mb-1">{{ rpt.tenant }}</span>
           <div class="flex items-center gap-3 text-[12px] text-muted-foreground font-sans">

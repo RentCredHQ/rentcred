@@ -71,7 +71,7 @@ watch(() => show.value, async (open) => {
               <h3 class="font-mono text-base font-semibold text-foreground">{{ txn.id ? txn.id.slice(0, 12) : 'Transaction' }}</h3>
               <span class="font-sans text-[12px] text-muted-foreground">{{ txn.date }}</span>
             </div>
-            <button @click="show = false" class="text-muted-foreground hover:text-foreground">
+            <button @click="show = false" class="text-muted-foreground hover:text-foreground" aria-label="Close">
               <span class="material-symbols-rounded text-[20px]">close</span>
             </button>
           </div>
@@ -90,7 +90,7 @@ watch(() => show.value, async (open) => {
             <!-- Amount & Status -->
             <div class="flex items-center justify-between">
               <span class="font-mono text-2xl font-bold text-foreground">{{ txn.amount }}</span>
-              <span class="inline-flex px-2.5 py-0.5 rounded-full text-[11px] font-semibold" :class="[txn.statusBg, txn.statusText]">{{ txn.status }}</span>
+              <UiStatusPill :status="txn.status" :label="txn.status" />
             </div>
 
             <!-- Details -->
