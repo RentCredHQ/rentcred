@@ -8,10 +8,10 @@ function close() {
 
 const notifications = ref([
   { id: 1, title: 'New KYB application', desc: 'Nwosu Properties Ltd submitted a KYB application for review.', time: '5 minutes ago', read: false, dot: 'bg-primary' },
-  { id: 2, title: 'Case escalated', desc: 'Case RC-1037 has been escalated due to overdue field visit.', time: '30 minutes ago', read: false, dot: 'bg-[#8C1C00]' },
-  { id: 3, title: 'Report submitted', desc: 'Chidi Nwosu submitted verification report RPT-0089 for review.', time: '1 hour ago', read: false, dot: 'bg-[#004D1A]' },
-  { id: 4, title: 'Agent suspended', desc: 'Tunde Bakare has been automatically suspended after 3 failed checks.', time: '3 hours ago', read: true, dot: 'bg-[#804200]' },
-  { id: 5, title: 'Payment processed', desc: 'Commission payment of ₦45,000 to Premier Realty completed.', time: '5 hours ago', read: true, dot: 'bg-[#004D1A]' },
+  { id: 2, title: 'Case escalated', desc: 'Case RC-1037 has been escalated due to overdue field visit.', time: '30 minutes ago', read: false, dot: 'bg-st-red-text' },
+  { id: 3, title: 'Report submitted', desc: 'Chidi Nwosu submitted verification report RPT-0089 for review.', time: '1 hour ago', read: false, dot: 'bg-st-green-text' },
+  { id: 4, title: 'Agent suspended', desc: 'Tunde Bakare has been automatically suspended after 3 failed checks.', time: '3 hours ago', read: true, dot: 'bg-st-amber-text' },
+  { id: 5, title: 'Payment processed', desc: 'Commission payment of ₦45,000 to Premier Realty completed.', time: '5 hours ago', read: true, dot: 'bg-st-green-text' },
 ])
 
 function markAllRead() {

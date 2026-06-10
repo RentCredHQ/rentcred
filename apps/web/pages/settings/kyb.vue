@@ -92,11 +92,11 @@ async function handleSubmit() {
 
 function getStatusInfo(status: string) {
   const map: Record<string, { label: string; bg: string; text: string }> = {
-    pending: { label: 'Pending', bg: 'bg-[#E9E3D8]', text: 'text-[#804200]' },
-    submitted: { label: 'Under Review', bg: 'bg-[#DFDFE6]', text: 'text-[#000066]' },
-    under_review: { label: 'Under Review', bg: 'bg-[#DFDFE6]', text: 'text-[#000066]' },
-    approved: { label: 'Approved', bg: 'bg-[#DFE6E1]', text: 'text-[#004D1A]' },
-    rejected: { label: 'Rejected', bg: 'bg-[#E5DCDA]', text: 'text-[#8C1C00]' },
+    pending: { label: 'Pending', bg: 'bg-st-amber-bg', text: 'text-st-amber-text' },
+    submitted: { label: 'Under Review', bg: 'bg-st-blue-bg', text: 'text-st-blue-text' },
+    under_review: { label: 'Under Review', bg: 'bg-st-blue-bg', text: 'text-st-blue-text' },
+    approved: { label: 'Approved', bg: 'bg-st-green-bg', text: 'text-st-green-text' },
+    rejected: { label: 'Rejected', bg: 'bg-st-red-bg', text: 'text-st-red-text' },
   }
   return map[status] || map.pending
 }
@@ -119,7 +119,7 @@ function getStatusInfo(status: string) {
 
     <!-- Existing Application Status -->
     <template v-else-if="existingApp">
-      <div class="bg-white border border-border p-6 flex flex-col gap-5">
+      <div class="bg-card border border-border p-6 flex flex-col gap-5">
         <div class="flex items-center justify-between">
           <h2 class="font-mono text-base font-semibold text-foreground">Application Status</h2>
           <span class="inline-flex px-3 py-1 text-[12px] font-medium" :class="[getStatusInfo(existingApp.status).bg, getStatusInfo(existingApp.status).text]">
@@ -142,14 +142,14 @@ function getStatusInfo(status: string) {
           </div>
         </div>
 
-        <div v-if="existingApp.reviewNotes" class="bg-[#E7E8E5] p-4">
+        <div v-if="existingApp.reviewNotes" class="bg-surface p-4">
           <span class="font-mono text-[11px] font-semibold text-muted-foreground tracking-wider">REVIEW NOTES</span>
           <p class="font-sans text-sm text-foreground mt-1">{{ existingApp.reviewNotes }}</p>
         </div>
 
         <div v-if="existingApp.status === 'rejected'" class="flex flex-col gap-3">
           <p class="font-sans text-sm text-muted-foreground">Your application was rejected. You can submit a new application with updated information.</p>
-          <button @click="existingApp = null" class="w-fit px-5 py-2.5 bg-[#FF8400] text-[#0D0D0D] font-sans text-sm font-semibold hover:opacity-90 transition-opacity">
+          <button @click="existingApp = null" class="w-fit px-5 py-2.5 bg-[#FF8400] text-primary-foreground font-sans text-sm font-semibold hover:opacity-90 transition-opacity">
             Submit New Application
           </button>
         </div>
@@ -164,14 +164,14 @@ function getStatusInfo(status: string) {
           <div class="flex items-center gap-2.5">
             <div
               class="w-7 h-7 flex items-center justify-center text-[12px] font-semibold"
-              :class="step.status === 'completed' ? 'bg-[#DFE6E1] text-[#004D1A]' : step.status === 'active' ? 'bg-[#0D0D0D] text-white' : 'bg-[#E7E8E5] text-muted-foreground'"
+              :class="step.status === 'completed' ? 'bg-st-green-bg text-st-green-text' : step.status === 'active' ? 'bg-[#0D0D0D] text-white' : 'bg-surface text-muted-foreground'"
             >
               <span v-if="step.status === 'completed'" class="material-symbols-rounded text-[16px]">check</span>
               <span v-else>{{ i + 1 }}</span>
             </div>
             <span class="font-sans text-[13px] whitespace-nowrap" :class="step.status === 'pending' ? 'font-medium text-muted-foreground' : 'font-semibold text-foreground'">{{ step.label }}</span>
           </div>
-          <div v-if="i < steps.length - 1" class="flex-1 h-0.5 mx-3 min-w-[20px]" :class="step.status === 'completed' ? 'bg-[#DFE6E1]' : 'bg-border'" />
+          <div v-if="i < steps.length - 1" class="flex-1 h-0.5 mx-3 min-w-[20px]" :class="step.status === 'completed' ? 'bg-st-green-bg' : 'bg-border'" />
         </template>
       </div>
 
@@ -181,7 +181,7 @@ function getStatusInfo(status: string) {
       </div>
 
       <!-- Step 1: Company Info -->
-      <div v-if="currentStep === 1" class="bg-white border border-border p-6 sm:p-7 flex flex-col gap-5">
+      <div v-if="currentStep === 1" class="bg-card border border-border p-6 sm:p-7 flex flex-col gap-5">
         <div>
           <h2 class="font-mono text-base font-semibold text-foreground">Company Information</h2>
           <p class="font-sans text-[13px] text-muted-foreground mt-1">Enter your registered business details as they appear on your CAC certificate.</p>
@@ -223,7 +223,7 @@ function getStatusInfo(status: string) {
           <button
             @click="currentStep = 2"
             :disabled="!canProceedStep1"
-            class="px-6 py-2.5 bg-[#FF8400] text-[#0D0D0D] font-sans text-sm font-semibold hover:opacity-90 transition-opacity disabled:opacity-40 disabled:cursor-not-allowed"
+            class="px-6 py-2.5 bg-[#FF8400] text-primary-foreground font-sans text-sm font-semibold hover:opacity-90 transition-opacity disabled:opacity-40 disabled:cursor-not-allowed"
           >
             Continue
           </button>
@@ -231,7 +231,7 @@ function getStatusInfo(status: string) {
       </div>
 
       <!-- Step 2: Documents -->
-      <div v-if="currentStep === 2" class="bg-white border border-border p-6 sm:p-7 flex flex-col gap-5">
+      <div v-if="currentStep === 2" class="bg-card border border-border p-6 sm:p-7 flex flex-col gap-5">
         <div>
           <h2 class="font-mono text-base font-semibold text-foreground">Upload Documents</h2>
           <p class="font-sans text-[13px] text-muted-foreground mt-1">Upload the following documents to verify your business identity. Accepted formats: PDF, JPG, PNG.</p>
@@ -242,7 +242,7 @@ function getStatusInfo(status: string) {
             <div class="flex flex-col gap-0.5 flex-1 min-w-0">
               <span class="font-sans text-sm font-medium text-foreground">{{ upload.name }}</span>
               <span class="font-sans text-[12px] text-muted-foreground">{{ upload.desc }}</span>
-              <span v-if="form[upload.key]" class="font-mono text-[11px] text-[#004D1A] mt-1 flex items-center gap-1">
+              <span v-if="form[upload.key]" class="font-mono text-[11px] text-st-green-text mt-1 flex items-center gap-1">
                 <span class="material-symbols-rounded text-[14px]">check_circle</span>
                 Uploaded
               </span>
@@ -274,7 +274,7 @@ function getStatusInfo(status: string) {
           <button
             @click="currentStep = 3"
             :disabled="!canProceedStep2"
-            class="px-6 py-2.5 bg-[#FF8400] text-[#0D0D0D] font-sans text-sm font-semibold hover:opacity-90 transition-opacity disabled:opacity-40 disabled:cursor-not-allowed"
+            class="px-6 py-2.5 bg-[#FF8400] text-primary-foreground font-sans text-sm font-semibold hover:opacity-90 transition-opacity disabled:opacity-40 disabled:cursor-not-allowed"
           >
             Continue
           </button>
@@ -283,7 +283,7 @@ function getStatusInfo(status: string) {
 
       <!-- Step 3: Review & Submit -->
       <div v-if="currentStep === 3" class="flex flex-col gap-5">
-        <div class="bg-white border border-border p-6 sm:p-7 flex flex-col gap-5">
+        <div class="bg-card border border-border p-6 sm:p-7 flex flex-col gap-5">
           <div>
             <h2 class="font-mono text-base font-semibold text-foreground">Review Your Application</h2>
             <p class="font-sans text-[13px] text-muted-foreground mt-1">Please review your information before submitting. You won't be able to edit after submission.</p>
@@ -308,7 +308,7 @@ function getStatusInfo(status: string) {
             <span class="font-mono text-[11px] font-semibold text-muted-foreground tracking-wider">DOCUMENTS</span>
             <div class="flex flex-col gap-2 mt-2">
               <div v-for="upload in uploads" :key="upload.key" class="flex items-center gap-2">
-                <span class="material-symbols-rounded text-[16px] text-[#004D1A]">check_circle</span>
+                <span class="material-symbols-rounded text-[16px] text-st-green-text">check_circle</span>
                 <span class="font-sans text-sm text-foreground">{{ upload.name }}</span>
               </div>
             </div>
@@ -325,7 +325,7 @@ function getStatusInfo(status: string) {
           <button
             @click="handleSubmit"
             :disabled="submitting"
-            class="px-6 py-2.5 bg-[#FF8400] text-[#0D0D0D] font-sans text-sm font-semibold hover:opacity-90 transition-opacity disabled:opacity-50"
+            class="px-6 py-2.5 bg-[#FF8400] text-primary-foreground font-sans text-sm font-semibold hover:opacity-90 transition-opacity disabled:opacity-50"
           >
             {{ submitting ? 'Submitting...' : 'Submit Application' }}
           </button>
@@ -333,9 +333,9 @@ function getStatusInfo(status: string) {
       </div>
 
       <!-- Step 4: Success -->
-      <div v-if="currentStep === 4" class="bg-white border border-border p-8 sm:p-10 flex flex-col items-center text-center gap-5">
-        <div class="w-16 h-16 bg-[#DFE6E1] flex items-center justify-center">
-          <span class="material-symbols-rounded text-[32px] text-[#004D1A]">check_circle</span>
+      <div v-if="currentStep === 4" class="bg-card border border-border p-8 sm:p-10 flex flex-col items-center text-center gap-5">
+        <div class="w-16 h-16 bg-st-green-bg flex items-center justify-center">
+          <span class="material-symbols-rounded text-[32px] text-st-green-text">check_circle</span>
         </div>
         <div>
           <h2 class="font-mono text-xl font-bold text-foreground">Application Submitted</h2>
@@ -343,13 +343,13 @@ function getStatusInfo(status: string) {
             Your KYB application has been submitted successfully. Our team will review your documents and get back to you within 24–48 hours.
           </p>
         </div>
-        <div class="bg-[#E7E8E5] px-4 py-3 flex items-center gap-3 w-full max-w-sm">
+        <div class="bg-surface px-4 py-3 flex items-center gap-3 w-full max-w-sm">
           <span class="material-symbols-rounded text-[18px] text-muted-foreground">info</span>
           <span class="font-sans text-[13px] text-muted-foreground text-left">You'll receive a notification once your verification is complete.</span>
         </div>
         <NuxtLink
           to="/dashboard"
-          class="px-6 py-2.5 bg-[#FF8400] text-[#0D0D0D] font-sans text-sm font-semibold hover:opacity-90 transition-opacity"
+          class="px-6 py-2.5 bg-[#FF8400] text-primary-foreground font-sans text-sm font-semibold hover:opacity-90 transition-opacity"
         >
           Go to Dashboard
         </NuxtLink>
@@ -357,7 +357,7 @@ function getStatusInfo(status: string) {
     </template>
 
     <!-- Help Card -->
-    <div class="bg-[#E7E8E5] p-5 flex flex-col gap-3">
+    <div class="bg-surface p-5 flex flex-col gap-3">
       <span class="font-mono text-sm font-semibold text-foreground">Need help?</span>
       <span class="font-sans text-[13px] text-muted-foreground leading-[1.4]">Contact our KYB team for assistance with document requirements or verification status.</span>
       <NuxtLink to="/contact" class="w-fit px-4 py-2 bg-[#0D0D0D] text-white font-sans text-[12px] font-semibold hover:opacity-90 transition-opacity">

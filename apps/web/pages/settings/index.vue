@@ -129,7 +129,7 @@ async function handlePasswordChange() {
       <!-- Left Column -->
       <div class="flex-1 flex flex-col gap-6">
         <!-- Profile Card -->
-        <div class="bg-white border border-border rounded-lg p-7 flex flex-col gap-6">
+        <div class="bg-card border border-border rounded-lg p-7 flex flex-col gap-6">
           <h2 class="font-mono text-base font-semibold text-foreground">Profile</h2>
 
           <div class="flex flex-col sm:flex-row gap-4 sm:gap-6">
@@ -154,7 +154,7 @@ async function handlePasswordChange() {
               </div>
               <div class="flex flex-col gap-1">
                 <span class="font-mono text-[11px] font-semibold text-muted-foreground tracking-wider">ROLE</span>
-                <span class="inline-flex px-3 py-1 rounded-full bg-[#DFE6E1] text-[#004D1A] font-sans text-[12px] font-medium w-fit">{{ profile.role }}</span>
+                <span class="inline-flex px-3 py-1 rounded-full bg-st-green-bg text-st-green-text font-sans text-[12px] font-medium w-fit">{{ profile.role }}</span>
               </div>
             </div>
           </div>
@@ -163,21 +163,21 @@ async function handlePasswordChange() {
         </div>
 
         <!-- Security Card -->
-        <div class="bg-white border border-border rounded-lg p-7 flex flex-col gap-5">
+        <div class="bg-card border border-border rounded-lg p-7 flex flex-col gap-5">
           <h2 class="font-mono text-base font-semibold text-foreground">Security</h2>
 
           <div class="flex flex-col gap-4">
             <div class="flex flex-col gap-1.5">
               <label class="font-mono text-[11px] font-semibold text-muted-foreground tracking-wider">CURRENT PASSWORD</label>
-              <input v-model="passwords.current" type="password" placeholder="Enter current password" class="w-full h-[44px] px-3.5 bg-white border border-border rounded-lg text-sm font-sans text-foreground placeholder:text-muted-foreground focus:outline-none focus:border-primary transition-colors" />
+              <input v-model="passwords.current" type="password" placeholder="Enter current password" class="w-full h-[44px] px-3.5 bg-card border border-border rounded-lg text-sm font-sans text-foreground placeholder:text-muted-foreground focus:outline-none focus:border-primary transition-colors" />
             </div>
             <div class="flex flex-col gap-1.5">
               <label class="font-mono text-[11px] font-semibold text-muted-foreground tracking-wider">NEW PASSWORD</label>
-              <input v-model="passwords.new" type="password" placeholder="Enter new password" class="w-full h-[44px] px-3.5 bg-white border border-border rounded-lg text-sm font-sans text-foreground placeholder:text-muted-foreground focus:outline-none focus:border-primary transition-colors" />
+              <input v-model="passwords.new" type="password" placeholder="Enter new password" class="w-full h-[44px] px-3.5 bg-card border border-border rounded-lg text-sm font-sans text-foreground placeholder:text-muted-foreground focus:outline-none focus:border-primary transition-colors" />
             </div>
             <div class="flex flex-col gap-1.5">
               <label class="font-mono text-[11px] font-semibold text-muted-foreground tracking-wider">CONFIRM PASSWORD</label>
-              <input v-model="passwords.confirm" type="password" placeholder="Confirm new password" class="w-full h-[44px] px-3.5 bg-white border border-border rounded-lg text-sm font-sans text-foreground placeholder:text-muted-foreground focus:outline-none focus:border-primary transition-colors" />
+              <input v-model="passwords.confirm" type="password" placeholder="Confirm new password" class="w-full h-[44px] px-3.5 bg-card border border-border rounded-lg text-sm font-sans text-foreground placeholder:text-muted-foreground focus:outline-none focus:border-primary transition-colors" />
             </div>
           </div>
 
@@ -196,7 +196,7 @@ async function handlePasswordChange() {
       <!-- Right Column -->
       <div class="w-full lg:w-[400px] flex flex-col gap-6">
         <!-- Company Information -->
-        <div class="bg-white border border-border rounded-lg p-7 flex flex-col gap-5">
+        <div class="bg-card border border-border rounded-lg p-7 flex flex-col gap-5">
           <h2 class="font-mono text-base font-semibold text-foreground">Company Information</h2>
 
           <div class="flex flex-col gap-4">
@@ -220,7 +220,7 @@ async function handlePasswordChange() {
         </div>
 
         <!-- Notification Preferences -->
-        <div class="bg-white border border-border rounded-lg p-7 flex flex-col gap-5">
+        <div class="bg-card border border-border rounded-lg p-7 flex flex-col gap-5">
           <h2 class="font-mono text-base font-semibold text-foreground">Notification Preferences</h2>
 
           <div class="flex flex-col">
@@ -234,7 +234,7 @@ async function handlePasswordChange() {
                 :class="notif.enabled ? 'bg-primary' : 'bg-border'"
                 @click="toggleNotification(notif.id)"
               >
-                <div class="w-[18px] h-[18px] rounded-full bg-white transition-transform" :class="notif.enabled ? 'translate-x-[18px]' : ''" />
+                <div class="w-[18px] h-[18px] rounded-full bg-card transition-transform" :class="notif.enabled ? 'translate-x-[18px]' : ''" />
               </button>
             </div>
           </div>

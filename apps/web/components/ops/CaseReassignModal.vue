@@ -19,7 +19,7 @@ const loading = ref(false)
 const actionLoading = ref(false)
 const error = ref<string | null>(null)
 
-const agentColors = ['bg-primary', 'bg-[#1A56DB]', 'bg-[#004D1A]', 'bg-[#804200]', 'bg-[#8C1C00]']
+const agentColors = ['bg-primary', 'bg-[#1A56DB]', 'bg-st-green-text', 'bg-st-amber-text', 'bg-st-red-text']
 
 function getInitials(name: string) {
   return name.split(' ').map(w => w[0]).join('').slice(0, 2).toUpperCase()
@@ -87,11 +87,11 @@ async function handleAssign() {
       <div v-if="modelValue" class="fixed inset-0 z-50 flex items-start justify-center pt-10 sm:pt-20 px-4" @click.self="close">
         <div class="absolute inset-0 bg-black/50" @click="close" />
 
-        <div class="relative w-full mx-4 max-w-md bg-white rounded-2xl border border-border shadow-xl flex flex-col max-h-[85vh] overflow-hidden">
+        <div class="relative w-full mx-4 max-w-md bg-card rounded-2xl border border-border shadow-xl flex flex-col max-h-[85vh] overflow-hidden">
           <!-- Header -->
           <div class="flex items-center justify-between px-5 py-4 border-b border-border flex-shrink-0">
             <h2 class="font-mono text-[16px] font-bold text-foreground">{{ caseInfo.currentAgent === '—' ? 'Assign Field Agent' : 'Reassign Case' }}</h2>
-            <button @click="close" class="w-8 h-8 flex items-center justify-center rounded-lg bg-[#E7E8E5] hover:bg-border transition-colors" aria-label="Close">
+            <button @click="close" class="w-8 h-8 flex items-center justify-center rounded-lg bg-surface hover:bg-border transition-colors" aria-label="Close">
               <span class="material-symbols-rounded text-[18px] text-muted-foreground">close</span>
             </button>
           </div>
@@ -99,12 +99,12 @@ async function handleAssign() {
           <!-- Body -->
           <div class="flex-1 overflow-y-auto px-5 py-5 flex flex-col gap-5">
             <!-- Current Assignment -->
-            <div class="bg-white border border-border rounded-xl p-4 flex flex-col gap-2">
+            <div class="bg-card border border-border rounded-xl p-4 flex flex-col gap-2">
               <span class="font-mono text-[11px] font-semibold text-muted-foreground tracking-wider">CASE DETAILS</span>
               <span class="font-mono text-[15px] font-bold text-foreground">{{ caseInfo.id?.slice(0, 10) }}…</span>
               <span class="font-sans text-[13px] text-muted-foreground">Tenant: {{ caseInfo.tenant }}</span>
               <div v-if="caseInfo.currentAgent !== '—'" class="flex items-center gap-2">
-                <div class="w-2 h-2 rounded-full bg-[#804200]" />
+                <div class="w-2 h-2 rounded-full bg-st-amber-text" />
                 <span class="font-sans text-[12px] text-foreground">Currently assigned to: {{ caseInfo.currentAgent }}</span>
               </div>
               <div v-else class="flex items-center gap-2">
@@ -117,7 +117,7 @@ async function handleAssign() {
             <span class="font-mono text-[13px] font-semibold text-foreground">{{ caseInfo.currentAgent === '—' ? 'Select Field Agent' : 'Select New Agent' }}</span>
 
             <!-- Search -->
-            <div class="flex items-center gap-2.5 h-11 px-3.5 border border-border rounded-lg bg-white">
+            <div class="flex items-center gap-2.5 h-11 px-3.5 border border-border rounded-lg bg-card">
               <span class="material-symbols-rounded text-[20px] text-muted-foreground">search</span>
               <input type="text" placeholder="Search agents..." class="flex-1 bg-transparent text-[13px] font-sans text-foreground placeholder:text-muted-foreground outline-none" />
             </div>
@@ -149,14 +149,14 @@ async function handleAssign() {
               <textarea
                 v-model="reason"
                 placeholder="Agent workload balancing"
-                class="w-full h-20 px-3.5 py-3 border border-border rounded-lg bg-white text-[13px] font-sans text-foreground placeholder:text-muted-foreground outline-none focus:ring-1 focus:ring-primary resize-none leading-relaxed"
+                class="w-full h-20 px-3.5 py-3 border border-border rounded-lg bg-card text-[13px] font-sans text-foreground placeholder:text-muted-foreground outline-none focus:ring-1 focus:ring-primary resize-none leading-relaxed"
               />
             </div>
           </div>
 
           <!-- Error -->
           <div v-if="error" class="px-5 pb-2">
-            <div class="font-sans text-[13px] text-[#8C1C00]">{{ error }}</div>
+            <div class="font-sans text-[13px] text-st-red-text">{{ error }}</div>
           </div>
 
           <!-- Footer -->

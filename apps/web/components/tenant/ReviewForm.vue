@@ -157,7 +157,7 @@ async function handleSubmit() {
           :class="form.isAnonymous ? 'bg-primary' : 'bg-border'"
           @click="form.isAnonymous = !form.isAnonymous"
         >
-          <div class="w-4 h-4 rounded-full bg-white transition-transform" :class="form.isAnonymous ? 'translate-x-4' : ''" />
+          <div class="w-4 h-4 rounded-full bg-card transition-transform" :class="form.isAnonymous ? 'translate-x-4' : ''" />
         </button>
         <span class="font-sans text-sm font-medium text-foreground">Submit anonymously</span>
       </div>

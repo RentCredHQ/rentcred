@@ -17,14 +17,14 @@ const sharingReport = ref(false)
 
 function getStatusStyle(status: string) {
   const map: Record<string, { bg: string; text: string }> = {
-    completed: { bg: 'bg-[#DFE6E1]', text: 'text-[#004D1A]' },
-    in_progress: { bg: 'bg-[#DFDFE6]', text: 'text-[#000066]' },
-    pending: { bg: 'bg-[#E9E3D8]', text: 'text-[#804200]' },
-    field_visit: { bg: 'bg-[#DFDFE6]', text: 'text-[#000066]' },
-    report_building: { bg: 'bg-[#E9E3D8]', text: 'text-[#804200]' },
-    rejected: { bg: 'bg-[#E5DCDA]', text: 'text-[#8C1C00]' },
+    completed: { bg: 'bg-st-green-bg', text: 'text-st-green-text' },
+    in_progress: { bg: 'bg-st-blue-bg', text: 'text-st-blue-text' },
+    pending: { bg: 'bg-st-amber-bg', text: 'text-st-amber-text' },
+    field_visit: { bg: 'bg-st-blue-bg', text: 'text-st-blue-text' },
+    report_building: { bg: 'bg-st-amber-bg', text: 'text-st-amber-text' },
+    rejected: { bg: 'bg-st-red-bg', text: 'text-st-red-text' },
   }
-  return map[status] || { bg: 'bg-[#E7E8E5]', text: 'text-foreground' }
+  return map[status] || { bg: 'bg-surface', text: 'text-foreground' }
 }
 
 const caseData = ref({
@@ -69,9 +69,9 @@ function buildSteps(submission: any) {
   return Object.entries(CHECKLIST_LABELS).map(([key, name]) => {
     const val = checklist[key]
     if (val === true) {
-      return { name, status: 'completed', date: 'Completed', icon: 'check_circle', iconColor: 'text-[#004D1A]', dateColor: 'text-muted-foreground' }
+      return { name, status: 'completed', date: 'Completed', icon: 'check_circle', iconColor: 'text-st-green-text', dateColor: 'text-muted-foreground' }
     } else if (val === 'in_progress') {
-      return { name, status: 'in_progress', date: 'In progress', icon: 'pending', iconColor: 'text-[#804200]', dateColor: 'text-[#804200]' }
+      return { name, status: 'in_progress', date: 'In progress', icon: 'pending', iconColor: 'text-st-amber-text', dateColor: 'text-st-amber-text' }
     }
     return { name, status: 'pending', date: 'Not started', icon: 'radio_button_unchecked', iconColor: 'text-muted-foreground', dateColor: 'text-muted-foreground' }
   })
@@ -173,7 +173,7 @@ onMounted(async () => {
     <div class="flex flex-col lg:flex-row gap-6">
       <!-- Left: Timeline -->
       <div class="flex-1">
-        <div class="bg-white border-[1.5px] border-border rounded-lg p-5 lg:p-6 flex flex-col gap-5">
+        <div class="bg-card border-[1.5px] border-border rounded-lg p-5 lg:p-6 flex flex-col gap-5">
           <h2 class="font-mono text-base font-semibold text-foreground">Verification Progress</h2>
 
           <template v-for="(step, index) in steps" :key="step.name">
@@ -192,7 +192,7 @@ onMounted(async () => {
       <!-- Right: Info + Actions -->
       <div class="w-full lg:w-[340px] flex flex-col gap-4">
         <!-- Tenant Info -->
-        <div class="bg-white border-[1.5px] border-border rounded-lg p-5 lg:p-6 flex flex-col gap-4">
+        <div class="bg-card border-[1.5px] border-border rounded-lg p-5 lg:p-6 flex flex-col gap-4">
           <h2 class="font-mono text-base font-semibold text-foreground">Tenant Information</h2>
 
           <div class="flex flex-col gap-1">
@@ -214,7 +214,7 @@ onMounted(async () => {
         </div>
 
         <!-- Assignment Info -->
-        <div v-if="caseData.fieldAgent" class="bg-white border-[1.5px] border-border rounded-lg p-5 lg:p-6 flex flex-col gap-4">
+        <div v-if="caseData.fieldAgent" class="bg-card border-[1.5px] border-border rounded-lg p-5 lg:p-6 flex flex-col gap-4">
           <h2 class="font-mono text-base font-semibold text-foreground">Field Assignment</h2>
           <div class="flex flex-col gap-1">
             <span class="font-mono text-[11px] font-semibold text-muted-foreground tracking-wider">FIELD AGENT</span>
@@ -225,13 +225,13 @@ onMounted(async () => {
             <span class="font-sans text-sm text-foreground">{{ caseData.scheduledDate }}</span>
           </div>
           <div class="flex items-center gap-2">
-            <span class="w-2 h-2 rounded-full" :class="caseData.rawStatus === 'field_visit' ? 'bg-blue-500' : 'bg-[#004D1A]'" />
+            <span class="w-2 h-2 rounded-full" :class="caseData.rawStatus === 'field_visit' ? 'bg-blue-500' : 'bg-st-green-text'" />
             <span class="font-sans text-[13px] text-muted-foreground">{{ caseData.rawStatus === 'field_visit' ? 'Visit in progress' : 'Agent assigned' }}</span>
           </div>
         </div>
 
         <!-- Property Details -->
-        <div class="bg-white border-[1.5px] border-border rounded-lg p-5 lg:p-6 flex flex-col gap-4">
+        <div class="bg-card border-[1.5px] border-border rounded-lg p-5 lg:p-6 flex flex-col gap-4">
           <h2 class="font-mono text-base font-semibold text-foreground">Property Details</h2>
 
           <div class="flex flex-col gap-1">
@@ -266,7 +266,7 @@ onMounted(async () => {
         </div>
 
         <!-- Actions -->
-        <div class="bg-white border-[1.5px] border-border rounded-lg p-5 lg:p-6 flex flex-col gap-3">
+        <div class="bg-card border-[1.5px] border-border rounded-lg p-5 lg:p-6 flex flex-col gap-3">
           <h2 class="font-mono text-base font-semibold text-foreground">Actions</h2>
           <button
             @click="handleShareReport"
@@ -279,7 +279,7 @@ onMounted(async () => {
             <span class="material-symbols-rounded text-[18px]">mail</span>
             Resend Invite
           </button>
-          <button @click="handleCancelCase" class="font-sans text-sm font-medium text-[#D93C15] text-center hover:underline">Cancel Case</button>
+          <button @click="handleCancelCase" class="font-sans text-sm font-medium text-st-red-text text-center hover:underline">Cancel Case</button>
         </div>
       </div>
     </div>

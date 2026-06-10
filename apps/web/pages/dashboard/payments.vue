@@ -26,8 +26,8 @@ const kpis = ref([
 ])
 
 function getTxStatusStyle(status: string) {
-  if (status === 'refund' || status === 'refunded') return { bg: 'bg-[#E9E3D8]', text: 'text-[#804200]' }
-  return { bg: 'bg-[#DFE6E1]', text: 'text-[#004D1A]' }
+  if (status === 'refund' || status === 'refunded') return { bg: 'bg-st-amber-bg', text: 'text-st-amber-text' }
+  return { bg: 'bg-st-green-bg', text: 'text-st-green-text' }
 }
 
 const rawTransactions = ref<any[]>([])
@@ -119,7 +119,7 @@ onMounted(async () => {
 
     <!-- KPI Row -->
     <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
-      <div v-for="kpi in kpis" :key="kpi.label" class="bg-white border border-border rounded-xl p-5 flex flex-col gap-2 shadow-sm">
+      <div v-for="kpi in kpis" :key="kpi.label" class="bg-card border border-border rounded-xl p-5 flex flex-col gap-2 shadow-sm">
         <div class="flex items-center justify-between">
           <span class="font-sans text-[13px] text-muted-foreground">{{ kpi.label }}</span>
           <span class="material-symbols-rounded text-[18px] text-muted-foreground">{{ kpi.icon }}</span>
@@ -129,7 +129,7 @@ onMounted(async () => {
     </div>
 
     <!-- Table -->
-    <div class="bg-white border border-border rounded-xl overflow-hidden shadow-sm">
+    <div class="bg-card border border-border rounded-xl overflow-hidden shadow-sm">
       <!-- Desktop -->
       <div class="hidden lg:block">
         <div class="flex bg-background px-5 py-3 border-b border-border">
@@ -142,7 +142,7 @@ onMounted(async () => {
         </div>
         <!-- Empty State -->
         <div v-if="filtered.length === 0" class="flex flex-col items-center justify-center py-16 gap-4">
-          <div class="w-16 h-16 rounded-full bg-[#E7E8E5] flex items-center justify-center">
+          <div class="w-16 h-16 rounded-full bg-surface flex items-center justify-center">
             <span class="material-symbols-rounded text-[28px] text-muted-foreground">receipt_long</span>
           </div>
           <div class="flex flex-col items-center gap-1">
@@ -166,7 +166,7 @@ onMounted(async () => {
       <!-- Mobile -->
       <div class="lg:hidden">
         <div v-if="filtered.length === 0" class="flex flex-col items-center justify-center py-16 gap-4">
-          <div class="w-16 h-16 rounded-full bg-[#E7E8E5] flex items-center justify-center">
+          <div class="w-16 h-16 rounded-full bg-surface flex items-center justify-center">
             <span class="material-symbols-rounded text-[28px] text-muted-foreground">receipt_long</span>
           </div>
           <div class="flex flex-col items-center gap-1">
@@ -190,7 +190,7 @@ onMounted(async () => {
       <div class="flex items-center justify-between px-5 py-3 border-t border-border">
         <span class="font-sans text-[12px] text-muted-foreground">Showing {{ resultCount }} of {{ totalTransactions }} transactions</span>
         <div class="flex items-center gap-1.5">
-          <button @click="goPage(-1)" :disabled="currentPage <= 1" class="px-2.5 py-1 bg-white border border-border rounded-md text-[12px] font-sans text-foreground disabled:opacity-40">Prev</button>
+          <button @click="goPage(-1)" :disabled="currentPage <= 1" class="px-2.5 py-1 bg-card border border-border rounded-md text-[12px] font-sans text-foreground disabled:opacity-40">Prev</button>
           <span class="px-2.5 py-1 bg-foreground rounded-md text-[12px] font-sans text-white">{{ currentPage }}</span>
           <button @click="goPage(1)" :disabled="currentPage >= totalPages" class="px-2.5 py-1 bg-primary rounded-md text-[12px] font-sans text-white disabled:opacity-40">Next</button>
         </div>

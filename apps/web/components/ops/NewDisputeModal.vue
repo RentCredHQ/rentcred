@@ -55,11 +55,11 @@ async function submit() {
         <div class="absolute inset-0 bg-black/50" @click="close" />
 
         <!-- Modal -->
-        <div class="relative w-full mx-4 max-w-md bg-white rounded-2xl border border-border shadow-xl flex flex-col max-h-[85vh] overflow-hidden">
+        <div class="relative w-full mx-4 max-w-md bg-card rounded-2xl border border-border shadow-xl flex flex-col max-h-[85vh] overflow-hidden">
           <!-- Header -->
           <div class="flex items-center justify-between px-5 py-4 border-b border-border flex-shrink-0">
             <h2 class="font-mono text-[16px] font-bold text-foreground">File a Dispute</h2>
-            <button @click="close" class="w-8 h-8 flex items-center justify-center rounded-lg bg-[#E7E8E5] hover:bg-border transition-colors" aria-label="Close">
+            <button @click="close" class="w-8 h-8 flex items-center justify-center rounded-lg bg-surface hover:bg-border transition-colors" aria-label="Close">
               <span class="material-symbols-rounded text-[18px] text-muted-foreground">close</span>
             </button>
           </div>
@@ -73,7 +73,7 @@ async function submit() {
                 v-model="form.caseId"
                 type="text"
                 placeholder="e.g. RC-2026-00389"
-                class="w-full h-11 px-3.5 border border-border rounded-lg bg-white text-[13px] font-sans text-foreground placeholder:text-muted-foreground outline-none focus:ring-1 focus:ring-primary"
+                class="w-full h-11 px-3.5 border border-border rounded-lg bg-card text-[13px] font-sans text-foreground placeholder:text-muted-foreground outline-none focus:ring-1 focus:ring-primary"
               />
             </div>
 
@@ -82,7 +82,7 @@ async function submit() {
               <label class="font-sans text-[13px] font-medium text-foreground">Category</label>
               <select
                 v-model="form.category"
-                class="w-full h-11 px-3.5 border border-border rounded-lg bg-white text-[13px] font-sans text-foreground outline-none focus:ring-1 focus:ring-primary appearance-none cursor-pointer"
+                class="w-full h-11 px-3.5 border border-border rounded-lg bg-card text-[13px] font-sans text-foreground outline-none focus:ring-1 focus:ring-primary appearance-none cursor-pointer"
               >
                 <option v-for="cat in categories" :key="cat" :value="cat">{{ cat }}</option>
               </select>
@@ -93,7 +93,7 @@ async function submit() {
               <label class="font-sans text-[13px] font-medium text-foreground">Priority</label>
               <select
                 v-model="form.priority"
-                class="w-full h-11 px-3.5 border border-border rounded-lg bg-white text-[13px] font-sans text-foreground outline-none focus:ring-1 focus:ring-primary appearance-none cursor-pointer"
+                class="w-full h-11 px-3.5 border border-border rounded-lg bg-card text-[13px] font-sans text-foreground outline-none focus:ring-1 focus:ring-primary appearance-none cursor-pointer"
               >
                 <option v-for="p in priorities" :key="p" :value="p">{{ p }}</option>
               </select>
@@ -106,7 +106,7 @@ async function submit() {
                 v-model="form.subject"
                 type="text"
                 placeholder="Brief summary of the issue"
-                class="w-full h-11 px-3.5 border border-border rounded-lg bg-white text-[13px] font-sans text-foreground placeholder:text-muted-foreground outline-none focus:ring-1 focus:ring-primary"
+                class="w-full h-11 px-3.5 border border-border rounded-lg bg-card text-[13px] font-sans text-foreground placeholder:text-muted-foreground outline-none focus:ring-1 focus:ring-primary"
               />
             </div>
 
@@ -116,14 +116,14 @@ async function submit() {
               <textarea
                 v-model="form.description"
                 placeholder="Provide details about the dispute..."
-                class="w-full h-[120px] px-3.5 py-3 border border-border rounded-lg bg-white text-[13px] font-sans text-foreground placeholder:text-muted-foreground outline-none focus:ring-1 focus:ring-primary resize-none leading-relaxed"
+                class="w-full h-[120px] px-3.5 py-3 border border-border rounded-lg bg-card text-[13px] font-sans text-foreground placeholder:text-muted-foreground outline-none focus:ring-1 focus:ring-primary resize-none leading-relaxed"
               />
             </div>
 
             <!-- Attachments -->
             <div class="flex flex-col gap-1.5">
               <label class="font-sans text-[13px] font-medium text-foreground">Attachments</label>
-              <div class="w-full h-[100px] border border-dashed border-border rounded-lg bg-white flex flex-col items-center justify-center gap-2 cursor-pointer hover:bg-background transition-colors">
+              <div class="w-full h-[100px] border border-dashed border-border rounded-lg bg-card flex flex-col items-center justify-center gap-2 cursor-pointer hover:bg-background transition-colors">
                 <span class="material-symbols-rounded text-[28px] text-muted-foreground">cloud_upload</span>
                 <span class="font-sans text-[13px] text-muted-foreground">Click to upload files</span>
                 <span class="font-sans text-[11px] text-muted-foreground/60">PNG, JPG, PDF up to 10MB</span>
@@ -133,7 +133,7 @@ async function submit() {
 
           <!-- Error -->
           <div v-if="error" class="px-5 pb-2">
-            <div class="font-sans text-[13px] text-[#8C1C00]">{{ error }}</div>
+            <div class="font-sans text-[13px] text-st-red-text">{{ error }}</div>
           </div>
 
           <!-- Footer -->

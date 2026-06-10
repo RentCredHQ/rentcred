@@ -27,17 +27,17 @@ const kpis = computed(() => {
   const resolved = all.filter(d => ['resolved', 'closed'].includes(d.status)).length
   return [
     { label: 'TOTAL DISPUTES', value: String(pagination.value.total || all.length), valueColor: 'text-foreground' },
-    { label: 'OPEN', value: String(open), valueColor: 'text-[#804200]' },
-    { label: 'RESOLVED', value: String(resolved), valueColor: 'text-[#004D1A]' },
+    { label: 'OPEN', value: String(open), valueColor: 'text-st-amber-text' },
+    { label: 'RESOLVED', value: String(resolved), valueColor: 'text-st-green-text' },
     { label: 'UNDER REVIEW', value: String(all.filter(d => d.status === 'under_review').length), valueColor: 'text-blue-600' },
   ]
 })
 
 function statusBadgeClasses(status: string) {
   switch (status) {
-    case 'resolved': case 'closed': return 'bg-[#DFE6E1] text-[#004D1A]'
+    case 'resolved': case 'closed': return 'bg-st-green-bg text-st-green-text'
     case 'under_review': return 'bg-blue-50 text-blue-600'
-    default: return 'bg-[#E9E3D8] text-[#804200]'
+    default: return 'bg-st-amber-bg text-st-amber-text'
   }
 }
 
@@ -106,7 +106,7 @@ onMounted(loadDisputes)
         <button
           v-for="tab in statusTabs" :key="tab.value"
           class="px-3 py-1.5 rounded-full text-[12px] font-mono font-semibold transition-colors whitespace-nowrap"
-          :class="activeStatus === tab.value ? 'bg-foreground text-white' : 'bg-[#E7E8E5] text-muted-foreground hover:text-foreground'"
+          :class="activeStatus === tab.value ? 'bg-foreground text-white' : 'bg-surface text-muted-foreground hover:text-foreground'"
           @click="activeStatus = tab.value"
         >
           {{ tab.label }}

@@ -29,8 +29,8 @@ onMounted(async () => {
 
 function statusClasses(status: string) {
   switch (status) {
-    case 'Completed': return 'bg-[#DFE6E1] text-[#004D1A]'
-    case 'In Progress': return 'bg-[#E9E3D8] text-[#804200]'
+    case 'Completed': return 'bg-st-green-bg text-st-green-text'
+    case 'In Progress': return 'bg-st-amber-bg text-st-amber-text'
     default: return 'bg-background text-muted-foreground'
   }
 }
@@ -49,7 +49,7 @@ function statusClasses(status: string) {
     <div class="flex flex-col gap-3">
       <!-- Empty State -->
       <div v-if="schedule.length === 0 && !loading" class="flex flex-col items-center justify-center py-16 gap-4">
-        <div class="w-16 h-16 rounded-full bg-[#E7E8E5] flex items-center justify-center">
+        <div class="w-16 h-16 rounded-full bg-surface flex items-center justify-center">
           <span class="material-symbols-rounded text-[28px] text-muted-foreground">calendar_month</span>
         </div>
         <div class="flex flex-col items-center gap-1">

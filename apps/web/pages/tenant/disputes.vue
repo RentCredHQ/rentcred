@@ -20,9 +20,9 @@ const form = reactive({
 
 function statusBadgeClasses(status: string) {
   switch (status) {
-    case 'resolved': return 'bg-[#DFE6E1] text-[#004D1A]'
-    case 'closed': return 'bg-[#E7E8E5] text-foreground'
-    case 'under_review': return 'bg-[#E9E3D8] text-[#804200]'
+    case 'resolved': return 'bg-st-green-bg text-st-green-text'
+    case 'closed': return 'bg-surface text-foreground'
+    case 'under_review': return 'bg-st-amber-bg text-st-amber-text'
     default: return 'bg-blue-50 text-blue-600'
   }
 }
@@ -85,7 +85,7 @@ onMounted(loadData)
     </div>
 
     <!-- New Dispute Form -->
-    <div v-if="showForm" class="bg-white border border-border rounded-xl p-5 lg:p-6 flex flex-col gap-4 shadow-sm">
+    <div v-if="showForm" class="bg-card border border-border rounded-xl p-5 lg:p-6 flex flex-col gap-4 shadow-sm">
       <h2 class="font-mono text-base font-semibold text-foreground">File a New Dispute</h2>
 
       <div class="flex flex-col gap-4">
@@ -121,7 +121,7 @@ onMounted(loadData)
     </div>
 
     <!-- Disputes List -->
-    <div v-for="dispute in disputes" :key="dispute.id" class="bg-white border border-border rounded-xl p-5 lg:p-6 flex flex-col gap-3 shadow-sm">
+    <div v-for="dispute in disputes" :key="dispute.id" class="bg-card border border-border rounded-xl p-5 lg:p-6 flex flex-col gap-3 shadow-sm">
       <div class="flex items-start justify-between">
         <div class="flex flex-col gap-0.5">
           <span class="font-sans text-[15px] font-medium text-foreground">{{ dispute.reason }}</span>
@@ -132,13 +132,13 @@ onMounted(loadData)
         </span>
       </div>
       <p class="font-sans text-sm text-muted-foreground">{{ dispute.description }}</p>
-      <div v-if="dispute.resolution" class="bg-[#DFE6E1] rounded-lg p-3">
-        <span class="font-mono text-[11px] font-semibold text-[#004D1A] uppercase tracking-wider">Resolution</span>
-        <p class="font-sans text-sm text-[#004D1A] mt-1">{{ dispute.resolution }}</p>
+      <div v-if="dispute.resolution" class="bg-st-green-bg rounded-lg p-3">
+        <span class="font-mono text-[11px] font-semibold text-st-green-text uppercase tracking-wider">Resolution</span>
+        <p class="font-sans text-sm text-st-green-text mt-1">{{ dispute.resolution }}</p>
       </div>
     </div>
 
-    <div v-if="!loading && disputes.length === 0 && !showForm" class="bg-white border border-border rounded-xl p-8 flex flex-col items-center gap-4 text-center">
+    <div v-if="!loading && disputes.length === 0 && !showForm" class="bg-card border border-border rounded-xl p-8 flex flex-col items-center gap-4 text-center">
       <span class="material-symbols-rounded text-[48px] text-muted-foreground">gavel</span>
       <h3 class="font-mono text-lg font-semibold text-foreground">No Disputes</h3>
       <p class="font-sans text-sm text-muted-foreground max-w-[400px]">You haven't filed any disputes. If you disagree with verification findings, you can file one here.</p>

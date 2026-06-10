@@ -6,8 +6,8 @@ const { getDisputes } = useDisputes()
 
 const kpis = ref([
   { label: 'TOTAL DISPUTES', value: '0', sub: '', valueColor: 'text-foreground' },
-  { label: 'OPEN', value: '0', sub: '', valueColor: 'text-[#804200]' },
-  { label: 'RESOLVED', value: '0', sub: '', valueColor: 'text-[#004D1A]' },
+  { label: 'OPEN', value: '0', sub: '', valueColor: 'text-st-amber-text' },
+  { label: 'RESOLVED', value: '0', sub: '', valueColor: 'text-st-green-text' },
   { label: 'AVG RESOLUTION', value: '—', sub: '', valueColor: 'text-foreground', smallValue: true },
 ])
 
@@ -28,9 +28,9 @@ const showNewDispute = ref(false)
 
 function getStatusStyle(status: string) {
   switch (status) {
-    case 'resolved': case 'closed': return { bg: 'bg-[#DFE6E1]', text: 'text-[#004D1A]', label: status === 'closed' ? 'Closed' : 'Resolved' }
-    case 'under_review': return { bg: 'bg-[#E9E3D8]', text: 'text-[#804200]', label: 'Under Review' }
-    case 'open': return { bg: 'bg-[#E9E3D8]', text: 'text-[#804200]', label: 'Open' }
+    case 'resolved': case 'closed': return { bg: 'bg-st-green-bg', text: 'text-st-green-text', label: status === 'closed' ? 'Closed' : 'Resolved' }
+    case 'under_review': return { bg: 'bg-st-amber-bg', text: 'text-st-amber-text', label: 'Under Review' }
+    case 'open': return { bg: 'bg-st-amber-bg', text: 'text-st-amber-text', label: 'Open' }
     default: return { bg: 'bg-blue-50', text: 'text-blue-600', label: status.replace(/_/g, ' ').replace(/\b\w/g, (c: string) => c.toUpperCase()) }
   }
 }
@@ -47,8 +47,8 @@ onMounted(async () => {
         parties: `${d.raisedBy?.name ?? '—'} / ${d.submission?.agent?.name ?? '—'}`,
         reason: d.reason ?? '—',
         priority: 'Medium',
-        priorityBg: 'bg-[#E9E3D8]',
-        priorityText: 'text-[#804200]',
+        priorityBg: 'bg-st-amber-bg',
+        priorityText: 'text-st-amber-text',
         status: style.label,
         statusBg: style.bg,
         statusText: style.text,
@@ -63,8 +63,8 @@ onMounted(async () => {
 
     kpis.value = [
       { label: 'TOTAL DISPUTES', value: String(total), sub: '', valueColor: 'text-foreground' },
-      { label: 'OPEN', value: String(open), sub: '', valueColor: 'text-[#804200]' },
-      { label: 'RESOLVED', value: String(resolved), sub: '', valueColor: 'text-[#004D1A]' },
+      { label: 'OPEN', value: String(open), sub: '', valueColor: 'text-st-amber-text' },
+      { label: 'RESOLVED', value: String(resolved), sub: '', valueColor: 'text-st-green-text' },
       { label: 'AVG RESOLUTION', value: '—', sub: '', valueColor: 'text-foreground', smallValue: true },
     ]
   } catch { /* empty */ }
@@ -103,7 +103,7 @@ const { searchQuery, activeFilter, filtered, resultCount } = useFilter({
 
     <!-- KPI Row -->
     <div class="grid grid-cols-2 lg:grid-cols-4 gap-4">
-      <div v-for="kpi in kpis" :key="kpi.label" class="bg-white border border-border rounded-lg p-5 flex flex-col gap-2">
+      <div v-for="kpi in kpis" :key="kpi.label" class="bg-card border border-border rounded-lg p-5 flex flex-col gap-2">
         <span class="font-mono text-[11px] font-semibold text-muted-foreground tracking-wider">{{ kpi.label }}</span>
         <span class="font-mono font-bold" :class="[kpi.valueColor, kpi.smallValue ? 'text-2xl' : 'text-[28px]']">{{ kpi.value }}</span>
         <span class="font-sans text-[12px] text-muted-foreground">{{ kpi.sub }}</span>
@@ -114,7 +114,7 @@ const { searchQuery, activeFilter, filtered, resultCount } = useFilter({
     <UiFilterTabs v-model="activeFilter" :tabs="statusTabs" />
 
     <!-- Disputes Table -->
-    <div class="bg-white border border-border rounded-lg overflow-hidden">
+    <div class="bg-card border border-border rounded-lg overflow-hidden">
       <!-- Table Header Row -->
       <div class="flex items-center justify-between px-6 py-3 border-b border-border">
         <div class="flex items-center gap-2">
@@ -138,7 +138,7 @@ const { searchQuery, activeFilter, filtered, resultCount } = useFilter({
 
         <!-- Empty State -->
         <div v-if="filtered.length === 0 && !loading" class="flex flex-col items-center justify-center py-16 gap-4">
-          <div class="w-16 h-16 rounded-full bg-[#E7E8E5] flex items-center justify-center">
+          <div class="w-16 h-16 rounded-full bg-surface flex items-center justify-center">
             <span class="material-symbols-rounded text-[28px] text-muted-foreground">gavel</span>
           </div>
           <div class="flex flex-col items-center gap-1">
@@ -169,7 +169,7 @@ const { searchQuery, activeFilter, filtered, resultCount } = useFilter({
       <!-- Mobile -->
       <div class="lg:hidden">
         <div v-if="filtered.length === 0 && !loading" class="flex flex-col items-center justify-center py-16 gap-4">
-          <div class="w-16 h-16 rounded-full bg-[#E7E8E5] flex items-center justify-center">
+          <div class="w-16 h-16 rounded-full bg-surface flex items-center justify-center">
             <span class="material-symbols-rounded text-[28px] text-muted-foreground">gavel</span>
           </div>
           <div class="flex flex-col items-center gap-1">
@@ -195,7 +195,7 @@ const { searchQuery, activeFilter, filtered, resultCount } = useFilter({
       <div class="flex items-center justify-between px-6 py-3 border-t border-border">
         <span class="font-sans text-[12px] text-muted-foreground">Showing {{ resultCount }} of {{ totalDisputes }} disputes</span>
         <div class="flex items-center gap-1.5">
-          <button @click="goPage(-1)" :disabled="currentPage <= 1" class="px-2.5 py-1 bg-white border border-border rounded-md text-[12px] font-sans text-foreground disabled:opacity-40">Prev</button>
+          <button @click="goPage(-1)" :disabled="currentPage <= 1" class="px-2.5 py-1 bg-card border border-border rounded-md text-[12px] font-sans text-foreground disabled:opacity-40">Prev</button>
           <span class="px-2.5 py-1 bg-foreground rounded-md text-[12px] font-sans text-white">{{ currentPage }}</span>
           <button @click="goPage(1)" :disabled="currentPage >= totalPages" class="px-2.5 py-1 bg-primary rounded-md text-[12px] font-sans text-white disabled:opacity-40">Next</button>
         </div>

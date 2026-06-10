@@ -3,6 +3,9 @@ const route = useRoute()
 const authStore = useAuthStore()
 const mobileMenuOpen = ref(false)
 
+const colorMode = useColorMode()
+const logoVariant = computed(() => (colorMode.value === 'dark' ? 'dark' : 'light'))
+
 const user = computed(() => {
   if (!authStore.user) return null
   const name = authStore.user.name || 'Agent'
@@ -42,9 +45,9 @@ watch(() => route.path, () => {
 <template>
   <div class="min-h-screen flex bg-background">
     <!-- Desktop Sidebar -->
-    <aside class="hidden lg:flex sticky top-0 h-screen w-[260px] bg-[#E7E8E5] flex-col border-r border-border flex-shrink-0">
+    <aside class="hidden lg:flex sticky top-0 h-screen w-[260px] bg-sidebar flex-col border-r border-border flex-shrink-0">
       <div class="flex items-center gap-2.5 px-6 py-5 border-b border-border">
-        <UiRentCredLogo :size="28" variant="light" :show-text="true" :horizontal="true" />
+        <UiRentCredLogo :size="28" :variant="logoVariant" :show-text="true" :horizontal="true" />
       </div>
 
       <nav class="flex-1 flex flex-col gap-6 px-3 py-4 overflow-y-auto">
@@ -55,7 +58,7 @@ watch(() => route.path, () => {
             :key="item.to"
             :to="item.to"
             class="flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-sans transition-colors"
-            :class="isActive(item.to) ? 'bg-[#CBCCC9] text-foreground font-semibold' : 'text-muted-foreground hover:text-foreground hover:bg-[#CBCCC9]/50'"
+            :class="isActive(item.to) ? 'bg-border text-foreground font-semibold' : 'text-muted-foreground hover:text-foreground hover:bg-border/50'"
           >
             <span class="material-symbols-rounded text-[20px]">{{ item.icon }}</span>
             {{ item.label }}
@@ -69,7 +72,7 @@ watch(() => route.path, () => {
             :key="item.to"
             :to="item.to"
             class="flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-sans transition-colors"
-            :class="isActive(item.to) ? 'bg-[#CBCCC9] text-foreground font-semibold' : 'text-muted-foreground hover:text-foreground hover:bg-[#CBCCC9]/50'"
+            :class="isActive(item.to) ? 'bg-border text-foreground font-semibold' : 'text-muted-foreground hover:text-foreground hover:bg-border/50'"
           >
             <span class="material-symbols-rounded text-[20px]">{{ item.icon }}</span>
             {{ item.label }}
@@ -79,7 +82,7 @@ watch(() => route.path, () => {
 
       <div class="flex items-center gap-3 px-6 py-4 border-t border-border">
         <div class="w-9 h-9 rounded-full bg-primary flex items-center justify-center">
-          <span class="font-mono text-[13px] font-semibold text-foreground">{{ user?.initials || 'FA' }}</span>
+          <span class="font-mono text-[13px] font-semibold text-primary-foreground">{{ user?.initials || 'FA' }}</span>
         </div>
         <div class="flex flex-col gap-px">
           <span class="text-[13px] font-medium text-foreground font-sans">{{ user?.name || 'Agent' }}</span>
@@ -95,9 +98,12 @@ watch(() => route.path, () => {
           <span class="material-symbols-rounded text-[24px]">menu</span>
         </button>
         <span class="font-mono text-lg font-bold text-primary">RentCred</span>
-        <button class="flex items-center justify-center w-10 h-10 rounded-full border border-border bg-card" aria-label="Notifications">
-          <span class="material-symbols-rounded text-[20px] text-muted-foreground">notifications</span>
-        </button>
+        <div class="flex items-center gap-1">
+          <UiThemeToggle compact />
+          <button class="flex items-center justify-center w-10 h-10 rounded-full border border-border bg-card" aria-label="Notifications">
+            <span class="material-symbols-rounded text-[20px] text-muted-foreground">notifications</span>
+          </button>
+        </div>
       </div>
     </div>
 
@@ -107,9 +113,9 @@ watch(() => route.path, () => {
         <div v-if="mobileMenuOpen" class="lg:hidden fixed inset-0 bg-black/50 z-50" @click="mobileMenuOpen = false" />
       </Transition>
       <Transition name="dashslide">
-        <aside v-if="mobileMenuOpen" class="lg:hidden fixed top-0 left-0 bottom-0 w-[280px] bg-[#E7E8E5] z-50 flex flex-col overflow-y-auto">
+        <aside v-if="mobileMenuOpen" class="lg:hidden fixed top-0 left-0 bottom-0 w-[280px] bg-sidebar z-50 flex flex-col overflow-y-auto">
           <div class="flex items-center justify-between px-5 py-5 border-b border-border">
-            <UiRentCredLogo :size="24" variant="light" :show-text="true" :horizontal="true" />
+            <UiRentCredLogo :size="24" :variant="logoVariant" :show-text="true" :horizontal="true" />
             <button @click="mobileMenuOpen = false" class="text-muted-foreground" aria-label="Close">
               <span class="material-symbols-rounded text-[20px]">close</span>
             </button>
@@ -122,7 +128,7 @@ watch(() => route.path, () => {
                 :key="item.to"
                 :to="item.to"
                 class="flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-sans transition-colors"
-                :class="isActive(item.to) ? 'bg-[#CBCCC9] text-foreground font-semibold' : 'text-muted-foreground'"
+                :class="isActive(item.to) ? 'bg-border text-foreground font-semibold' : 'text-muted-foreground'"
               >
                 <span class="material-symbols-rounded text-[20px]">{{ item.icon }}</span>
                 {{ item.label }}
@@ -135,7 +141,7 @@ watch(() => route.path, () => {
                 :key="item.to"
                 :to="item.to"
                 class="flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-sans transition-colors"
-                :class="isActive(item.to) ? 'bg-[#CBCCC9] text-foreground font-semibold' : 'text-muted-foreground'"
+                :class="isActive(item.to) ? 'bg-border text-foreground font-semibold' : 'text-muted-foreground'"
               >
                 <span class="material-symbols-rounded text-[20px]">{{ item.icon }}</span>
                 {{ item.label }}
@@ -144,7 +150,7 @@ watch(() => route.path, () => {
           </nav>
           <div class="flex items-center gap-3 px-5 py-4 border-t border-border">
             <div class="w-9 h-9 rounded-full bg-primary flex items-center justify-center">
-              <span class="font-mono text-[13px] font-semibold text-foreground">{{ user?.initials || 'FA' }}</span>
+              <span class="font-mono text-[13px] font-semibold text-primary-foreground">{{ user?.initials || 'FA' }}</span>
             </div>
             <div class="flex flex-col gap-px">
               <span class="text-[13px] font-medium text-foreground font-sans">{{ user?.name || 'Agent' }}</span>
@@ -164,6 +170,7 @@ watch(() => route.path, () => {
           <span class="font-sans text-[13px] text-muted-foreground">{{ user?.email || '' }} &bull; Field Agent</span>
         </div>
         <div class="flex items-center gap-3">
+          <UiThemeToggle />
           <button class="flex items-center justify-center w-10 h-10 rounded-lg border border-border hover:bg-surface transition-colors" aria-label="Notifications">
             <span class="material-symbols-rounded text-[20px] text-muted-foreground">notifications</span>
           </button>
@@ -189,7 +196,7 @@ watch(() => route.path, () => {
           :key="tab.to"
           :to="tab.to"
           class="flex-1 flex flex-col items-center justify-center py-2 rounded-full font-mono text-[10px] font-semibold tracking-wide gap-1"
-          :class="isActive(tab.to) ? 'bg-primary text-foreground' : 'text-muted-foreground'"
+          :class="isActive(tab.to) ? 'bg-primary text-primary-foreground' : 'text-muted-foreground'"
         >
           <span class="material-symbols-rounded text-[18px]">{{ tab.icon }}</span>
           {{ tab.label }}

@@ -171,20 +171,20 @@ async function handleSubmit() {
   <div>
     <!-- Confirmation Screen -->
     <div v-if="showConfirmation" class="flex items-center justify-center min-h-[60vh]">
-      <div class="bg-white border border-border rounded-xl p-8 lg:p-10 w-full max-w-[560px] flex flex-col items-center gap-5 text-center">
-        <div class="w-20 h-20 rounded-full bg-[#DFE6E1] flex items-center justify-center">
-          <span class="material-symbols-rounded text-[40px] text-[#004D1A]">check</span>
+      <div class="bg-card border border-border rounded-xl p-8 lg:p-10 w-full max-w-[560px] flex flex-col items-center gap-5 text-center">
+        <div class="w-20 h-20 rounded-full bg-st-green-bg flex items-center justify-center">
+          <span class="material-symbols-rounded text-[40px] text-st-green-text">check</span>
         </div>
         <h1 class="font-mono text-2xl font-bold text-foreground">Tenant Invite Sent</h1>
         <p class="font-sans text-sm text-muted-foreground max-w-[440px]" style="line-height: 1.5">We securely sent a consent link to {{ step1.fullName }}. Most tenants complete verification within 5-15 minutes.</p>
 
         <div class="w-full bg-background border border-border rounded-lg p-3 flex flex-col gap-2">
           <div class="flex items-center gap-2">
-            <span class="material-symbols-rounded text-[16px] text-[#004D1A]">lock</span>
+            <span class="material-symbols-rounded text-[16px] text-st-green-text">lock</span>
             <span class="font-sans text-[13px] text-foreground">Invite sent via encrypted SMS and email</span>
           </div>
           <div class="flex items-center gap-2">
-            <span class="material-symbols-rounded text-[16px] text-[#004D1A]">verified_user</span>
+            <span class="material-symbols-rounded text-[16px] text-st-green-text">verified_user</span>
             <span class="font-sans text-[13px] text-foreground">NDPR compliant consent capture</span>
           </div>
         </div>
@@ -249,7 +249,7 @@ async function handleSubmit() {
       </div>
 
       <!-- Step 1: Tenant Information -->
-      <div v-if="currentStep === 1" class="bg-white border border-border rounded-lg p-6 lg:p-8 w-full max-w-[600px] flex flex-col gap-6">
+      <div v-if="currentStep === 1" class="bg-card border border-border rounded-lg p-6 lg:p-8 w-full max-w-[600px] flex flex-col gap-6">
         <div class="flex flex-col gap-1.5">
           <h2 class="font-mono text-xl font-bold text-foreground">Tenant Information</h2>
           <p class="font-sans text-sm text-muted-foreground">Enter the tenant details to begin screening</p>
@@ -277,7 +277,7 @@ async function handleSubmit() {
       </div>
 
       <!-- Step 2: Property Details -->
-      <div v-if="currentStep === 2" class="bg-white border border-border rounded-lg p-6 lg:p-8 w-full max-w-[600px] flex flex-col gap-6">
+      <div v-if="currentStep === 2" class="bg-card border border-border rounded-lg p-6 lg:p-8 w-full max-w-[600px] flex flex-col gap-6">
         <div class="flex flex-col gap-1.5">
           <h2 class="font-mono text-xl font-bold text-foreground">Property Details</h2>
           <p class="font-sans text-sm text-muted-foreground">Describe the property the tenant intends to rent</p>
@@ -369,7 +369,7 @@ async function handleSubmit() {
             <button
               v-if="step2.propertyImages.length < 5"
               type="button"
-              class="w-full py-6 border-2 border-dashed border-border rounded-lg flex flex-col items-center gap-2 hover:border-primary hover:bg-[#FFF8F0] transition-colors"
+              class="w-full py-6 border-2 border-dashed border-border rounded-lg flex flex-col items-center gap-2 hover:border-primary hover:bg-primary/5 transition-colors"
               :class="{ 'opacity-50 pointer-events-none': uploading }"
               @click="fileInput?.click()">
               <span class="material-symbols-rounded text-[28px] text-muted-foreground">add_a_photo</span>
@@ -418,7 +418,7 @@ async function handleSubmit() {
       </div>
 
       <!-- Step 3: Select Package -->
-      <div v-if="currentStep === 3" class="bg-white border border-border rounded-lg p-6 lg:p-8 w-full max-w-[600px] flex flex-col gap-6">
+      <div v-if="currentStep === 3" class="bg-card border border-border rounded-lg p-6 lg:p-8 w-full max-w-[600px] flex flex-col gap-6">
         <div class="flex flex-col gap-1.5">
           <h2 class="font-mono text-xl font-bold text-foreground">Select Verification Package</h2>
           <p class="font-sans text-sm text-muted-foreground">Choose the level of verification for this tenant</p>
@@ -429,7 +429,7 @@ async function handleSubmit() {
             v-for="pkg in packages"
             :key="pkg.id"
             class="flex items-start gap-3 w-full p-4 text-left rounded-lg border transition-all"
-            :class="selectedPackage === pkg.id ? 'border-primary border-l-[3px] bg-[#FFF8F0]' : 'border-border hover:border-muted-foreground'"
+            :class="selectedPackage === pkg.id ? 'border-primary border-l-[3px] bg-primary/5' : 'border-border hover:border-muted-foreground'"
             @click="selectedPackage = pkg.id"
           >
             <div class="w-[18px] h-[18px] rounded-full border-2 mt-0.5 flex-shrink-0 flex items-center justify-center" :class="selectedPackage === pkg.id ? 'border-primary' : 'border-border'">
@@ -454,7 +454,7 @@ async function handleSubmit() {
               :class="useBundleCredit ? 'bg-primary' : 'bg-border'"
               @click="useBundleCredit = !useBundleCredit"
             >
-              <div class="w-4 h-4 rounded-full bg-white transition-transform" :class="useBundleCredit ? 'translate-x-4' : ''" />
+              <div class="w-4 h-4 rounded-full bg-card transition-transform" :class="useBundleCredit ? 'translate-x-4' : ''" />
             </button>
             <span class="font-sans text-sm font-medium text-foreground">Use bundle credit</span>
           </div>
@@ -468,7 +468,7 @@ async function handleSubmit() {
       </div>
 
       <!-- Step 4: Review & Pay -->
-      <div v-if="currentStep === 4" class="bg-white border border-border rounded-lg p-6 lg:p-8 w-full max-w-[600px] flex flex-col gap-6">
+      <div v-if="currentStep === 4" class="bg-card border border-border rounded-lg p-6 lg:p-8 w-full max-w-[600px] flex flex-col gap-6">
         <div class="flex flex-col gap-1.5">
           <h2 class="font-mono text-xl font-bold text-foreground">Review & Pay</h2>
           <p class="font-sans text-sm text-muted-foreground">Confirm details before submitting</p>
@@ -518,9 +518,9 @@ async function handleSubmit() {
         </div>
 
         <!-- Info Note -->
-        <div class="flex items-start gap-2.5 bg-[#DFDFE6] p-3.5 rounded">
-          <span class="material-symbols-rounded text-[18px] text-[#000066] mt-0.5">info</span>
-          <span class="font-sans text-[13px] text-[#000066]">An invite link will be sent to the tenant via SMS and email to complete their profile.</span>
+        <div class="flex items-start gap-2.5 bg-st-blue-bg p-3.5 rounded">
+          <span class="material-symbols-rounded text-[18px] text-st-blue-text mt-0.5">info</span>
+          <span class="font-sans text-[13px] text-st-blue-text">An invite link will be sent to the tenant via SMS and email to complete their profile.</span>
         </div>
 
         <!-- Error message -->

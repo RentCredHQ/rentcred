@@ -12,8 +12,8 @@ const txn = ref({
   date: '',
   amount: '₦0',
   status: '',
-  statusBg: 'bg-[#E9E3D8]',
-  statusText: 'text-[#804200]',
+  statusBg: 'bg-st-amber-bg',
+  statusText: 'text-st-amber-text',
   type: '',
   caseId: '',
   tenant: '',
@@ -24,10 +24,10 @@ const txn = ref({
 })
 
 const statusStyleMap: Record<string, { bg: string; text: string; label: string }> = {
-  processed: { bg: 'bg-[#DFE6E1]', text: 'text-[#004D1A]', label: 'Processed' },
-  completed: { bg: 'bg-[#DFE6E1]', text: 'text-[#004D1A]', label: 'Processed' },
-  pending: { bg: 'bg-[#E9E3D8]', text: 'text-[#804200]', label: 'Pending' },
-  failed: { bg: 'bg-[#E5DCDA]', text: 'text-[#8C1C00]', label: 'Failed' },
+  processed: { bg: 'bg-st-green-bg', text: 'text-st-green-text', label: 'Processed' },
+  completed: { bg: 'bg-st-green-bg', text: 'text-st-green-text', label: 'Processed' },
+  pending: { bg: 'bg-st-amber-bg', text: 'text-st-amber-text', label: 'Pending' },
+  failed: { bg: 'bg-st-red-bg', text: 'text-st-red-text', label: 'Failed' },
 }
 
 watch(() => show.value, async (open) => {
@@ -83,7 +83,7 @@ watch(() => show.value, async (open) => {
 
           <!-- Error -->
           <div v-else-if="error" class="p-6">
-            <div class="font-sans text-[13px] text-[#8C1C00]">{{ error }}</div>
+            <div class="font-sans text-[13px] text-st-red-text">{{ error }}</div>
           </div>
 
           <div v-else class="flex flex-col gap-5 p-6">

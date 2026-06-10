@@ -41,8 +41,8 @@ const summaryCards = computed(() => {
   return [
     { label: 'Total Submissions', value: String(total), valueColor: 'text-foreground' },
     { label: 'In Progress', value: String(inProgress), valueColor: 'text-primary' },
-    { label: 'Needs Attention', value: String(needsAttention), valueColor: 'text-[#804200]' },
-    { label: 'Completed', value: String(completed), valueColor: 'text-[#004D1A]' },
+    { label: 'Needs Attention', value: String(needsAttention), valueColor: 'text-st-amber-text' },
+    { label: 'Completed', value: String(completed), valueColor: 'text-st-green-text' },
   ]
 })
 
@@ -73,7 +73,7 @@ onMounted(async () => {
     <!-- Header -->
     <div class="flex items-center gap-3">
       <h1 class="font-mono text-2xl font-semibold text-foreground" style="letter-spacing: -0.5px">My Submissions</h1>
-      <span class="px-2.5 py-1 rounded-full bg-[#E7E8E5] font-sans text-[12px] font-medium text-foreground">{{ resultCount }} active</span>
+      <span class="px-2.5 py-1 rounded-full bg-surface font-sans text-[12px] font-medium text-foreground">{{ resultCount }} active</span>
     </div>
 
     <!-- Search & Filters -->
@@ -84,7 +84,7 @@ onMounted(async () => {
 
     <!-- Summary Cards -->
     <div class="grid grid-cols-2 lg:grid-cols-4 gap-3">
-      <div v-for="card in summaryCards" :key="card.label" class="bg-white border border-border rounded-lg px-3.5 py-3 flex flex-col gap-1">
+      <div v-for="card in summaryCards" :key="card.label" class="bg-card border border-border rounded-lg px-3.5 py-3 flex flex-col gap-1">
         <span class="font-sans text-[12px] text-muted-foreground">{{ card.label }}</span>
         <span class="font-mono text-xl font-bold" :class="card.valueColor">{{ card.value }}</span>
       </div>
@@ -99,9 +99,9 @@ onMounted(async () => {
     </div>
 
     <!-- Desktop Table -->
-    <div class="hidden lg:block bg-white border-[1.5px] border-border rounded-lg overflow-hidden">
+    <div class="hidden lg:block bg-card border-[1.5px] border-border rounded-lg overflow-hidden">
       <!-- Column Headers -->
-      <div class="flex bg-[#E7E8E5] px-4 py-3 min-w-[860px]">
+      <div class="flex bg-surface px-4 py-3 min-w-[860px]">
         <div class="w-[180px] flex-shrink-0"><span class="font-mono text-[12px] font-semibold text-muted-foreground tracking-wider">Tenant Name</span></div>
         <div class="w-[120px] flex-shrink-0"><span class="font-mono text-[12px] font-semibold text-muted-foreground tracking-wider">Case ID</span></div>
         <div class="w-[130px] flex-shrink-0"><span class="font-mono text-[12px] font-semibold text-muted-foreground tracking-wider">Package</span></div>
@@ -112,7 +112,7 @@ onMounted(async () => {
 
       <!-- Empty State -->
       <div v-if="filtered.length === 0" class="flex flex-col items-center justify-center py-16 gap-4">
-        <div class="w-16 h-16 rounded-full bg-[#E7E8E5] flex items-center justify-center">
+        <div class="w-16 h-16 rounded-full bg-surface flex items-center justify-center">
           <span class="material-symbols-rounded text-[28px] text-muted-foreground">folder_open</span>
         </div>
         <div class="flex flex-col items-center gap-1">
@@ -151,7 +151,7 @@ onMounted(async () => {
     <!-- Mobile Card List -->
     <div class="lg:hidden flex flex-col gap-3">
       <div v-if="filtered.length === 0" class="flex flex-col items-center justify-center py-16 gap-4">
-        <div class="w-16 h-16 rounded-full bg-[#E7E8E5] flex items-center justify-center">
+        <div class="w-16 h-16 rounded-full bg-surface flex items-center justify-center">
           <span class="material-symbols-rounded text-[28px] text-muted-foreground">folder_open</span>
         </div>
         <div class="flex flex-col items-center gap-1">
@@ -163,7 +163,7 @@ onMounted(async () => {
         v-for="sub in filtered"
         :key="sub.caseId"
         :to="`/dashboard/submissions/${sub.caseId}`"
-        class="bg-white border border-border rounded-xl p-4 flex flex-col gap-3"
+        class="bg-card border border-border rounded-xl p-4 flex flex-col gap-3"
       >
         <div class="flex items-center justify-between">
           <span class="font-sans text-sm font-semibold text-foreground">{{ sub.name }}</span>

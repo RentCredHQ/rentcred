@@ -43,9 +43,9 @@ const { activeFilter, filtered, resultCount } = useFilter({
 
 function resultClasses(result: string) {
   switch (result) {
-    case 'Verified': return 'bg-[#DFE6E1] text-[#004D1A]'
-    case 'Flagged': return 'bg-[#E5DCDA] text-[#8C1C00]'
-    default: return 'bg-[#E9E3D8] text-[#804200]'
+    case 'Verified': return 'bg-st-green-bg text-st-green-text'
+    case 'Flagged': return 'bg-st-red-bg text-st-red-text'
+    default: return 'bg-st-amber-bg text-st-amber-text'
   }
 }
 </script>
@@ -60,7 +60,7 @@ function resultClasses(result: string) {
     <div class="flex flex-col gap-3">
       <!-- Empty State -->
       <div v-if="filtered.length === 0 && !loading" class="flex flex-col items-center justify-center py-16 gap-4">
-        <div class="w-16 h-16 rounded-full bg-[#E7E8E5] flex items-center justify-center">
+        <div class="w-16 h-16 rounded-full bg-surface flex items-center justify-center">
           <span class="material-symbols-rounded text-[28px] text-muted-foreground">assessment</span>
         </div>
         <div class="flex flex-col items-center gap-1">

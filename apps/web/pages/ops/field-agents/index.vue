@@ -16,16 +16,16 @@ const statusTabs = [
 ]
 
 const statusStyleMap: Record<string, { bg: string; text: string }> = {
-  active: { bg: 'bg-[#DFE6E1]', text: 'text-[#004D1A]' },
+  active: { bg: 'bg-st-green-bg', text: 'text-st-green-text' },
   inactive: { bg: 'bg-background', text: 'text-muted-foreground' },
-  suspended: { bg: 'bg-[#E5DCDA]', text: 'text-[#8C1C00]' },
+  suspended: { bg: 'bg-st-red-bg', text: 'text-st-red-text' },
 }
 
 const kpis = ref([
   { label: 'TOTAL AGENTS', value: '—', sub: '', valueColor: 'text-foreground' },
-  { label: 'ACTIVE TODAY', value: '—', sub: '', valueColor: 'text-[#004D1A]' },
+  { label: 'ACTIVE TODAY', value: '—', sub: '', valueColor: 'text-st-green-text' },
   { label: 'AVG RATING', value: '—', sub: '', valueColor: 'text-primary' },
-  { label: 'PENDING REVIEWS', value: '—', sub: '', valueColor: 'text-[#804200]' },
+  { label: 'PENDING REVIEWS', value: '—', sub: '', valueColor: 'text-st-amber-text' },
 ])
 
 const agents = ref<any[]>([])
@@ -78,9 +78,9 @@ async function fetchAgents() {
     const totalActive = items.reduce((sum: number, a: any) => sum + (a.activeAssignments ?? 0), 0)
     kpis.value = [
       { label: 'TOTAL AGENTS', value: String(totalAgents.value), sub: '', valueColor: 'text-foreground' },
-      { label: 'VERIFIED', value: String(activeCount), sub: '', valueColor: 'text-[#004D1A]' },
+      { label: 'VERIFIED', value: String(activeCount), sub: '', valueColor: 'text-st-green-text' },
       { label: 'ACTIVE CASES', value: String(totalActive), sub: '', valueColor: 'text-primary' },
-      { label: 'PENDING REVIEWS', value: '—', sub: '', valueColor: 'text-[#804200]' },
+      { label: 'PENDING REVIEWS', value: '—', sub: '', valueColor: 'text-st-amber-text' },
     ]
   } catch { /* empty */ }
   finally { loading.value = false }
@@ -155,7 +155,7 @@ const { searchQuery, activeFilter, filtered, resultCount } = useFilter({
 
         <!-- Empty State -->
         <div v-if="filtered.length === 0 && !loading" class="flex flex-col items-center justify-center py-16 gap-4">
-          <div class="w-16 h-16 rounded-full bg-[#E7E8E5] flex items-center justify-center">
+          <div class="w-16 h-16 rounded-full bg-surface flex items-center justify-center">
             <span class="material-symbols-rounded text-[28px] text-muted-foreground">badge</span>
           </div>
           <div class="flex flex-col items-center gap-1">
@@ -188,7 +188,7 @@ const { searchQuery, activeFilter, filtered, resultCount } = useFilter({
       <!-- Mobile Cards -->
       <div class="lg:hidden">
         <div v-if="filtered.length === 0 && !loading" class="flex flex-col items-center justify-center py-16 gap-4">
-          <div class="w-16 h-16 rounded-full bg-[#E7E8E5] flex items-center justify-center">
+          <div class="w-16 h-16 rounded-full bg-surface flex items-center justify-center">
             <span class="material-symbols-rounded text-[28px] text-muted-foreground">badge</span>
           </div>
           <div class="flex flex-col items-center gap-1">
@@ -217,7 +217,7 @@ const { searchQuery, activeFilter, filtered, resultCount } = useFilter({
       <div class="flex items-center justify-between px-6 py-3 border-t border-border">
         <span class="font-sans text-[12px] text-muted-foreground">Showing {{ resultCount }} of {{ totalAgents }} agents</span>
         <div class="flex items-center gap-1.5">
-          <button @click="goPage(-1)" :disabled="currentPage <= 1" class="px-2.5 py-1 bg-white border border-border rounded-md text-[12px] font-sans text-foreground disabled:opacity-40">Prev</button>
+          <button @click="goPage(-1)" :disabled="currentPage <= 1" class="px-2.5 py-1 bg-card border border-border rounded-md text-[12px] font-sans text-foreground disabled:opacity-40">Prev</button>
           <span class="px-2.5 py-1 bg-foreground rounded-md text-[12px] font-sans text-white">{{ currentPage }}</span>
           <button @click="goPage(1)" :disabled="currentPage >= totalPages" class="px-2.5 py-1 bg-primary rounded-md text-[12px] font-sans text-white disabled:opacity-40">Next</button>
         </div>

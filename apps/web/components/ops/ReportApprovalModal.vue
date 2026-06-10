@@ -68,11 +68,11 @@ async function requestRevisions() {
         <div class="absolute inset-0 bg-black/50" @click="close" />
 
         <!-- Modal -->
-        <div class="relative w-full mx-4 max-w-[440px] bg-white rounded-2xl border border-border shadow-xl flex flex-col max-h-[85vh] overflow-hidden">
+        <div class="relative w-full mx-4 max-w-[440px] bg-card rounded-2xl border border-border shadow-xl flex flex-col max-h-[85vh] overflow-hidden">
           <!-- Header -->
           <div class="flex items-center justify-between px-6 py-5 border-b border-border flex-shrink-0">
             <h2 class="font-mono text-[16px] font-bold text-foreground">Review &amp; Approve Report</h2>
-            <button @click="close" class="w-8 h-8 flex items-center justify-center rounded-lg bg-[#E7E8E5] hover:bg-border transition-colors" aria-label="Close">
+            <button @click="close" class="w-8 h-8 flex items-center justify-center rounded-lg bg-surface hover:bg-border transition-colors" aria-label="Close">
               <span class="material-symbols-rounded text-[18px] text-muted-foreground">close</span>
             </button>
           </div>
@@ -80,7 +80,7 @@ async function requestRevisions() {
           <!-- Body -->
           <div class="flex-1 overflow-y-auto px-6 py-6 flex flex-col gap-5">
             <!-- Case Information Card -->
-            <div class="bg-[#E7E8E5] rounded-[10px] p-4 flex flex-col gap-3">
+            <div class="bg-surface rounded-[10px] p-4 flex flex-col gap-3">
               <span class="font-sans text-[13px] font-semibold text-foreground">Case Information</span>
               <div class="flex justify-between">
                 <span class="font-sans text-[12px] text-muted-foreground">Case ID</span>
@@ -99,8 +99,8 @@ async function requestRevisions() {
             <!-- Approve Card -->
             <div class="border border-border rounded-[10px] p-4 flex flex-col gap-3">
               <div class="flex items-center gap-3">
-                <div class="w-9 h-9 rounded-lg bg-[#DFE6E1] flex items-center justify-center flex-shrink-0">
-                  <span class="material-symbols-rounded text-[20px] text-[#004D1A]">check_circle</span>
+                <div class="w-9 h-9 rounded-lg bg-st-green-bg flex items-center justify-center flex-shrink-0">
+                  <span class="material-symbols-rounded text-[20px] text-st-green-text">check_circle</span>
                 </div>
                 <div class="flex flex-col gap-0.5">
                   <span class="font-sans text-[14px] font-semibold text-foreground">Approve Report</span>
@@ -110,7 +110,7 @@ async function requestRevisions() {
               <button
                 @click="approveReport"
                 :disabled="actionLoading"
-                class="flex items-center justify-center gap-2 w-full h-10 bg-[#004D1A] text-white rounded-lg hover:opacity-90 transition-opacity disabled:opacity-50 disabled:cursor-not-allowed"
+                class="flex items-center justify-center gap-2 w-full h-10 bg-st-green-text text-white rounded-lg hover:opacity-90 transition-opacity disabled:opacity-50 disabled:cursor-not-allowed"
               >
                 <span v-if="actionLoading" class="material-symbols-rounded text-[16px] animate-spin">progress_activity</span>
                 <span v-else class="material-symbols-rounded text-[16px]">check</span>
@@ -121,8 +121,8 @@ async function requestRevisions() {
             <!-- Revise Card -->
             <div class="border border-border rounded-[10px] p-4 flex flex-col gap-3">
               <div class="flex items-center gap-3">
-                <div class="w-9 h-9 rounded-lg bg-[#E9E3D8] flex items-center justify-center flex-shrink-0">
-                  <span class="material-symbols-rounded text-[20px] text-[#804200]">edit_note</span>
+                <div class="w-9 h-9 rounded-lg bg-st-amber-bg flex items-center justify-center flex-shrink-0">
+                  <span class="material-symbols-rounded text-[20px] text-st-amber-text">edit_note</span>
                 </div>
                 <div class="flex flex-col gap-0.5">
                   <span class="font-sans text-[14px] font-semibold text-foreground">Request Revisions</span>
@@ -132,7 +132,7 @@ async function requestRevisions() {
               <textarea
                 v-model="feedback"
                 placeholder="Enter feedback for the agent..."
-                class="w-full h-20 px-3 py-3 border border-border rounded-lg bg-white text-[12px] font-sans text-foreground placeholder:text-muted-foreground outline-none focus:ring-1 focus:ring-primary resize-none"
+                class="w-full h-20 px-3 py-3 border border-border rounded-lg bg-card text-[12px] font-sans text-foreground placeholder:text-muted-foreground outline-none focus:ring-1 focus:ring-primary resize-none"
               />
               <button
                 @click="requestRevisions"
@@ -146,7 +146,7 @@ async function requestRevisions() {
             </div>
 
             <!-- Error -->
-            <div v-if="error" class="font-sans text-[13px] text-[#8C1C00]">{{ error }}</div>
+            <div v-if="error" class="font-sans text-[13px] text-st-red-text">{{ error }}</div>
 
             <!-- Cancel Link -->
             <div class="flex justify-center py-1">

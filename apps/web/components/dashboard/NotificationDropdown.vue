@@ -5,9 +5,9 @@ const close = () => emit('update:modelValue', false)
 
 const notifications = ref([
   { id: 1, title: 'Report ready', desc: 'Verification report for Adebayo Ogunlesi is now available to view.', time: '2 minutes ago', read: false, dot: 'bg-primary' },
-  { id: 2, title: 'Tenant consent received', desc: 'Chioma Eze has completed their consent form for RC-2026-00389.', time: '15 minutes ago', read: false, dot: 'bg-[#004D1A]' },
+  { id: 2, title: 'Tenant consent received', desc: 'Chioma Eze has completed their consent form for RC-2026-00389.', time: '15 minutes ago', read: false, dot: 'bg-st-green-text' },
   { id: 3, title: 'Verification in progress', desc: 'Case RC-2026-00412 verification has started.', time: '1 hour ago', read: true, dot: 'bg-[#1A56DB]' },
-  { id: 4, title: 'Payment received', desc: '₦45,000 received for 5 verification credits.', time: '3 hours ago', read: true, dot: 'bg-[#004D1A]' },
+  { id: 4, title: 'Payment received', desc: '₦45,000 received for 5 verification credits.', time: '3 hours ago', read: true, dot: 'bg-st-green-text' },
   { id: 5, title: 'System maintenance scheduled', desc: 'Scheduled maintenance on March 20, 2:00 AM - 4:00 AM WAT.', time: 'Yesterday', read: true, dot: 'bg-muted-foreground' },
 ])
 
@@ -18,7 +18,7 @@ function markAllRead() {
 
 <template>
   <Transition name="dropdown">
-    <div v-if="modelValue" class="absolute right-0 top-full mt-2 w-[360px] bg-white rounded-xl border border-border shadow-xl flex flex-col overflow-hidden z-50">
+    <div v-if="modelValue" class="absolute right-0 top-full mt-2 w-[360px] bg-card rounded-xl border border-border shadow-xl flex flex-col overflow-hidden z-50">
       <div class="fixed inset-0 z-[-1]" @click="close" />
 
       <!-- Header -->

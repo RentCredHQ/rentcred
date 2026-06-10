@@ -114,13 +114,13 @@ onMounted(async () => {
     <!-- Loading State — skeletons -->
     <div v-if="loading" class="flex flex-col gap-6">
       <div class="grid grid-cols-1 lg:grid-cols-3 gap-4">
-        <div v-for="i in 3" :key="i" class="bg-white border border-border rounded-xl p-5 flex flex-col gap-3 shadow-sm">
+        <div v-for="i in 3" :key="i" class="bg-card border border-border rounded-xl p-5 flex flex-col gap-3 shadow-sm">
           <UiSkeleton w="44%" h="12px" />
           <UiSkeleton w="64px" h="28px" />
           <UiSkeleton w="60%" h="10px" />
         </div>
       </div>
-      <div class="bg-white border border-border rounded-xl overflow-hidden shadow-sm">
+      <div class="bg-card border border-border rounded-xl overflow-hidden shadow-sm">
         <div class="px-5 py-4 border-b border-border"><UiSkeleton w="140px" h="16px" /></div>
         <UiSkeletonRows :rows="5" />
       </div>
@@ -144,7 +144,7 @@ onMounted(async () => {
       <NuxtLink
         v-if="authStore.user?.kybStatus !== 'submitted'"
         to="/settings/kyb"
-        class="px-4 py-2 bg-[#FF8400] text-[#0D0D0D] font-sans text-sm font-semibold hover:opacity-90 transition-opacity whitespace-nowrap"
+        class="px-4 py-2 bg-[#FF8400] text-primary-foreground font-sans text-sm font-semibold hover:opacity-90 transition-opacity whitespace-nowrap"
       >
         Start KYB
       </NuxtLink>
@@ -165,7 +165,7 @@ onMounted(async () => {
     <!-- Metrics Row / KPI Cards -->
     <div class="grid grid-cols-1 lg:grid-cols-3 gap-4">
       <!-- Bundle Credits -->
-      <div class="bg-white border border-border rounded-xl p-5 flex flex-col gap-3 shadow-sm">
+      <div class="bg-card border border-border rounded-xl p-5 flex flex-col gap-3 shadow-sm">
         <div class="flex items-center justify-between">
           <span class="font-sans text-[13px] text-muted-foreground">{{ stats.bundleCredits.label }}</span>
           <span class="material-symbols-rounded text-[18px] text-muted-foreground">{{ stats.bundleCredits.icon }}</span>
@@ -175,13 +175,13 @@ onMounted(async () => {
           <span class="font-sans text-[13px] text-muted-foreground pb-0.5">of {{ stats.bundleCredits.total }} remaining</span>
         </div>
         <!-- Progress Bar -->
-        <div class="w-full h-1.5 bg-[#E7E8E5] rounded-full">
+        <div class="w-full h-1.5 bg-surface rounded-full">
           <div class="h-1.5 bg-primary rounded-full" :style="{ width: `${stats.bundleCredits.total > 0 ? (stats.bundleCredits.value / stats.bundleCredits.total) * 100 : 0}%` }" />
         </div>
       </div>
 
       <!-- Active Checks -->
-      <div class="bg-white border border-border rounded-xl p-5 flex flex-col gap-2 shadow-sm">
+      <div class="bg-card border border-border rounded-xl p-5 flex flex-col gap-2 shadow-sm">
         <div class="flex items-center justify-between">
           <span class="font-sans text-[13px] text-muted-foreground">{{ stats.activeChecks.label }}</span>
           <span class="material-symbols-rounded text-[18px] text-muted-foreground">{{ stats.activeChecks.icon }}</span>
@@ -191,7 +191,7 @@ onMounted(async () => {
       </div>
 
       <!-- Reports Ready -->
-      <div class="bg-white border border-border rounded-xl p-5 flex flex-col gap-2 shadow-sm">
+      <div class="bg-card border border-border rounded-xl p-5 flex flex-col gap-2 shadow-sm">
         <div class="flex items-center justify-between">
           <span class="font-sans text-[13px] text-muted-foreground">{{ stats.reportsReady.label }}</span>
           <span class="material-symbols-rounded text-[18px] text-muted-foreground">{{ stats.reportsReady.icon }}</span>
@@ -202,12 +202,12 @@ onMounted(async () => {
     </div>
 
     <!-- Desktop: Submissions Table -->
-    <div class="hidden lg:block bg-white border border-border rounded-xl overflow-hidden shadow-sm">
+    <div class="hidden lg:block bg-card border border-border rounded-xl overflow-hidden shadow-sm">
       <!-- Table Header -->
       <div class="flex items-center justify-between px-5 py-4 border-b border-border">
         <div class="flex items-center gap-3">
           <span class="font-sans text-[15px] font-semibold text-foreground">My Submissions</span>
-          <span class="px-2 py-0.5 rounded-full bg-[#E7E8E5] font-mono text-[12px] text-muted-foreground">{{ mappedSubmissions.length }}</span>
+          <span class="px-2 py-0.5 rounded-full bg-surface font-mono text-[12px] text-muted-foreground">{{ mappedSubmissions.length }}</span>
         </div>
         <div class="flex items-center gap-2 px-3 h-9 bg-background border border-border rounded-lg w-[200px]">
           <span class="material-symbols-rounded text-[16px] text-muted-foreground">search</span>
@@ -227,7 +227,7 @@ onMounted(async () => {
 
       <!-- Empty State -->
       <div v-if="mappedSubmissions.length === 0" class="flex flex-col items-center justify-center py-16 gap-4">
-        <div class="w-16 h-16 rounded-full bg-[#E7E8E5] flex items-center justify-center">
+        <div class="w-16 h-16 rounded-full bg-surface flex items-center justify-center">
           <span class="material-symbols-rounded text-[28px] text-muted-foreground">description</span>
         </div>
         <div class="flex flex-col items-center gap-1">
@@ -293,7 +293,7 @@ onMounted(async () => {
     <div class="lg:hidden flex flex-col gap-3">
       <h2 class="font-mono text-base font-semibold text-foreground">Recent Activity</h2>
       <div v-if="recentActivity.length === 0" class="flex flex-col items-center justify-center py-16 gap-4">
-        <div class="w-16 h-16 rounded-full bg-[#E7E8E5] flex items-center justify-center">
+        <div class="w-16 h-16 rounded-full bg-surface flex items-center justify-center">
           <span class="material-symbols-rounded text-[28px] text-muted-foreground">description</span>
         </div>
         <div class="flex flex-col items-center gap-1">
@@ -305,7 +305,7 @@ onMounted(async () => {
         <div
           v-for="item in recentActivity"
           :key="item.name"
-          class="flex items-center justify-between bg-white border border-border rounded-xl px-4 py-3"
+          class="flex items-center justify-between bg-card border border-border rounded-xl px-4 py-3"
         >
           <div class="flex flex-col gap-0.5">
             <span class="font-sans text-sm font-semibold text-foreground">{{ item.name }}</span>

@@ -10,9 +10,9 @@ const error = ref<string | null>(null)
 
 function statusBadgeClasses(status: string) {
   switch (status) {
-    case 'resolved': case 'closed': return 'bg-[#DFE6E1] text-[#004D1A]'
+    case 'resolved': case 'closed': return 'bg-st-green-bg text-st-green-text'
     case 'under_review': return 'bg-blue-50 text-blue-600'
-    default: return 'bg-[#E9E3D8] text-[#804200]'
+    default: return 'bg-st-amber-bg text-st-amber-text'
   }
 }
 
@@ -108,9 +108,9 @@ watch(show, (val) => {
             </div>
 
             <!-- Existing Resolution -->
-            <div v-if="dispute.resolution" class="bg-[#DFE6E1] rounded-lg p-4 flex flex-col gap-1">
-              <span class="font-mono text-[11px] font-semibold text-[#004D1A] tracking-wider">RESOLUTION</span>
-              <p class="font-sans text-[13px] text-[#004D1A]">{{ dispute.resolution }}</p>
+            <div v-if="dispute.resolution" class="bg-st-green-bg rounded-lg p-4 flex flex-col gap-1">
+              <span class="font-mono text-[11px] font-semibold text-st-green-text tracking-wider">RESOLUTION</span>
+              <p class="font-sans text-[13px] text-st-green-text">{{ dispute.resolution }}</p>
             </div>
 
             <!-- Resolution Form (only for open/under_review disputes) -->
@@ -138,7 +138,7 @@ watch(show, (val) => {
                   Mark Under Review
                 </button>
                 <button
-                  class="flex-1 px-4 py-2.5 bg-[#004D1A] text-white rounded-lg text-[13px] font-mono font-semibold hover:opacity-90 transition-opacity disabled:opacity-50"
+                  class="flex-1 px-4 py-2.5 bg-st-green-text text-white rounded-lg text-[13px] font-mono font-semibold hover:opacity-90 transition-opacity disabled:opacity-50"
                   :disabled="isSubmitting || !resolution"
                   @click="handleAction('resolved')"
                 >

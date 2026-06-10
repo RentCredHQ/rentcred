@@ -9,9 +9,9 @@ useSeoMeta({ title: () => `Dispute ${disputeId.value} — RentCred` })
 
 function getStatusStyle(status: string) {
   switch (status) {
-    case 'resolved': case 'closed': return { bg: 'bg-[#DFE6E1]', text: 'text-[#004D1A]', label: status === 'closed' ? 'Closed' : 'Resolved' }
-    case 'under_review': return { bg: 'bg-[#E9E3D8]', text: 'text-[#804200]', label: 'Under Review' }
-    case 'open': return { bg: 'bg-[#E9E3D8]', text: 'text-[#804200]', label: 'Open' }
+    case 'resolved': case 'closed': return { bg: 'bg-st-green-bg', text: 'text-st-green-text', label: status === 'closed' ? 'Closed' : 'Resolved' }
+    case 'under_review': return { bg: 'bg-st-amber-bg', text: 'text-st-amber-text', label: 'Under Review' }
+    case 'open': return { bg: 'bg-st-amber-bg', text: 'text-st-amber-text', label: 'Open' }
     default: return { bg: 'bg-blue-50', text: 'text-blue-600', label: status?.replace(/_/g, ' ').replace(/\b\w/g, (c: string) => c.toUpperCase()) ?? 'Unknown' }
   }
 }
@@ -22,8 +22,8 @@ const dispute = ref<any>({
   statusBg: '',
   statusText: '',
   priority: 'Medium',
-  priorityBg: 'bg-[#E9E3D8]',
-  priorityText: 'text-[#804200]',
+  priorityBg: 'bg-st-amber-bg',
+  priorityText: 'text-st-amber-text',
   caseId: '',
   filedBy: '',
   filedDate: '',
@@ -53,8 +53,8 @@ onMounted(async () => {
       statusBg: style.bg,
       statusText: style.text,
       priority: 'Medium',
-      priorityBg: 'bg-[#E9E3D8]',
-      priorityText: 'text-[#804200]',
+      priorityBg: 'bg-st-amber-bg',
+      priorityText: 'text-st-amber-text',
       caseId: d.submissionId ?? '',
       filedBy: d.raisedBy?.name ?? '—',
       filedDate: d.createdAt ? new Date(d.createdAt).toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' }) : '—',
@@ -76,7 +76,7 @@ onMounted(async () => {
           title: `Dispute ${d.status}`,
           detail: d.resolution ?? '',
           icon: 'check',
-          color: 'bg-[#004D1A]',
+          color: 'bg-st-green-text',
         }] : []),
       ],
       info: {
@@ -113,11 +113,11 @@ const newComment = ref('')
           <span class="inline-flex px-2.5 py-0.5 rounded-full text-[11px] font-semibold" :class="[dispute.priorityBg, dispute.priorityText]">{{ dispute.priority }}</span>
         </div>
         <div class="flex items-center gap-2">
-          <button class="flex items-center gap-2 px-4 py-2 border border-border rounded-lg text-[13px] font-sans font-medium text-foreground hover:bg-white transition-colors">
+          <button class="flex items-center gap-2 px-4 py-2 border border-border rounded-lg text-[13px] font-sans font-medium text-foreground hover:bg-card transition-colors">
             <span class="material-symbols-rounded text-[16px]">edit</span>
             Update
           </button>
-          <button class="flex items-center gap-2 px-4 py-2 bg-[#004D1A] text-white rounded-lg text-[13px] font-sans font-medium hover:opacity-90 transition-opacity">
+          <button class="flex items-center gap-2 px-4 py-2 bg-st-green-text text-white rounded-lg text-[13px] font-sans font-medium hover:opacity-90 transition-opacity">
             <span class="material-symbols-rounded text-[16px]">check</span>
             Resolve
           </button>
@@ -130,18 +130,18 @@ const newComment = ref('')
       <!-- Main Column -->
       <div class="lg:col-span-2 flex flex-col gap-6">
         <!-- Description Card -->
-        <div class="bg-white border border-border rounded-xl p-5 flex flex-col gap-3">
+        <div class="bg-card border border-border rounded-xl p-5 flex flex-col gap-3">
           <h2 class="font-mono text-[15px] font-semibold text-foreground">{{ dispute.subject }}</h2>
           <div class="flex flex-wrap items-center gap-2 sm:gap-4 text-[12px] font-sans text-muted-foreground">
             <span>Filed by {{ dispute.filedBy }}</span>
             <span>{{ dispute.filedDate }}</span>
-            <span class="inline-flex px-2 py-0.5 rounded bg-[#E7E8E5] text-[11px] font-medium text-foreground">{{ dispute.category }}</span>
+            <span class="inline-flex px-2 py-0.5 rounded bg-surface text-[11px] font-medium text-foreground">{{ dispute.category }}</span>
           </div>
           <p class="font-sans text-[13px] text-foreground leading-relaxed">{{ dispute.description }}</p>
         </div>
 
         <!-- Timeline -->
-        <div class="bg-white border border-border rounded-xl p-5 flex flex-col gap-4">
+        <div class="bg-card border border-border rounded-xl p-5 flex flex-col gap-4">
           <h3 class="font-mono text-[13px] font-semibold text-foreground tracking-wider uppercase">Activity Timeline</h3>
           <div class="flex flex-col gap-0">
             <div v-for="(event, idx) in dispute.timeline" :key="idx" class="flex gap-4">
@@ -165,7 +165,7 @@ const newComment = ref('')
         </div>
 
         <!-- Add Comment -->
-        <div class="bg-white border border-border rounded-xl p-5 flex flex-col gap-3">
+        <div class="bg-card border border-border rounded-xl p-5 flex flex-col gap-3">
           <h3 class="font-mono text-[13px] font-semibold text-foreground">Add Comment</h3>
           <textarea
             v-model="newComment"
@@ -188,7 +188,7 @@ const newComment = ref('')
       <!-- Sidebar -->
       <div class="flex flex-col gap-4">
         <!-- Info Card -->
-        <div class="bg-white border border-border rounded-xl p-5 flex flex-col gap-4">
+        <div class="bg-card border border-border rounded-xl p-5 flex flex-col gap-4">
           <h3 class="font-mono text-[13px] font-semibold text-foreground tracking-wider uppercase">Details</h3>
           <div class="flex flex-col gap-3">
             <div class="flex justify-between">
@@ -205,13 +205,13 @@ const newComment = ref('')
             </div>
             <div class="flex justify-between">
               <span class="font-sans text-[12px] text-muted-foreground">SLA</span>
-              <span class="font-sans text-[12px] font-medium text-[#804200]">{{ dispute.info.sla }}</span>
+              <span class="font-sans text-[12px] font-medium text-st-amber-text">{{ dispute.info.sla }}</span>
             </div>
           </div>
         </div>
 
         <!-- Evidence Card -->
-        <div class="bg-white border border-border rounded-xl p-5 flex flex-col gap-3">
+        <div class="bg-card border border-border rounded-xl p-5 flex flex-col gap-3">
           <h3 class="font-mono text-[13px] font-semibold text-foreground tracking-wider uppercase">Evidence</h3>
           <div class="flex flex-col gap-2">
             <div class="flex items-center gap-3 p-3 border border-border rounded-lg hover:bg-background transition-colors cursor-pointer">

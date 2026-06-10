@@ -5,6 +5,9 @@ const mobileMenuOpen = ref(false)
 const profileOpen = ref(false)
 const notificationsOpen = ref(false)
 
+const colorMode = useColorMode()
+const logoVariant = computed(() => (colorMode.value === 'dark' ? 'dark' : 'light'))
+
 const user = computed(() => {
   if (!authStore.user) return null
   const name = authStore.user.name || 'User'
@@ -46,10 +49,10 @@ watch(() => route.path, () => {
 <template>
   <div class="min-h-screen flex bg-background">
     <!-- Desktop Sidebar -->
-    <aside class="hidden lg:flex sticky top-0 h-screen w-[260px] bg-[#E7E8E5] flex-col border-r border-border flex-shrink-0">
+    <aside class="hidden lg:flex sticky top-0 h-screen w-[260px] bg-sidebar flex-col border-r border-border flex-shrink-0">
       <!-- Logo -->
       <div class="flex items-center gap-2.5 px-6 py-5 border-b border-border">
-        <UiRentCredLogo :size="28" variant="light" :show-text="true" :horizontal="true" />
+        <UiRentCredLogo :size="28" :variant="logoVariant" :show-text="true" :horizontal="true" />
       </div>
 
       <!-- Nav -->
@@ -65,8 +68,8 @@ watch(() => route.path, () => {
             :to="item.to"
             class="flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-sans transition-colors"
             :class="isActive(item.to)
-              ? 'bg-[#CBCCC9] text-foreground font-semibold'
-              : 'text-muted-foreground hover:text-foreground hover:bg-[#CBCCC9]/50'"
+              ? 'bg-border text-foreground font-semibold'
+              : 'text-muted-foreground hover:text-foreground hover:bg-border/50'"
           >
             <span class="material-symbols-rounded text-[20px]">{{ item.icon }}</span>
             {{ item.label }}
@@ -84,8 +87,8 @@ watch(() => route.path, () => {
             :to="item.to"
             class="flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-sans transition-colors"
             :class="isActive(item.to)
-              ? 'bg-[#CBCCC9] text-foreground font-semibold'
-              : 'text-muted-foreground hover:text-foreground hover:bg-[#CBCCC9]/50'"
+              ? 'bg-border text-foreground font-semibold'
+              : 'text-muted-foreground hover:text-foreground hover:bg-border/50'"
           >
             <span class="material-symbols-rounded text-[20px]">{{ item.icon }}</span>
             {{ item.label }}
@@ -96,7 +99,7 @@ watch(() => route.path, () => {
       <!-- Profile Footer -->
       <div class="flex items-center gap-3 px-6 py-4 border-t border-border">
         <div class="w-9 h-9 rounded-full bg-primary flex items-center justify-center">
-          <span class="font-mono text-[13px] font-semibold text-foreground">{{ user?.initials || 'U' }}</span>
+          <span class="font-mono text-[13px] font-semibold text-primary-foreground">{{ user?.initials || 'U' }}</span>
         </div>
         <div class="flex flex-col gap-px">
           <span class="text-[13px] font-medium text-foreground font-sans">{{ user?.name || 'User' }}</span>
@@ -112,9 +115,12 @@ watch(() => route.path, () => {
           <span class="material-symbols-rounded text-[24px]">menu</span>
         </button>
         <span class="font-mono text-lg font-bold text-primary">RentCred</span>
-        <NuxtLink to="/dashboard/notifications" class="text-foreground">
-          <span class="material-symbols-rounded text-[24px]">notifications</span>
-        </NuxtLink>
+        <div class="flex items-center gap-1">
+          <UiThemeToggle compact />
+          <NuxtLink to="/dashboard/notifications" class="flex items-center justify-center w-9 h-9 text-foreground" aria-label="Notifications">
+            <span class="material-symbols-rounded text-[24px]">notifications</span>
+          </NuxtLink>
+        </div>
       </div>
     </div>
 
@@ -124,10 +130,10 @@ watch(() => route.path, () => {
         <div v-if="mobileMenuOpen" class="lg:hidden fixed inset-0 bg-black/50 z-50" @click="mobileMenuOpen = false" />
       </Transition>
       <Transition name="dashslide">
-        <aside v-if="mobileMenuOpen" class="lg:hidden fixed top-0 left-0 bottom-0 w-[280px] bg-[#E7E8E5] z-50 flex flex-col overflow-y-auto">
+        <aside v-if="mobileMenuOpen" class="lg:hidden fixed top-0 left-0 bottom-0 w-[280px] bg-sidebar z-50 flex flex-col overflow-y-auto">
           <!-- Logo -->
           <div class="flex items-center justify-between px-5 py-5 border-b border-border">
-            <UiRentCredLogo :size="24" variant="light" :show-text="true" :horizontal="true" />
+            <UiRentCredLogo :size="24" :variant="logoVariant" :show-text="true" :horizontal="true" />
             <button @click="mobileMenuOpen = false" class="text-muted-foreground" aria-label="Close">
               <span class="material-symbols-rounded text-[20px]">close</span>
             </button>
@@ -142,7 +148,7 @@ watch(() => route.path, () => {
                 :key="item.to"
                 :to="item.to"
                 class="flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-sans transition-colors"
-                :class="isActive(item.to) ? 'bg-[#CBCCC9] text-foreground font-semibold' : 'text-muted-foreground'"
+                :class="isActive(item.to) ? 'bg-border text-foreground font-semibold' : 'text-muted-foreground'"
               >
                 <span class="material-symbols-rounded text-[20px]">{{ item.icon }}</span>
                 {{ item.label }}
@@ -155,7 +161,7 @@ watch(() => route.path, () => {
                 :key="item.to"
                 :to="item.to"
                 class="flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-sans transition-colors"
-                :class="isActive(item.to) ? 'bg-[#CBCCC9] text-foreground font-semibold' : 'text-muted-foreground'"
+                :class="isActive(item.to) ? 'bg-border text-foreground font-semibold' : 'text-muted-foreground'"
               >
                 <span class="material-symbols-rounded text-[20px]">{{ item.icon }}</span>
                 {{ item.label }}
@@ -166,7 +172,7 @@ watch(() => route.path, () => {
           <!-- Profile -->
           <div class="flex items-center gap-3 px-5 py-4 border-t border-border">
             <div class="w-9 h-9 rounded-full bg-primary flex items-center justify-center">
-              <span class="font-mono text-[13px] font-semibold text-foreground">{{ user?.initials || 'U' }}</span>
+              <span class="font-mono text-[13px] font-semibold text-primary-foreground">{{ user?.initials || 'U' }}</span>
             </div>
             <div class="flex flex-col gap-px">
               <span class="text-[13px] font-medium text-foreground font-sans">{{ user?.name || 'User' }}</span>
@@ -186,10 +192,11 @@ watch(() => route.path, () => {
           <span class="font-sans text-[13px] text-muted-foreground">{{ user?.email || 'Loading...' }} &bull; Agent Dashboard</span>
         </div>
         <div class="flex items-center gap-3">
-          <NuxtLink to="/dashboard/submit/1" class="flex items-center gap-2 px-5 py-2.5 bg-primary text-foreground rounded font-mono text-[13px] font-medium hover:opacity-90 transition-opacity">
+          <NuxtLink to="/dashboard/submit/1" class="flex items-center gap-2 px-5 py-2.5 bg-primary text-primary-foreground rounded font-mono text-[13px] font-medium hover:opacity-90 transition-opacity">
             <span class="material-symbols-rounded text-[18px]">add</span>
             Submit Tenant
           </NuxtLink>
+          <UiThemeToggle />
           <div class="relative">
             <button @click="notificationsOpen = !notificationsOpen" class="flex items-center justify-center w-10 h-10 rounded-lg border border-border hover:bg-surface transition-colors" aria-label="Notifications">
               <span class="material-symbols-rounded text-[20px] text-muted-foreground">notifications</span>
@@ -198,7 +205,7 @@ watch(() => route.path, () => {
           </div>
           <div class="relative">
             <button @click="profileOpen = !profileOpen" class="w-9 h-9 rounded-full bg-primary flex items-center justify-center hover:opacity-90 transition-opacity">
-              <span class="font-mono text-[12px] font-semibold text-foreground">{{ user?.initials || 'U' }}</span>
+              <span class="font-mono text-[12px] font-semibold text-primary-foreground">{{ user?.initials || 'U' }}</span>
             </button>
             <DashboardProfileDropdown v-model="profileOpen" />
           </div>
@@ -214,11 +221,11 @@ watch(() => route.path, () => {
 
       <!-- Mobile Bottom Tab Bar -->
       <div class="lg:hidden fixed bottom-0 left-0 right-0 bg-background px-5 pb-5 pt-3 z-40">
-        <div class="flex items-center rounded-full bg-white border border-border p-1">
+        <div class="flex items-center rounded-full bg-card border border-border p-1">
           <NuxtLink
             to="/dashboard"
             class="flex-1 flex flex-col items-center justify-center py-2 rounded-full text-[10px] font-semibold tracking-wide font-sans gap-1"
-            :class="route.path === '/dashboard' ? 'bg-primary text-foreground' : 'text-muted-foreground'"
+            :class="route.path === '/dashboard' ? 'bg-primary text-primary-foreground' : 'text-muted-foreground'"
           >
             <span class="material-symbols-rounded text-[18px]">home</span>
             HOME
@@ -226,7 +233,7 @@ watch(() => route.path, () => {
           <NuxtLink
             to="/dashboard/submit/1"
             class="flex-1 flex flex-col items-center justify-center py-2 rounded-full text-[10px] font-semibold tracking-wide font-sans gap-1"
-            :class="route.path.startsWith('/dashboard/submit') ? 'bg-primary text-foreground' : 'text-muted-foreground'"
+            :class="route.path.startsWith('/dashboard/submit') ? 'bg-primary text-primary-foreground' : 'text-muted-foreground'"
           >
             <span class="material-symbols-rounded text-[18px]">person_add</span>
             SUBMIT
@@ -234,7 +241,7 @@ watch(() => route.path, () => {
           <NuxtLink
             to="/dashboard/submissions"
             class="flex-1 flex flex-col items-center justify-center py-2 rounded-full text-[10px] font-semibold tracking-wide font-sans gap-1"
-            :class="route.path.startsWith('/dashboard/submissions') ? 'bg-primary text-foreground' : 'text-muted-foreground'"
+            :class="route.path.startsWith('/dashboard/submissions') ? 'bg-primary text-primary-foreground' : 'text-muted-foreground'"
           >
             <span class="material-symbols-rounded text-[18px]">folder_open</span>
             CASES
@@ -242,7 +249,7 @@ watch(() => route.path, () => {
           <NuxtLink
             to="/dashboard/reports"
             class="flex-1 flex flex-col items-center justify-center py-2 rounded-full text-[10px] font-semibold tracking-wide font-sans gap-1"
-            :class="route.path.startsWith('/dashboard/reports') ? 'bg-primary text-foreground' : 'text-muted-foreground'"
+            :class="route.path.startsWith('/dashboard/reports') ? 'bg-primary text-primary-foreground' : 'text-muted-foreground'"
           >
             <span class="material-symbols-rounded text-[18px]">description</span>
             REPORTS
@@ -250,7 +257,7 @@ watch(() => route.path, () => {
           <NuxtLink
             to="/settings"
             class="flex-1 flex flex-col items-center justify-center py-2 rounded-full text-[10px] font-semibold tracking-wide font-sans gap-1"
-            :class="route.path.startsWith('/settings') ? 'bg-primary text-foreground' : 'text-muted-foreground'"
+            :class="route.path.startsWith('/settings') ? 'bg-primary text-primary-foreground' : 'text-muted-foreground'"
           >
             <span class="material-symbols-rounded text-[18px]">more_horiz</span>
             MORE

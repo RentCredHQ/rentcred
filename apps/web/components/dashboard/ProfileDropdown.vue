@@ -34,7 +34,7 @@ function handleSignOut() {
 
 <template>
   <Transition name="dropdown">
-    <div v-if="modelValue" class="absolute right-0 top-full mt-2 w-[280px] bg-white rounded-xl border border-border shadow-xl flex flex-col overflow-hidden z-50">
+    <div v-if="modelValue" class="absolute right-0 top-full mt-2 w-[280px] bg-card rounded-xl border border-border shadow-xl flex flex-col overflow-hidden z-50">
       <!-- Backdrop (click outside to close) -->
       <div class="fixed inset-0 z-[-1]" @click="close" />
 
@@ -46,7 +46,7 @@ function handleSignOut() {
         <div class="flex flex-col gap-0.5 flex-1 min-w-0">
           <span class="font-mono text-[14px] font-bold text-foreground">{{ user?.name || 'User' }}</span>
           <span class="font-sans text-[12px] text-muted-foreground truncate">{{ user?.email || 'Loading...' }}</span>
-          <span class="inline-flex w-fit px-2 py-0.5 rounded bg-[#E7E8E5] text-[11px] font-semibold text-foreground mt-0.5">{{ user?.role || 'User' }}</span>
+          <span class="inline-flex w-fit px-2 py-0.5 rounded bg-surface text-[11px] font-semibold text-foreground mt-0.5">{{ user?.role || 'User' }}</span>
         </div>
       </div>
 
@@ -67,9 +67,9 @@ function handleSignOut() {
 
       <!-- Logout -->
       <div class="border-t border-border">
-        <button class="flex items-center gap-3 w-full px-4 py-3 hover:bg-[#FDECEC] transition-colors" @click="handleSignOut">
-          <span class="material-symbols-rounded text-[20px] text-[#991B1B]">logout</span>
-          <span class="font-mono text-[14px] font-semibold text-[#991B1B]">Sign Out</span>
+        <button class="flex items-center gap-3 w-full px-4 py-3 hover:bg-st-red-bg transition-colors" @click="handleSignOut">
+          <span class="material-symbols-rounded text-[20px] text-st-red-text">logout</span>
+          <span class="font-mono text-[14px] font-semibold text-st-red-text">Sign Out</span>
         </button>
       </div>
 

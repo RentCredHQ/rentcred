@@ -19,19 +19,19 @@ const statusTabs = [
 ]
 
 const statusStyleMap: Record<string, { bg: string; text: string }> = {
-  pending: { bg: 'bg-[#E9E3D8]', text: 'text-[#804200]' },
-  in_progress: { bg: 'bg-[#E9E3D8]', text: 'text-[#804200]' },
+  pending: { bg: 'bg-st-amber-bg', text: 'text-st-amber-text' },
+  in_progress: { bg: 'bg-st-amber-bg', text: 'text-st-amber-text' },
   field_visit: { bg: 'bg-blue-50', text: 'text-blue-600' },
-  report_building: { bg: 'bg-[#E9E3D8]', text: 'text-[#804200]' },
-  completed: { bg: 'bg-[#DFE6E1]', text: 'text-[#004D1A]' },
-  rejected: { bg: 'bg-[#E5DCDA]', text: 'text-[#8C1C00]' },
+  report_building: { bg: 'bg-st-amber-bg', text: 'text-st-amber-text' },
+  completed: { bg: 'bg-st-green-bg', text: 'text-st-green-text' },
+  rejected: { bg: 'bg-st-red-bg', text: 'text-st-red-text' },
 }
 
 const kpis = ref([
   { label: 'TOTAL CASES', value: '—', sub: '', valueColor: 'text-foreground' },
   { label: 'IN PROGRESS', value: '—', sub: '', valueColor: 'text-primary' },
-  { label: 'PENDING ASSIGNMENT', value: '—', sub: '', valueColor: 'text-[#804200]' },
-  { label: 'COMPLETED THIS WEEK', value: '—', sub: '', valueColor: 'text-[#004D1A]' },
+  { label: 'PENDING ASSIGNMENT', value: '—', sub: '', valueColor: 'text-st-amber-text' },
+  { label: 'COMPLETED THIS WEEK', value: '—', sub: '', valueColor: 'text-st-green-text' },
 ])
 
 const cases = ref<any[]>([])
@@ -52,7 +52,7 @@ async function fetchCases(page = 1) {
     totalPages.value = pagination.totalPages ?? 1
 
     cases.value = items.map((s: any) => {
-      const style = statusStyleMap[s.status] ?? { bg: 'bg-[#E9E3D8]', text: 'text-[#804200]' }
+      const style = statusStyleMap[s.status] ?? { bg: 'bg-st-amber-bg', text: 'text-st-amber-text' }
       return {
         id: s.id,
         tenant: s.tenantName,
@@ -73,8 +73,8 @@ async function fetchCases(page = 1) {
     kpis.value = [
       { label: 'TOTAL CASES', value: String(totalCases.value), sub: '', valueColor: 'text-foreground' },
       { label: 'IN PROGRESS', value: String(inProgress), sub: '', valueColor: 'text-primary' },
-      { label: 'PENDING ASSIGNMENT', value: String(pending), sub: '', valueColor: 'text-[#804200]' },
-      { label: 'COMPLETED', value: String(completed), sub: '', valueColor: 'text-[#004D1A]' },
+      { label: 'PENDING ASSIGNMENT', value: String(pending), sub: '', valueColor: 'text-st-amber-text' },
+      { label: 'COMPLETED', value: String(completed), sub: '', valueColor: 'text-st-green-text' },
     ]
   } catch { /* empty */ }
   finally { loading.value = false }
@@ -147,7 +147,7 @@ const { searchQuery, activeFilter, filtered, resultCount } = useFilter({
 
         <!-- Empty State -->
         <div v-if="filtered.length === 0 && !loading" class="flex flex-col items-center justify-center py-16 gap-4">
-          <div class="w-16 h-16 rounded-full bg-[#E7E8E5] flex items-center justify-center">
+          <div class="w-16 h-16 rounded-full bg-surface flex items-center justify-center">
             <span class="material-symbols-rounded text-[28px] text-muted-foreground">folder_open</span>
           </div>
           <div class="flex flex-col items-center gap-1">
@@ -175,7 +175,7 @@ const { searchQuery, activeFilter, filtered, resultCount } = useFilter({
       <!-- Mobile Cards -->
       <div class="lg:hidden">
         <div v-if="filtered.length === 0 && !loading" class="flex flex-col items-center justify-center py-16 gap-4">
-          <div class="w-16 h-16 rounded-full bg-[#E7E8E5] flex items-center justify-center">
+          <div class="w-16 h-16 rounded-full bg-surface flex items-center justify-center">
             <span class="material-symbols-rounded text-[28px] text-muted-foreground">folder_open</span>
           </div>
           <div class="flex flex-col items-center gap-1">
@@ -203,9 +203,9 @@ const { searchQuery, activeFilter, filtered, resultCount } = useFilter({
       <div class="flex items-center justify-between px-6 py-3 border-t border-border">
         <span class="font-sans text-[12px] text-muted-foreground">Showing {{ resultCount }} of {{ totalCases }} cases</span>
         <div class="flex items-center gap-1.5">
-          <button @click="goPage(currentPage - 1)" :disabled="currentPage <= 1" class="px-2.5 py-1 bg-white border border-border rounded-md text-[12px] font-sans text-foreground disabled:opacity-40">Prev</button>
+          <button @click="goPage(currentPage - 1)" :disabled="currentPage <= 1" class="px-2.5 py-1 bg-card border border-border rounded-md text-[12px] font-sans text-foreground disabled:opacity-40">Prev</button>
           <template v-for="p in totalPages" :key="p">
-            <button @click="goPage(p)" class="px-2.5 py-1 rounded-md text-[12px] font-sans" :class="p === currentPage ? 'bg-foreground text-white' : 'bg-white border border-border text-foreground'">{{ p }}</button>
+            <button @click="goPage(p)" class="px-2.5 py-1 rounded-md text-[12px] font-sans" :class="p === currentPage ? 'bg-foreground text-white' : 'bg-card border border-border text-foreground'">{{ p }}</button>
           </template>
           <button @click="goPage(currentPage + 1)" :disabled="currentPage >= totalPages" class="px-2.5 py-1 bg-primary rounded-md text-[12px] font-sans text-white disabled:opacity-40">Next</button>
         </div>

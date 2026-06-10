@@ -48,11 +48,11 @@ async function sendEmail() {
       <div v-if="modelValue" class="fixed inset-0 z-50 flex items-center justify-center">
         <div class="absolute inset-0 bg-black/40" @click="close" />
 
-        <div class="relative w-full mx-4 max-w-[480px] max-h-[90vh] bg-white rounded-2xl border border-border shadow-2xl flex flex-col overflow-hidden">
+        <div class="relative w-full mx-4 max-w-[480px] max-h-[90vh] bg-card rounded-2xl border border-border shadow-2xl flex flex-col overflow-hidden">
           <!-- Header -->
           <div class="flex items-center justify-between px-6 py-5 border-b border-border">
             <h2 class="font-mono text-lg font-bold text-foreground">Share Report</h2>
-            <button @click="close" class="w-8 h-8 rounded-lg bg-[#E7E8E5] flex items-center justify-center hover:bg-border transition-colors" aria-label="Close">
+            <button @click="close" class="w-8 h-8 rounded-lg bg-surface flex items-center justify-center hover:bg-border transition-colors" aria-label="Close">
               <span class="material-symbols-rounded text-[18px] text-muted-foreground">close</span>
             </button>
           </div>
@@ -63,7 +63,7 @@ async function sendEmail() {
             <div class="flex flex-col gap-2.5">
               <label class="font-sans text-sm font-semibold text-foreground">Share via link</label>
               <div class="flex items-center gap-2">
-                <div class="flex-1 h-10 px-3 flex items-center rounded-lg bg-[#E7E8E5] border border-border overflow-hidden">
+                <div class="flex-1 h-10 px-3 flex items-center rounded-lg bg-surface border border-border overflow-hidden">
                   <span class="font-sans text-xs text-muted-foreground truncate">{{ shareLink }}</span>
                 </div>
                 <button @click="copyLink" class="h-10 px-4 flex items-center gap-1.5 rounded-lg bg-foreground text-white font-sans text-[13px] font-medium hover:bg-foreground/90 transition-colors flex-shrink-0">
@@ -115,7 +115,7 @@ async function sendEmail() {
                 :class="requireAuth ? 'bg-primary' : 'bg-border'"
               >
                 <div
-                  class="w-5 h-5 rounded-full bg-white shadow-sm absolute top-0.5 transition-transform"
+                  class="w-5 h-5 rounded-full bg-card shadow-sm absolute top-0.5 transition-transform"
                   :class="requireAuth ? 'translate-x-[22px]' : 'translate-x-0.5'"
                 />
               </button>

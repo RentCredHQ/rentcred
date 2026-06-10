@@ -16,10 +16,10 @@ function stepIndex(status: string) {
 
 function statusBadgeClasses(status: string) {
   switch (status) {
-    case 'completed': return 'bg-[#DFE6E1] text-[#004D1A]'
+    case 'completed': return 'bg-st-green-bg text-st-green-text'
     case 'rejected': return 'bg-red-50 text-red-700'
     case 'field_visit': return 'bg-blue-50 text-blue-600'
-    default: return 'bg-[#E9E3D8] text-[#804200]'
+    default: return 'bg-st-amber-bg text-st-amber-text'
   }
 }
 
@@ -43,7 +43,7 @@ onMounted(async () => {
     </div>
 
     <!-- Submissions -->
-    <div v-for="sub in submissions" :key="sub.id" class="bg-white border border-border rounded-xl p-5 lg:p-6 flex flex-col gap-5 shadow-sm">
+    <div v-for="sub in submissions" :key="sub.id" class="bg-card border border-border rounded-xl p-5 lg:p-6 flex flex-col gap-5 shadow-sm">
       <div class="flex items-start justify-between">
         <div class="flex flex-col gap-0.5">
           <span class="font-sans text-[15px] font-medium text-foreground">{{ sub.propertyAddress }}</span>
@@ -60,8 +60,8 @@ onMounted(async () => {
           <div class="flex flex-col items-center gap-1">
             <div class="w-8 h-8 rounded-full flex items-center justify-center text-[14px]"
               :class="stepIndex(sub.status) >= i
-                ? 'bg-[#DFE6E1] text-[#004D1A]'
-                : 'bg-[#E7E8E5] text-muted-foreground'"
+                ? 'bg-st-green-bg text-st-green-text'
+                : 'bg-surface text-muted-foreground'"
             >
               <span class="material-symbols-rounded text-[18px]">
                 {{ stepIndex(sub.status) > i ? 'check' : stepIndex(sub.status) === i ? 'pending' : 'circle' }}
@@ -72,7 +72,7 @@ onMounted(async () => {
             </span>
           </div>
           <div v-if="i < statusSteps.length - 1" class="flex-1 h-0.5 -mt-5"
-            :class="stepIndex(sub.status) > i ? 'bg-[#004D1A]' : 'bg-[#E7E8E5]'"
+            :class="stepIndex(sub.status) > i ? 'bg-st-green-text' : 'bg-surface'"
           />
         </template>
       </div>
@@ -87,7 +87,7 @@ onMounted(async () => {
           'Criminal': sub.verificationChecklist.criminalCheckDone,
           'Field Visit': sub.verificationChecklist.fieldVisitCompleted,
         }" :key="label" class="flex items-center gap-1.5">
-          <span class="material-symbols-rounded text-[16px]" :class="checked ? 'text-[#004D1A]' : 'text-muted-foreground'">
+          <span class="material-symbols-rounded text-[16px]" :class="checked ? 'text-st-green-text' : 'text-muted-foreground'">
             {{ checked ? 'check_circle' : 'radio_button_unchecked' }}
           </span>
           <span class="font-sans text-[12px]" :class="checked ? 'text-foreground' : 'text-muted-foreground'">{{ label }}</span>
@@ -96,7 +96,7 @@ onMounted(async () => {
     </div>
 
     <!-- Empty State -->
-    <div v-if="!loading && submissions.length === 0" class="bg-white border border-border rounded-xl p-8 flex flex-col items-center gap-4 text-center">
+    <div v-if="!loading && submissions.length === 0" class="bg-card border border-border rounded-xl p-8 flex flex-col items-center gap-4 text-center">
       <span class="material-symbols-rounded text-[48px] text-muted-foreground">search_off</span>
       <h3 class="font-mono text-lg font-semibold text-foreground">No Verifications Yet</h3>
       <p class="font-sans text-sm text-muted-foreground max-w-[400px]">You'll see verification requests here when an agent submits you for tenant screening.</p>

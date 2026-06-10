@@ -14,10 +14,10 @@ const statusTabs = [
 ]
 
 const statusStyleMap: Record<string, { bg: string; text: string; label: string }> = {
-  processed: { bg: 'bg-[#DFE6E1]', text: 'text-[#004D1A]', label: 'Processed' },
-  completed: { bg: 'bg-[#DFE6E1]', text: 'text-[#004D1A]', label: 'Processed' },
-  pending: { bg: 'bg-[#E9E3D8]', text: 'text-[#804200]', label: 'Pending' },
-  failed: { bg: 'bg-[#E5DCDA]', text: 'text-[#8C1C00]', label: 'Failed' },
+  processed: { bg: 'bg-st-green-bg', text: 'text-st-green-text', label: 'Processed' },
+  completed: { bg: 'bg-st-green-bg', text: 'text-st-green-text', label: 'Processed' },
+  pending: { bg: 'bg-st-amber-bg', text: 'text-st-amber-text', label: 'Pending' },
+  failed: { bg: 'bg-st-red-bg', text: 'text-st-red-text', label: 'Failed' },
 }
 
 function formatNaira(val: number) {
@@ -29,8 +29,8 @@ function formatNaira(val: number) {
 const kpis = ref([
   { label: 'TOTAL REVENUE', value: '—', sub: '', valueColor: 'text-foreground', subColor: '' },
   { label: 'PENDING PAYOUTS', value: '—', sub: '', valueColor: 'text-primary', subColor: '' },
-  { label: 'AGENT COMMISSIONS', value: '—', sub: '', valueColor: 'text-[#004D1A]', subColor: '' },
-  { label: 'FAILED PAYMENTS', value: '—', sub: '', valueColor: 'text-[#8C1C00]', subColor: 'text-[#8C1C00]' },
+  { label: 'AGENT COMMISSIONS', value: '—', sub: '', valueColor: 'text-st-green-text', subColor: '' },
+  { label: 'FAILED PAYMENTS', value: '—', sub: '', valueColor: 'text-st-red-text', subColor: 'text-st-red-text' },
 ])
 
 const transactions = ref<any[]>([])
@@ -52,8 +52,8 @@ async function fetchPayments(page = 1) {
     kpis.value = [
       { label: 'TOTAL CREDITS', value: String(s.totalSpent ?? 0), sub: '', valueColor: 'text-foreground', subColor: '' },
       { label: 'THIS MONTH', value: String(s.thisMonth ?? 0), sub: 'credits purchased', valueColor: 'text-primary', subColor: '' },
-      { label: 'TRANSACTIONS', value: String(s.transactionCount ?? 0), sub: '', valueColor: 'text-[#004D1A]', subColor: '' },
-      { label: 'FAILED PAYMENTS', value: '—', sub: '', valueColor: 'text-[#8C1C00]', subColor: 'text-[#8C1C00]' },
+      { label: 'TRANSACTIONS', value: String(s.transactionCount ?? 0), sub: '', valueColor: 'text-st-green-text', subColor: '' },
+      { label: 'FAILED PAYMENTS', value: '—', sub: '', valueColor: 'text-st-red-text', subColor: 'text-st-red-text' },
     ]
 
     // Map transactions
@@ -151,7 +151,7 @@ const { searchQuery, activeFilter, filtered, resultCount } = useFilter({
 
         <!-- Empty State -->
         <div v-if="filtered.length === 0 && !loading" class="flex flex-col items-center justify-center py-16 gap-4">
-          <div class="w-16 h-16 rounded-full bg-[#E7E8E5] flex items-center justify-center">
+          <div class="w-16 h-16 rounded-full bg-surface flex items-center justify-center">
             <span class="material-symbols-rounded text-[28px] text-muted-foreground">payments</span>
           </div>
           <div class="flex flex-col items-center gap-1">
@@ -181,7 +181,7 @@ const { searchQuery, activeFilter, filtered, resultCount } = useFilter({
       <!-- Mobile Cards -->
       <div class="lg:hidden">
         <div v-if="filtered.length === 0 && !loading" class="flex flex-col items-center justify-center py-16 gap-4">
-          <div class="w-16 h-16 rounded-full bg-[#E7E8E5] flex items-center justify-center">
+          <div class="w-16 h-16 rounded-full bg-surface flex items-center justify-center">
             <span class="material-symbols-rounded text-[28px] text-muted-foreground">payments</span>
           </div>
           <div class="flex flex-col items-center gap-1">
@@ -209,9 +209,9 @@ const { searchQuery, activeFilter, filtered, resultCount } = useFilter({
       <div class="flex items-center justify-between px-6 py-3 border-t border-border">
         <span class="font-sans text-[12px] text-muted-foreground">Showing {{ resultCount }} of {{ totalTransactions }} transactions</span>
         <div class="flex items-center gap-1.5">
-          <button @click="goPage(currentPage - 1)" :disabled="currentPage <= 1" class="px-2.5 py-1 bg-white border border-border rounded-md text-[12px] font-sans text-foreground disabled:opacity-40">Prev</button>
+          <button @click="goPage(currentPage - 1)" :disabled="currentPage <= 1" class="px-2.5 py-1 bg-card border border-border rounded-md text-[12px] font-sans text-foreground disabled:opacity-40">Prev</button>
           <template v-for="p in totalPages" :key="p">
-            <button @click="goPage(p)" class="px-2.5 py-1 rounded-md text-[12px] font-sans" :class="p === currentPage ? 'bg-foreground text-white' : 'bg-white border border-border text-foreground'">{{ p }}</button>
+            <button @click="goPage(p)" class="px-2.5 py-1 rounded-md text-[12px] font-sans" :class="p === currentPage ? 'bg-foreground text-white' : 'bg-card border border-border text-foreground'">{{ p }}</button>
           </template>
           <button @click="goPage(currentPage + 1)" :disabled="currentPage >= totalPages" class="px-2.5 py-1 bg-primary rounded-md text-[12px] font-sans text-white disabled:opacity-40">Next</button>
         </div>

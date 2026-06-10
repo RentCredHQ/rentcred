@@ -79,7 +79,7 @@ onMounted(async () => {
 
     <!-- KPI Row -->
     <div class="grid grid-cols-1 sm:grid-cols-3 gap-5">
-      <div class="bg-white border border-border rounded-xl p-5 flex flex-col gap-2">
+      <div class="bg-card border border-border rounded-xl p-5 flex flex-col gap-2">
         <span class="font-sans text-[13px] text-muted-foreground">Credits Remaining</span>
         <div class="flex items-end gap-2">
           <span class="font-mono text-2xl sm:text-4xl font-bold text-foreground leading-none">{{ kpis.remaining.value }}</span>
@@ -89,16 +89,16 @@ onMounted(async () => {
           <div class="h-2 bg-primary rounded-full" :style="{ width: `${kpis.remaining.total > 0 ? (kpis.remaining.value / kpis.remaining.total) * 100 : 0}%` }" />
         </div>
       </div>
-      <div class="bg-white border border-border rounded-xl p-5 flex flex-col gap-2">
+      <div class="bg-card border border-border rounded-xl p-5 flex flex-col gap-2">
         <span class="font-sans text-[13px] text-muted-foreground">Credits Used</span>
         <span class="font-mono text-2xl sm:text-4xl font-bold text-foreground leading-none">{{ kpis.used }}</span>
-        <span class="inline-block w-fit px-2.5 py-1 rounded-full bg-[#DFDFE6] text-[#000066] text-[11px] font-medium mt-1">This billing cycle</span>
+        <span class="inline-block w-fit px-2.5 py-1 rounded-full bg-st-blue-bg text-st-blue-text text-[11px] font-medium mt-1">This billing cycle</span>
       </div>
-      <div class="bg-white border border-border rounded-xl p-5 flex flex-col gap-2">
+      <div class="bg-card border border-border rounded-xl p-5 flex flex-col gap-2">
         <span class="font-sans text-[13px] text-muted-foreground">Active Bundle</span>
         <span class="font-mono text-2xl font-bold text-foreground">{{ kpis.activePlan }}</span>
         <span class="font-sans text-[13px] text-muted-foreground">Purchased: {{ kpis.purchased }}</span>
-        <span class="inline-block w-fit px-2.5 py-1 rounded-full bg-[#DFE6E1] text-[#004D1A] text-[11px] font-medium">Active</span>
+        <span class="inline-block w-fit px-2.5 py-1 rounded-full bg-st-green-bg text-st-green-text text-[11px] font-medium">Active</span>
       </div>
     </div>
 
@@ -109,7 +109,7 @@ onMounted(async () => {
         <div
           v-for="bundle in bundles"
           :key="bundle.name"
-          class="bg-white rounded-xl p-6 flex flex-col gap-4"
+          class="bg-card rounded-xl p-6 flex flex-col gap-4"
           :class="bundle.featured ? 'border-2 border-primary' : 'border border-border'"
         >
           <div v-if="bundle.featured" class="flex">
@@ -133,7 +133,7 @@ onMounted(async () => {
     </div>
 
     <!-- Purchase History -->
-    <div class="bg-white border border-border rounded-xl overflow-hidden">
+    <div class="bg-card border border-border rounded-xl overflow-hidden">
       <div class="flex items-center justify-between px-6 py-4 border-b border-border">
         <h2 class="font-mono text-base font-semibold text-foreground">Purchase History</h2>
         <span class="px-2.5 py-1 rounded-full bg-background font-sans text-[12px] text-muted-foreground">{{ history.length }} transactions</span>
@@ -150,7 +150,7 @@ onMounted(async () => {
         </div>
         <!-- Empty State -->
         <div v-if="history.length === 0" class="flex flex-col items-center justify-center py-16 gap-4">
-          <div class="w-16 h-16 rounded-full bg-[#E7E8E5] flex items-center justify-center">
+          <div class="w-16 h-16 rounded-full bg-surface flex items-center justify-center">
             <span class="material-symbols-rounded text-[28px] text-muted-foreground">history</span>
           </div>
           <div class="flex flex-col items-center gap-1">
@@ -164,7 +164,7 @@ onMounted(async () => {
           <div class="flex-1"><span class="font-mono text-sm text-foreground">{{ tx.amount }}</span></div>
           <div class="flex-1"><span class="font-sans text-[13px] text-muted-foreground">{{ tx.method }}</span></div>
           <div class="w-[100px]">
-            <span class="inline-flex px-2.5 py-1 rounded-full bg-[#DFE6E1] text-[#004D1A] text-[11px] font-medium">{{ tx.status }}</span>
+            <span class="inline-flex px-2.5 py-1 rounded-full bg-st-green-bg text-st-green-text text-[11px] font-medium">{{ tx.status }}</span>
           </div>
         </div>
       </div>
@@ -172,7 +172,7 @@ onMounted(async () => {
       <!-- Mobile List -->
       <div class="lg:hidden">
         <div v-if="history.length === 0" class="flex flex-col items-center justify-center py-16 gap-4">
-          <div class="w-16 h-16 rounded-full bg-[#E7E8E5] flex items-center justify-center">
+          <div class="w-16 h-16 rounded-full bg-surface flex items-center justify-center">
             <span class="material-symbols-rounded text-[28px] text-muted-foreground">history</span>
           </div>
           <div class="flex flex-col items-center gap-1">
@@ -187,7 +187,7 @@ onMounted(async () => {
           </div>
           <div class="flex items-center justify-between">
             <span class="font-sans text-[12px] text-muted-foreground">{{ tx.date }} · {{ tx.method }}</span>
-            <span class="inline-flex px-2 py-0.5 rounded-full bg-[#DFE6E1] text-[#004D1A] text-[10px] font-medium">{{ tx.status }}</span>
+            <span class="inline-flex px-2 py-0.5 rounded-full bg-st-green-bg text-st-green-text text-[10px] font-medium">{{ tx.status }}</span>
           </div>
         </div>
       </div>

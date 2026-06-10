@@ -3,6 +3,9 @@ const route = useRoute()
 const authStore = useAuthStore()
 const mobileMenuOpen = ref(false)
 
+const colorMode = useColorMode()
+const logoVariant = computed(() => (colorMode.value === 'dark' ? 'dark' : 'light'))
+
 const user = computed(() => {
   if (!authStore.user) return null
   const name = authStore.user.name || 'User'
@@ -39,9 +42,9 @@ watch(() => route.path, () => {
 <template>
   <div class="min-h-screen flex bg-background">
     <!-- Desktop Sidebar -->
-    <aside class="hidden lg:flex sticky top-0 h-screen w-[260px] bg-[#E7E8E5] flex-col border-r border-border flex-shrink-0">
+    <aside class="hidden lg:flex sticky top-0 h-screen w-[260px] bg-sidebar flex-col border-r border-border flex-shrink-0">
       <div class="flex items-center gap-2.5 px-6 py-5 border-b border-border">
-        <UiRentCredLogo :size="28" variant="light" :show-text="true" :horizontal="true" />
+        <UiRentCredLogo :size="28" :variant="logoVariant" :show-text="true" :horizontal="true" />
       </div>
 
       <nav class="flex-1 flex flex-col gap-6 px-3 py-4 overflow-y-auto">
@@ -50,7 +53,7 @@ watch(() => route.path, () => {
           <NuxtLink
             v-for="item in profileItems" :key="item.to" :to="item.to"
             class="flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-sans transition-colors"
-            :class="isActive(item.to) ? 'bg-[#CBCCC9] text-foreground font-semibold' : 'text-muted-foreground hover:text-foreground hover:bg-[#CBCCC9]/50'"
+            :class="isActive(item.to) ? 'bg-border text-foreground font-semibold' : 'text-muted-foreground hover:text-foreground hover:bg-border/50'"
           >
             <span class="material-symbols-rounded text-[20px]">{{ item.icon }}</span>
             {{ item.label }}
@@ -62,7 +65,7 @@ watch(() => route.path, () => {
           <NuxtLink
             v-for="item in verificationItems" :key="item.to" :to="item.to"
             class="flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-sans transition-colors"
-            :class="isActive(item.to) ? 'bg-[#CBCCC9] text-foreground font-semibold' : 'text-muted-foreground hover:text-foreground hover:bg-[#CBCCC9]/50'"
+            :class="isActive(item.to) ? 'bg-border text-foreground font-semibold' : 'text-muted-foreground hover:text-foreground hover:bg-border/50'"
           >
             <span class="material-symbols-rounded text-[20px]">{{ item.icon }}</span>
             {{ item.label }}
@@ -74,7 +77,7 @@ watch(() => route.path, () => {
           <NuxtLink
             v-for="item in supportItems" :key="item.to" :to="item.to"
             class="flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-sans transition-colors"
-            :class="isActive(item.to) ? 'bg-[#CBCCC9] text-foreground font-semibold' : 'text-muted-foreground hover:text-foreground hover:bg-[#CBCCC9]/50'"
+            :class="isActive(item.to) ? 'bg-border text-foreground font-semibold' : 'text-muted-foreground hover:text-foreground hover:bg-border/50'"
           >
             <span class="material-symbols-rounded text-[20px]">{{ item.icon }}</span>
             {{ item.label }}
@@ -84,7 +87,7 @@ watch(() => route.path, () => {
 
       <div class="flex items-center gap-3 px-6 py-4 border-t border-border">
         <div class="w-9 h-9 rounded-full bg-primary flex items-center justify-center">
-          <span class="font-mono text-[13px] font-semibold text-foreground">{{ user?.initials || 'U' }}</span>
+          <span class="font-mono text-[13px] font-semibold text-primary-foreground">{{ user?.initials || 'U' }}</span>
         </div>
         <div class="flex flex-col gap-px">
           <span class="text-[13px] font-medium text-foreground font-sans">{{ user?.name || 'User' }}</span>
@@ -100,9 +103,12 @@ watch(() => route.path, () => {
           <span class="material-symbols-rounded text-[24px]">menu</span>
         </button>
         <span class="font-mono text-lg font-bold text-primary">RentCred</span>
-        <NuxtLink to="/tenant/verification" class="text-foreground">
-          <span class="material-symbols-rounded text-[24px]">notifications</span>
-        </NuxtLink>
+        <div class="flex items-center gap-1">
+          <UiThemeToggle compact />
+          <NuxtLink to="/tenant/verification" class="flex items-center justify-center w-9 h-9 text-foreground" aria-label="Notifications">
+            <span class="material-symbols-rounded text-[24px]">notifications</span>
+          </NuxtLink>
+        </div>
       </div>
     </div>
 
@@ -112,9 +118,9 @@ watch(() => route.path, () => {
         <div v-if="mobileMenuOpen" class="lg:hidden fixed inset-0 bg-black/50 z-50" @click="mobileMenuOpen = false" />
       </Transition>
       <Transition name="dashslide">
-        <aside v-if="mobileMenuOpen" class="lg:hidden fixed top-0 left-0 bottom-0 w-[280px] bg-[#E7E8E5] z-50 flex flex-col overflow-y-auto">
+        <aside v-if="mobileMenuOpen" class="lg:hidden fixed top-0 left-0 bottom-0 w-[280px] bg-sidebar z-50 flex flex-col overflow-y-auto">
           <div class="flex items-center justify-between px-5 py-5 border-b border-border">
-            <UiRentCredLogo :size="24" variant="light" :show-text="true" :horizontal="true" />
+            <UiRentCredLogo :size="24" :variant="logoVariant" :show-text="true" :horizontal="true" />
             <button @click="mobileMenuOpen = false" class="text-muted-foreground" aria-label="Close">
               <span class="material-symbols-rounded text-[20px]">close</span>
             </button>
@@ -125,7 +131,7 @@ watch(() => route.path, () => {
               <span class="px-3 py-2 text-[11px] font-mono font-semibold text-muted-foreground uppercase tracking-wider">My Profile</span>
               <NuxtLink v-for="item in profileItems" :key="item.to" :to="item.to"
                 class="flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-sans transition-colors"
-                :class="isActive(item.to) ? 'bg-[#CBCCC9] text-foreground font-semibold' : 'text-muted-foreground'"
+                :class="isActive(item.to) ? 'bg-border text-foreground font-semibold' : 'text-muted-foreground'"
               >
                 <span class="material-symbols-rounded text-[20px]">{{ item.icon }}</span>
                 {{ item.label }}
@@ -135,7 +141,7 @@ watch(() => route.path, () => {
               <span class="px-3 py-2 pt-4 text-[11px] font-mono font-semibold text-muted-foreground uppercase tracking-wider">Verification</span>
               <NuxtLink v-for="item in verificationItems" :key="item.to" :to="item.to"
                 class="flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-sans transition-colors"
-                :class="isActive(item.to) ? 'bg-[#CBCCC9] text-foreground font-semibold' : 'text-muted-foreground'"
+                :class="isActive(item.to) ? 'bg-border text-foreground font-semibold' : 'text-muted-foreground'"
               >
                 <span class="material-symbols-rounded text-[20px]">{{ item.icon }}</span>
                 {{ item.label }}
@@ -145,7 +151,7 @@ watch(() => route.path, () => {
               <span class="px-3 py-2 pt-4 text-[11px] font-mono font-semibold text-muted-foreground uppercase tracking-wider">Support</span>
               <NuxtLink v-for="item in supportItems" :key="item.to" :to="item.to"
                 class="flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-sans transition-colors"
-                :class="isActive(item.to) ? 'bg-[#CBCCC9] text-foreground font-semibold' : 'text-muted-foreground'"
+                :class="isActive(item.to) ? 'bg-border text-foreground font-semibold' : 'text-muted-foreground'"
               >
                 <span class="material-symbols-rounded text-[20px]">{{ item.icon }}</span>
                 {{ item.label }}
@@ -155,7 +161,7 @@ watch(() => route.path, () => {
 
           <div class="flex items-center gap-3 px-5 py-4 border-t border-border">
             <div class="w-9 h-9 rounded-full bg-primary flex items-center justify-center">
-              <span class="font-mono text-[13px] font-semibold text-foreground">{{ user?.initials || 'U' }}</span>
+              <span class="font-mono text-[13px] font-semibold text-primary-foreground">{{ user?.initials || 'U' }}</span>
             </div>
             <div class="flex flex-col gap-px">
               <span class="text-[13px] font-medium text-foreground font-sans">{{ user?.name || 'User' }}</span>
@@ -174,10 +180,11 @@ watch(() => route.path, () => {
           <span class="font-sans text-[13px] text-muted-foreground">{{ user?.email || 'Loading...' }} &bull; Tenant Portal</span>
         </div>
         <div class="flex items-center gap-3">
-          <NuxtLink to="/tenant/profile/1" class="flex items-center gap-2 px-5 py-2.5 bg-primary text-foreground rounded font-mono text-[13px] font-medium hover:opacity-90 transition-opacity">
+          <NuxtLink to="/tenant/profile/1" class="flex items-center gap-2 px-5 py-2.5 bg-primary text-primary-foreground rounded font-mono text-[13px] font-medium hover:opacity-90 transition-opacity">
             <span class="material-symbols-rounded text-[18px]">edit</span>
             Complete Profile
           </NuxtLink>
+          <UiThemeToggle />
           <button @click="authStore.logout()" class="flex items-center justify-center w-10 h-10 rounded-lg border border-border hover:bg-surface transition-colors" aria-label="Sign out">
             <span class="material-symbols-rounded text-[20px] text-muted-foreground">logout</span>
           </button>
@@ -192,29 +199,29 @@ watch(() => route.path, () => {
 
       <!-- Mobile Bottom Tab Bar -->
       <div class="lg:hidden fixed bottom-0 left-0 right-0 bg-background px-5 pb-5 pt-3 z-40">
-        <div class="flex items-center rounded-full bg-white border border-border p-1">
+        <div class="flex items-center rounded-full bg-card border border-border p-1">
           <NuxtLink to="/tenant" class="flex-1 flex flex-col items-center justify-center py-2 rounded-full text-[10px] font-semibold tracking-wide font-sans gap-1"
-            :class="route.path === '/tenant' ? 'bg-primary text-foreground' : 'text-muted-foreground'">
+            :class="route.path === '/tenant' ? 'bg-primary text-primary-foreground' : 'text-muted-foreground'">
             <span class="material-symbols-rounded text-[18px]">home</span>
             HOME
           </NuxtLink>
           <NuxtLink to="/tenant/profile/1" class="flex-1 flex flex-col items-center justify-center py-2 rounded-full text-[10px] font-semibold tracking-wide font-sans gap-1"
-            :class="route.path.startsWith('/tenant/profile') ? 'bg-primary text-foreground' : 'text-muted-foreground'">
+            :class="route.path.startsWith('/tenant/profile') ? 'bg-primary text-primary-foreground' : 'text-muted-foreground'">
             <span class="material-symbols-rounded text-[18px]">person</span>
             PROFILE
           </NuxtLink>
           <NuxtLink to="/tenant/verification" class="flex-1 flex flex-col items-center justify-center py-2 rounded-full text-[10px] font-semibold tracking-wide font-sans gap-1"
-            :class="route.path.startsWith('/tenant/verification') ? 'bg-primary text-foreground' : 'text-muted-foreground'">
+            :class="route.path.startsWith('/tenant/verification') ? 'bg-primary text-primary-foreground' : 'text-muted-foreground'">
             <span class="material-symbols-rounded text-[18px]">verified</span>
             STATUS
           </NuxtLink>
           <NuxtLink to="/tenant/reports" class="flex-1 flex flex-col items-center justify-center py-2 rounded-full text-[10px] font-semibold tracking-wide font-sans gap-1"
-            :class="route.path.startsWith('/tenant/reports') ? 'bg-primary text-foreground' : 'text-muted-foreground'">
+            :class="route.path.startsWith('/tenant/reports') ? 'bg-primary text-primary-foreground' : 'text-muted-foreground'">
             <span class="material-symbols-rounded text-[18px]">description</span>
             REPORTS
           </NuxtLink>
           <NuxtLink to="/tenant/disputes" class="flex-1 flex flex-col items-center justify-center py-2 rounded-full text-[10px] font-semibold tracking-wide font-sans gap-1"
-            :class="route.path.startsWith('/tenant/disputes') ? 'bg-primary text-foreground' : 'text-muted-foreground'">
+            :class="route.path.startsWith('/tenant/disputes') ? 'bg-primary text-primary-foreground' : 'text-muted-foreground'">
             <span class="material-symbols-rounded text-[18px]">more_horiz</span>
             MORE
           </NuxtLink>

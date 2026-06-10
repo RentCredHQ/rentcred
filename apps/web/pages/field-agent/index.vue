@@ -36,10 +36,10 @@ onMounted(async () => {
 
 function statusClasses(status: string) {
   const s = status.toLowerCase()
-  if (s === 'completed') return 'bg-[#DFE6E1] text-[#004D1A]'
-  if (s === 'in_progress' || s === 'in progress') return 'bg-[#E9E3D8] text-[#804200]'
+  if (s === 'completed') return 'bg-st-green-bg text-st-green-text'
+  if (s === 'in_progress' || s === 'in progress') return 'bg-st-amber-bg text-st-amber-text'
   if (s === 'assigned' || s === 'pending') return 'bg-blue-50 text-blue-600'
-  return 'bg-[#E9E3D8] text-[#804200]'
+  return 'bg-st-amber-bg text-st-amber-text'
 }
 
 function statusLabel(status: string) {
@@ -61,18 +61,18 @@ function statusLabel(status: string) {
       </div>
       <div class="bg-card border border-border rounded-xl p-3.5 flex flex-col gap-1">
         <span class="font-mono text-[10px] font-semibold text-muted-foreground tracking-wider uppercase">Completed</span>
-        <span class="font-mono text-2xl font-bold text-[#004D1A]">{{ stats?.completed ?? '—' }}</span>
+        <span class="font-mono text-2xl font-bold text-st-green-text">{{ stats?.completed ?? '—' }}</span>
       </div>
       <div class="bg-card border border-border rounded-xl p-3.5 flex flex-col gap-1">
         <span class="font-mono text-[10px] font-semibold text-muted-foreground tracking-wider uppercase">Pending</span>
-        <span class="font-mono text-2xl font-bold text-[#804200]">{{ stats?.pending ?? '—' }}</span>
+        <span class="font-mono text-2xl font-bold text-st-amber-text">{{ stats?.pending ?? '—' }}</span>
       </div>
     </div>
     <span class="font-mono text-base font-semibold text-foreground">Today's Schedule</span>
     <div class="flex flex-col gap-3">
       <!-- Empty State -->
       <div v-if="visits.length === 0 && !loading" class="flex flex-col items-center justify-center py-16 gap-4">
-        <div class="w-16 h-16 rounded-full bg-[#E7E8E5] flex items-center justify-center">
+        <div class="w-16 h-16 rounded-full bg-surface flex items-center justify-center">
           <span class="material-symbols-rounded text-[28px] text-muted-foreground">event_available</span>
         </div>
         <div class="flex flex-col items-center gap-1">

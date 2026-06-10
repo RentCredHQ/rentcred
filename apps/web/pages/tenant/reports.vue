@@ -25,7 +25,7 @@ onMounted(async () => {
       <p class="font-sans text-sm text-muted-foreground">View your completed verification reports</p>
     </div>
 
-    <div v-for="report in reports" :key="report.id" class="bg-white border border-border rounded-xl p-5 lg:p-6 flex flex-col gap-4 shadow-sm">
+    <div v-for="report in reports" :key="report.id" class="bg-card border border-border rounded-xl p-5 lg:p-6 flex flex-col gap-4 shadow-sm">
       <div class="flex items-start justify-between">
         <div class="flex flex-col gap-0.5">
           <span class="font-sans text-[15px] font-medium text-foreground">{{ report.submission?.propertyAddress }}</span>
@@ -33,7 +33,7 @@ onMounted(async () => {
             {{ report.submission?.propertyType }} &bull; {{ report.submission?.neighborhood }}, {{ report.submission?.state }}
           </span>
         </div>
-        <span class="inline-flex px-2.5 py-0.5 rounded-full text-[11px] font-semibold bg-[#DFE6E1] text-[#004D1A]">Approved</span>
+        <span class="inline-flex px-2.5 py-0.5 rounded-full text-[11px] font-semibold bg-st-green-bg text-st-green-text">Approved</span>
       </div>
 
       <div class="flex items-center gap-4 text-[13px] font-sans text-muted-foreground">
@@ -57,7 +57,7 @@ onMounted(async () => {
       </NuxtLink>
     </div>
 
-    <div v-if="!loading && reports.length === 0" class="bg-white border border-border rounded-xl p-8 flex flex-col items-center gap-4 text-center">
+    <div v-if="!loading && reports.length === 0" class="bg-card border border-border rounded-xl p-8 flex flex-col items-center gap-4 text-center">
       <span class="material-symbols-rounded text-[48px] text-muted-foreground">description</span>
       <h3 class="font-mono text-lg font-semibold text-foreground">No Reports Yet</h3>
       <p class="font-sans text-sm text-muted-foreground max-w-[400px]">Completed verification reports will appear here once approved.</p>

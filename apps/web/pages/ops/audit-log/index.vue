@@ -76,7 +76,7 @@ const selectedDate = ref('all')
           <div class="flex-1">
             <span
               class="inline-flex px-2.5 py-0.5 rounded-full text-[11px] font-semibold"
-              :class="entry.status === 'Success' ? 'bg-[#DFE6E1] text-[#004D1A]' : 'bg-[#E9E3D8] text-[#804200]'"
+              :class="entry.status === 'Success' ? 'bg-st-green-bg text-st-green-text' : 'bg-st-amber-bg text-st-amber-text'"
             >
               {{ entry.status }}
             </span>
@@ -91,7 +91,7 @@ const selectedDate = ref('all')
             <span class="font-sans text-sm font-medium text-foreground">{{ entry.action }}</span>
             <span
               class="inline-flex px-2 py-0.5 rounded-full text-[10px] font-semibold"
-              :class="entry.status === 'Success' ? 'bg-[#DFE6E1] text-[#004D1A]' : 'bg-[#E9E3D8] text-[#804200]'"
+              :class="entry.status === 'Success' ? 'bg-st-green-bg text-st-green-text' : 'bg-st-amber-bg text-st-amber-text'"
             >
               {{ entry.status }}
             </span>
@@ -108,10 +108,10 @@ const selectedDate = ref('all')
       <div class="flex items-center justify-between px-6 py-3 border-t border-border">
         <span class="font-sans text-[12px] text-muted-foreground">Showing {{ resultCount }} of 1,847 actions</span>
         <div class="flex items-center gap-1.5">
-          <button class="px-2.5 py-1 bg-white border border-border rounded-md text-[12px] font-sans text-foreground">Prev</button>
+          <button class="px-2.5 py-1 bg-card border border-border rounded-md text-[12px] font-sans text-foreground">Prev</button>
           <button class="px-2.5 py-1 bg-foreground rounded-md text-[12px] font-sans text-white">1</button>
-          <button class="px-2.5 py-1 bg-white border border-border rounded-md text-[12px] font-sans text-foreground">2</button>
-          <button class="px-2.5 py-1 bg-white border border-border rounded-md text-[12px] font-sans text-foreground">3</button>
+          <button class="px-2.5 py-1 bg-card border border-border rounded-md text-[12px] font-sans text-foreground">2</button>
+          <button class="px-2.5 py-1 bg-card border border-border rounded-md text-[12px] font-sans text-foreground">3</button>
           <button class="px-2.5 py-1 bg-primary rounded-md text-[12px] font-sans text-white">Next</button>
         </div>
       </div>

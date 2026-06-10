@@ -37,7 +37,7 @@ const availableTransitions = computed(() => {
   return (VALID_TRANSITIONS[rawStatus.value] || []).map(s => ({
     value: s,
     label: SUBMISSION_STATUS_LABELS[s] ?? s,
-    style: statusStyleMap[s] ?? { bg: 'bg-[#E9E3D8]', text: 'text-[#804200]' },
+    style: statusStyleMap[s] ?? { bg: 'bg-st-amber-bg', text: 'text-st-amber-text' },
   }))
 })
 
@@ -95,12 +95,12 @@ async function toggleCheck(check: any) {
 }
 
 const statusStyleMap: Record<string, { bg: string; text: string }> = {
-  pending: { bg: 'bg-[#E9E3D8]', text: 'text-[#804200]' },
-  in_progress: { bg: 'bg-[#E9E3D8]', text: 'text-[#804200]' },
+  pending: { bg: 'bg-st-amber-bg', text: 'text-st-amber-text' },
+  in_progress: { bg: 'bg-st-amber-bg', text: 'text-st-amber-text' },
   field_visit: { bg: 'bg-blue-50', text: 'text-blue-600' },
-  report_building: { bg: 'bg-[#E9E3D8]', text: 'text-[#804200]' },
-  completed: { bg: 'bg-[#DFE6E1]', text: 'text-[#004D1A]' },
-  rejected: { bg: 'bg-[#E5DCDA]', text: 'text-[#8C1C00]' },
+  report_building: { bg: 'bg-st-amber-bg', text: 'text-st-amber-text' },
+  completed: { bg: 'bg-st-green-bg', text: 'text-st-green-text' },
+  rejected: { bg: 'bg-st-red-bg', text: 'text-st-red-text' },
 }
 
 const caseData = ref({
@@ -116,8 +116,8 @@ const caseData = ref({
   statusBg: '',
   statusText: '',
   priority: '—',
-  priorityBg: 'bg-[#E9E3D8]',
-  priorityText: 'text-[#804200]',
+  priorityBg: 'bg-st-amber-bg',
+  priorityText: 'text-st-amber-text',
   created: '',
   updated: '',
   sla: '',
@@ -141,7 +141,7 @@ async function fetchCaseData() {
     ])
 
     const s = submissionRes.data ?? submissionRes
-    const style = statusStyleMap[s.status] ?? { bg: 'bg-[#E9E3D8]', text: 'text-[#804200]' }
+    const style = statusStyleMap[s.status] ?? { bg: 'bg-st-amber-bg', text: 'text-st-amber-text' }
 
     // Extract field agent from fieldAssignments array
     const latestAssignment = s.fieldAssignments?.[0]
@@ -178,8 +178,8 @@ async function fetchCaseData() {
       statusBg: style.bg,
       statusText: style.text,
       priority: s.priority ?? '—',
-      priorityBg: 'bg-[#E9E3D8]',
-      priorityText: 'text-[#804200]',
+      priorityBg: 'bg-st-amber-bg',
+      priorityText: 'text-st-amber-text',
       created: s.createdAt ? new Date(s.createdAt).toLocaleDateString('en-NG', { month: 'short', day: 'numeric', year: 'numeric' }) : '',
       updated: s.updatedAt ? new Date(s.updatedAt).toLocaleDateString('en-NG', { month: 'short', day: 'numeric', year: 'numeric' }) : '',
       sla: s.sla ?? '',
@@ -203,7 +203,7 @@ async function fetchCaseData() {
     }
     checks.value = Object.entries(checkLabels).map(([key, label]) => {
       const val = checklist[key]
-      if (val === true) return { key, label, checked: true, status: 'Verified', icon: 'check_circle', color: 'text-[#004D1A]' }
+      if (val === true) return { key, label, checked: true, status: 'Verified', icon: 'check_circle', color: 'text-st-green-text' }
       return { key, label, checked: false, status: 'Pending', icon: 'schedule', color: 'text-muted-foreground' }
     })
 
@@ -288,7 +288,7 @@ onMounted(fetchCaseData)
               <span class="material-symbols-rounded text-[16px]">edit_note</span>
               {{ statusUpdating ? 'Updating...' : 'Update Status' }}
             </button>
-            <div v-if="showStatusMenu" class="absolute right-0 mt-1 w-48 bg-white border border-border rounded-lg shadow-lg z-20 py-1">
+            <div v-if="showStatusMenu" class="absolute right-0 mt-1 w-48 bg-card border border-border rounded-lg shadow-lg z-20 py-1">
               <button
                 v-for="t in availableTransitions"
                 :key="t.value"
@@ -317,7 +317,7 @@ onMounted(fetchCaseData)
       </div>
       <div class="flex items-center gap-1.5">
         <span class="material-symbols-rounded text-[16px]">timer</span>
-        SLA: <span class="text-[#804200] font-medium">{{ caseData.sla }}</span>
+        SLA: <span class="text-st-amber-text font-medium">{{ caseData.sla }}</span>
       </div>
       <div class="flex items-center gap-1.5">
         <span class="material-symbols-rounded text-[16px]">update</span>
@@ -524,7 +524,7 @@ onMounted(fetchCaseData)
                 <button
                   v-if="reportStatus === 'draft' || reportStatus === 'pending_approval'"
                   @click="approveReport"
-                  class="flex items-center gap-2 px-4 py-2 bg-[#004D1A] text-white rounded-lg text-[13px] font-mono font-medium hover:opacity-90 transition-opacity"
+                  class="flex items-center gap-2 px-4 py-2 bg-st-green-text text-white rounded-lg text-[13px] font-mono font-medium hover:opacity-90 transition-opacity"
                 >
                   <span class="material-symbols-rounded text-[16px]">check_circle</span>
                   Approve Report

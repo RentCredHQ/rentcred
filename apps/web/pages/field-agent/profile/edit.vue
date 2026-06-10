@@ -104,9 +104,9 @@ async function handleSave() {
 
     <template v-else>
       <!-- Success Toast -->
-      <div v-if="saved" class="flex items-center gap-2.5 px-4 py-3 rounded-xl bg-[#DFE6E1]">
-        <span class="material-symbols-rounded text-[20px] text-[#004D1A]">check_circle</span>
-        <span class="font-sans text-[13px] font-medium text-[#004D1A]">Profile updated successfully</span>
+      <div v-if="saved" class="flex items-center gap-2.5 px-4 py-3 rounded-xl bg-st-green-bg">
+        <span class="material-symbols-rounded text-[20px] text-st-green-text">check_circle</span>
+        <span class="font-sans text-[13px] font-medium text-st-green-text">Profile updated successfully</span>
       </div>
 
       <!-- Avatar -->
@@ -143,7 +143,7 @@ async function handleSave() {
         </div>
         <div class="flex flex-col gap-1.5">
           <label class="font-sans text-[13px] font-medium text-foreground">Email</label>
-          <div class="w-full h-[44px] px-3.5 bg-[#E7E8E5] border border-border rounded-lg flex items-center justify-between">
+          <div class="w-full h-[44px] px-3.5 bg-surface border border-border rounded-lg flex items-center justify-between">
             <span class="font-sans text-sm text-muted-foreground">{{ form.email }}</span>
             <span class="material-symbols-rounded text-[16px] text-muted-foreground">lock</span>
           </div>
@@ -154,7 +154,7 @@ async function handleSave() {
         </div>
         <div class="flex flex-col gap-1.5">
           <label class="font-sans text-[13px] font-medium text-foreground">Role</label>
-          <div class="w-full h-[44px] px-3.5 bg-[#E7E8E5] border border-border rounded-lg flex items-center justify-between">
+          <div class="w-full h-[44px] px-3.5 bg-surface border border-border rounded-lg flex items-center justify-between">
             <span class="font-sans text-sm text-muted-foreground">Field Agent</span>
             <span class="material-symbols-rounded text-[16px] text-muted-foreground">lock</span>
           </div>
@@ -172,7 +172,7 @@ async function handleSave() {
         @click="handleSave"
         :disabled="saving || saved"
         class="w-full h-12 flex items-center justify-center gap-2 rounded-xl font-mono text-[13px] font-semibold transition-all"
-        :class="saved ? 'bg-[#DFE6E1] text-[#004D1A]' : 'bg-primary text-foreground hover:opacity-90'"
+        :class="saved ? 'bg-st-green-bg text-st-green-text' : 'bg-primary text-foreground hover:opacity-90'"
       >
         <span v-if="saving" class="material-symbols-rounded text-[18px] animate-spin">progress_activity</span>
         <span v-else-if="saved" class="material-symbols-rounded text-[18px]">check_circle</span>

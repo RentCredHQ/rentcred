@@ -32,11 +32,11 @@ function getReportStatusLabel(status: string) {
 
 function getRecStyle(rating: string) {
   const map: Record<string, { label: string; color: string }> = {
-    excellent: { label: 'Low Concern', color: 'text-[#004D1A]' },
-    good: { label: 'Low Concern', color: 'text-[#004D1A]' },
-    fair: { label: 'Medium Concern', color: 'text-[#804200]' },
-    poor: { label: 'High Concern', color: 'text-[#8C1C00]' },
-    fail: { label: 'High Concern', color: 'text-[#8C1C00]' },
+    excellent: { label: 'Low Concern', color: 'text-st-green-text' },
+    good: { label: 'Low Concern', color: 'text-st-green-text' },
+    fair: { label: 'Medium Concern', color: 'text-st-amber-text' },
+    poor: { label: 'High Concern', color: 'text-st-red-text' },
+    fail: { label: 'High Concern', color: 'text-st-red-text' },
   }
   return map[rating] || { label: 'Unknown', color: 'text-foreground' }
 }
@@ -84,7 +84,7 @@ onMounted(async () => {
     <!-- Header -->
     <div class="flex items-center gap-3">
       <h1 class="font-mono text-2xl font-semibold text-foreground" style="letter-spacing: -0.5px">Reports</h1>
-      <span class="px-2.5 py-1 rounded-full bg-[#E7E8E5] font-sans text-[12px] font-medium text-foreground">{{ resultCount }} reports</span>
+      <span class="px-2.5 py-1 rounded-full bg-surface font-sans text-[12px] font-medium text-foreground">{{ resultCount }} reports</span>
     </div>
 
     <!-- Search & Filters -->
@@ -94,8 +94,8 @@ onMounted(async () => {
     </UiFilterBar>
 
     <!-- Desktop Table -->
-    <div class="hidden lg:block bg-white border-[1.5px] border-border rounded-lg overflow-hidden overflow-x-auto">
-      <div class="flex bg-[#E7E8E5] px-4 py-3 min-w-[860px]">
+    <div class="hidden lg:block bg-card border-[1.5px] border-border rounded-lg overflow-hidden overflow-x-auto">
+      <div class="flex bg-surface px-4 py-3 min-w-[860px]">
         <div class="w-[170px] flex-shrink-0"><span class="font-mono text-[12px] font-semibold text-muted-foreground tracking-wider">Tenant Name</span></div>
         <div class="w-[120px] flex-shrink-0"><span class="font-mono text-[12px] font-semibold text-muted-foreground tracking-wider">Case ID</span></div>
         <div class="w-[140px] flex-shrink-0"><span class="font-mono text-[12px] font-semibold text-muted-foreground tracking-wider">Report Status</span></div>
@@ -106,7 +106,7 @@ onMounted(async () => {
 
       <!-- Empty State -->
       <div v-if="filtered.length === 0" class="flex flex-col items-center justify-center py-16 gap-4">
-        <div class="w-16 h-16 rounded-full bg-[#E7E8E5] flex items-center justify-center">
+        <div class="w-16 h-16 rounded-full bg-surface flex items-center justify-center">
           <span class="material-symbols-rounded text-[28px] text-muted-foreground">assessment</span>
         </div>
         <div class="flex flex-col items-center gap-1">
@@ -134,7 +134,7 @@ onMounted(async () => {
     <!-- Mobile Card List -->
     <div class="lg:hidden flex flex-col gap-3">
       <div v-if="filtered.length === 0" class="flex flex-col items-center justify-center py-16 gap-4">
-        <div class="w-16 h-16 rounded-full bg-[#E7E8E5] flex items-center justify-center">
+        <div class="w-16 h-16 rounded-full bg-surface flex items-center justify-center">
           <span class="material-symbols-rounded text-[28px] text-muted-foreground">assessment</span>
         </div>
         <div class="flex flex-col items-center gap-1">
@@ -142,7 +142,7 @@ onMounted(async () => {
           <p class="font-sans text-sm text-muted-foreground text-center max-w-[320px]">Reports will appear here once verifications are complete</p>
         </div>
       </div>
-      <NuxtLink v-for="report in filtered" :key="report.caseId" :to="`/dashboard/reports/${report.caseId}`" class="bg-white border border-border rounded-xl p-4 flex flex-col gap-3 cursor-pointer hover:border-primary/40 transition-colors">
+      <NuxtLink v-for="report in filtered" :key="report.caseId" :to="`/dashboard/reports/${report.caseId}`" class="bg-card border border-border rounded-xl p-4 flex flex-col gap-3 cursor-pointer hover:border-primary/40 transition-colors">
         <div class="flex items-center justify-between">
           <span class="font-sans text-sm font-semibold text-foreground">{{ report.tenant }}</span>
           <UiStatusPill :status="report.rawStatus" :label="report.status" />

@@ -201,7 +201,7 @@ onMounted(async () => {
         <div class="flex flex-wrap items-center gap-3 lg:gap-4">
           <span class="font-mono text-[13px] text-muted-foreground">{{ report.caseId }}</span>
           <span class="font-sans text-[13px] text-muted-foreground">Generated: {{ report.generatedDate }}</span>
-          <span class="inline-flex px-3 py-1 rounded-full bg-[#DFE6E1] text-[#004D1A] text-[12px] font-semibold">{{ report.status }}</span>
+          <span class="inline-flex px-3 py-1 rounded-full bg-st-green-bg text-st-green-text text-[12px] font-semibold">{{ report.status }}</span>
         </div>
       </div>
       <div class="flex flex-wrap items-center gap-3">
@@ -209,7 +209,7 @@ onMounted(async () => {
           <span class="material-symbols-rounded text-[16px]">share</span>
           {{ sharingReport ? 'Sharing...' : 'Share Report' }}
         </button>
-        <button @click="handleDownload" class="flex items-center gap-2 px-5 py-2.5 bg-[#E7E8E5] border border-border text-foreground font-mono text-[13px] font-medium hover:opacity-90 transition-opacity">
+        <button @click="handleDownload" class="flex items-center gap-2 px-5 py-2.5 bg-surface border border-border text-foreground font-mono text-[13px] font-medium hover:opacity-90 transition-opacity">
           <span class="material-symbols-rounded text-[16px]">download</span>
           Download
         </button>
@@ -217,12 +217,12 @@ onMounted(async () => {
     </div>
 
     <!-- Recommendation Band -->
-    <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2 bg-[#DFE6E1] px-5 lg:px-6 py-4 rounded-none lg:rounded-none">
+    <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2 bg-st-green-bg px-5 lg:px-6 py-4 rounded-none lg:rounded-none">
       <div class="flex items-center gap-3">
-        <span class="material-symbols-rounded text-[24px] text-[#004D1A]">verified</span>
-        <span class="font-mono text-sm lg:text-base font-bold text-[#004D1A]">{{ report.recommendation }}</span>
+        <span class="material-symbols-rounded text-[24px] text-st-green-text">verified</span>
+        <span class="font-mono text-sm lg:text-base font-bold text-st-green-text">{{ report.recommendation }}</span>
       </div>
-      <span class="font-sans text-sm text-[#004D1A]">{{ report.recommendationSub }}</span>
+      <span class="font-sans text-sm text-st-green-text">{{ report.recommendationSub }}</span>
     </div>
 
     <!-- Report Body: Two Columns on Desktop, Stack on Mobile -->
@@ -232,12 +232,12 @@ onMounted(async () => {
         <div
           v-for="card in verificationCards"
           :key="card.title"
-          class="bg-white border border-border rounded-xl p-5 lg:p-6 flex flex-col gap-4"
+          class="bg-card border border-border rounded-xl p-5 lg:p-6 flex flex-col gap-4"
         >
           <!-- Card Header -->
           <div class="flex items-center justify-between">
             <span class="font-mono text-[14px] lg:text-[15px] font-semibold text-foreground">{{ card.title }}</span>
-            <span class="inline-flex px-2.5 py-1 rounded-full bg-[#DFE6E1] text-[#004D1A] text-[11px] font-semibold">{{ card.status }}</span>
+            <span class="inline-flex px-2.5 py-1 rounded-full bg-st-green-bg text-st-green-text text-[11px] font-semibold">{{ card.status }}</span>
           </div>
           <!-- Rows -->
           <div class="flex flex-col gap-3">
@@ -246,7 +246,7 @@ onMounted(async () => {
               <span
                 class="text-[13px] font-medium"
                 :class="[
-                  row.positive ? 'text-[#004D1A]' : 'text-foreground',
+                  row.positive ? 'text-st-green-text' : 'text-foreground',
                   row.mono ? 'font-mono' : 'font-sans'
                 ]"
               >{{ row.value }}</span>
@@ -258,7 +258,7 @@ onMounted(async () => {
       <!-- Right Column: Tenant Info -->
       <div class="w-full lg:w-[340px] flex flex-col gap-5">
         <!-- Tenant Info Card -->
-        <div class="bg-white border border-border rounded-xl p-5 lg:p-6 flex flex-col gap-3.5">
+        <div class="bg-card border border-border rounded-xl p-5 lg:p-6 flex flex-col gap-3.5">
           <span class="font-mono text-[14px] font-semibold text-foreground">Tenant Information</span>
           <div class="flex flex-col gap-0.5">
             <span class="font-sans text-[12px] text-muted-foreground">Phone</span>
@@ -283,7 +283,7 @@ onMounted(async () => {
         </div>
 
         <!-- Property Details Card -->
-        <div class="bg-white border border-border rounded-xl p-5 lg:p-6 flex flex-col gap-3.5">
+        <div class="bg-card border border-border rounded-xl p-5 lg:p-6 flex flex-col gap-3.5">
           <span class="font-mono text-[14px] font-semibold text-foreground">Property Details</span>
           <div class="flex flex-col gap-0.5">
             <span class="font-sans text-[12px] text-muted-foreground">Type</span>

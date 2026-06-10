@@ -68,9 +68,9 @@ function handleSignOut() {
 
       <!-- Sign Out -->
       <div class="border-t border-border py-1">
-        <button @click="handleSignOut" class="flex items-center gap-3 w-full px-4 py-2.5 hover:bg-[#FDECEC] transition-colors">
-          <span class="material-symbols-rounded text-[18px] text-[#8C1C00]">logout</span>
-          <span class="text-[13px] font-sans text-[#8C1C00]">Sign Out</span>
+        <button @click="handleSignOut" class="flex items-center gap-3 w-full px-4 py-2.5 hover:bg-st-red-bg transition-colors">
+          <span class="material-symbols-rounded text-[18px] text-st-red-text">logout</span>
+          <span class="text-[13px] font-sans text-st-red-text">Sign Out</span>
         </button>
       </div>
 

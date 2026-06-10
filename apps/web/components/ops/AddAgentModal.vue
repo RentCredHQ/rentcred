@@ -97,7 +97,7 @@ async function handleSubmit() {
             </div>
 
             <!-- Error -->
-            <div v-if="error" class="font-sans text-[13px] text-[#8C1C00]">{{ error }}</div>
+            <div v-if="error" class="font-sans text-[13px] text-st-red-text">{{ error }}</div>
 
             <!-- Actions -->
             <div class="flex items-center gap-3 pt-2">

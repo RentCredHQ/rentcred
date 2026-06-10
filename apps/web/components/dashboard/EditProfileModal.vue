@@ -69,11 +69,11 @@ async function handleSave() {
       <div v-if="modelValue" class="fixed inset-0 z-50 flex items-center justify-center">
         <div class="absolute inset-0 bg-black/40" @click="close" />
 
-        <div class="relative w-full mx-4 max-w-[520px] max-h-[90vh] bg-white rounded-2xl border border-border shadow-2xl flex flex-col overflow-hidden">
+        <div class="relative w-full mx-4 max-w-[520px] max-h-[90vh] bg-card rounded-2xl border border-border shadow-2xl flex flex-col overflow-hidden">
           <!-- Header -->
           <div class="flex items-center justify-between px-6 py-5 border-b border-border">
             <h2 class="font-mono text-base font-bold text-foreground">Edit Profile</h2>
-            <button @click="close" class="w-8 h-8 rounded-lg bg-[#E7E8E5] flex items-center justify-center hover:bg-border transition-colors" aria-label="Close">
+            <button @click="close" class="w-8 h-8 rounded-lg bg-surface flex items-center justify-center hover:bg-border transition-colors" aria-label="Close">
               <span class="material-symbols-rounded text-[18px] text-muted-foreground">close</span>
             </button>
           </div>
@@ -81,15 +81,15 @@ async function handleSave() {
           <!-- Body -->
           <div class="flex flex-col gap-6 p-6 overflow-y-auto">
             <!-- Success Toast -->
-            <div v-if="saved" class="flex items-center gap-2.5 px-4 py-3 rounded-lg bg-[#DFE6E1]">
-              <span class="material-symbols-rounded text-[20px] text-[#004D1A]">check_circle</span>
-              <span class="font-sans text-[13px] font-medium text-[#004D1A]">Profile updated successfully</span>
+            <div v-if="saved" class="flex items-center gap-2.5 px-4 py-3 rounded-lg bg-st-green-bg">
+              <span class="material-symbols-rounded text-[20px] text-st-green-text">check_circle</span>
+              <span class="font-sans text-[13px] font-medium text-st-green-text">Profile updated successfully</span>
             </div>
 
             <!-- Error Toast -->
-            <div v-if="error" class="flex items-center gap-2.5 px-4 py-3 rounded-lg bg-[#E5DCDA]">
-              <span class="material-symbols-rounded text-[20px] text-[#8C1C00]">error</span>
-              <span class="font-sans text-[13px] font-medium text-[#8C1C00]">{{ error }}</span>
+            <div v-if="error" class="flex items-center gap-2.5 px-4 py-3 rounded-lg bg-st-red-bg">
+              <span class="material-symbols-rounded text-[20px] text-st-red-text">error</span>
+              <span class="font-sans text-[13px] font-medium text-st-red-text">{{ error }}</span>
             </div>
 
             <!-- Avatar Section -->
@@ -114,35 +114,35 @@ async function handleSave() {
             <div class="flex flex-col sm:flex-row gap-4">
               <div class="flex-1 flex flex-col gap-1.5">
                 <label class="font-mono text-[11px] font-semibold text-muted-foreground tracking-wider">FIRST NAME</label>
-                <input v-model="form.firstName" type="text" class="w-full h-[44px] px-3.5 bg-white border border-border rounded-lg text-sm font-sans text-foreground focus:outline-none focus:border-primary transition-colors" />
+                <input v-model="form.firstName" type="text" class="w-full h-[44px] px-3.5 bg-card border border-border rounded-lg text-sm font-sans text-foreground focus:outline-none focus:border-primary transition-colors" />
               </div>
               <div class="flex-1 flex flex-col gap-1.5">
                 <label class="font-mono text-[11px] font-semibold text-muted-foreground tracking-wider">LAST NAME</label>
-                <input v-model="form.lastName" type="text" class="w-full h-[44px] px-3.5 bg-white border border-border rounded-lg text-sm font-sans text-foreground focus:outline-none focus:border-primary transition-colors" />
+                <input v-model="form.lastName" type="text" class="w-full h-[44px] px-3.5 bg-card border border-border rounded-lg text-sm font-sans text-foreground focus:outline-none focus:border-primary transition-colors" />
               </div>
             </div>
 
             <!-- Email -->
             <div class="flex flex-col gap-1.5">
               <label class="font-mono text-[11px] font-semibold text-muted-foreground tracking-wider">EMAIL ADDRESS</label>
-              <input v-model="form.email" type="email" class="w-full h-[44px] px-3.5 bg-white border border-border rounded-lg text-sm font-sans text-foreground focus:outline-none focus:border-primary transition-colors" />
+              <input v-model="form.email" type="email" class="w-full h-[44px] px-3.5 bg-card border border-border rounded-lg text-sm font-sans text-foreground focus:outline-none focus:border-primary transition-colors" />
             </div>
 
             <!-- Phone -->
             <div class="flex flex-col gap-1.5">
               <label class="font-mono text-[11px] font-semibold text-muted-foreground tracking-wider">PHONE NUMBER</label>
-              <input v-model="form.phone" type="tel" class="w-full h-[44px] px-3.5 bg-white border border-border rounded-lg text-sm font-sans text-foreground focus:outline-none focus:border-primary transition-colors" />
+              <input v-model="form.phone" type="tel" class="w-full h-[44px] px-3.5 bg-card border border-border rounded-lg text-sm font-sans text-foreground focus:outline-none focus:border-primary transition-colors" />
             </div>
 
             <!-- Company / Role -->
             <div class="flex flex-col sm:flex-row gap-4">
               <div class="flex-1 flex flex-col gap-1.5">
                 <label class="font-mono text-[11px] font-semibold text-muted-foreground tracking-wider">COMPANY NAME</label>
-                <input v-model="form.company" type="text" class="w-full h-[44px] px-3.5 bg-white border border-border rounded-lg text-sm font-sans text-foreground focus:outline-none focus:border-primary transition-colors" />
+                <input v-model="form.company" type="text" class="w-full h-[44px] px-3.5 bg-card border border-border rounded-lg text-sm font-sans text-foreground focus:outline-none focus:border-primary transition-colors" />
               </div>
               <div class="flex-1 flex flex-col gap-1.5">
                 <label class="font-mono text-[11px] font-semibold text-muted-foreground tracking-wider">ROLE</label>
-                <div class="w-full h-[44px] px-3.5 bg-[#E7E8E5] border border-border rounded-lg flex items-center justify-between">
+                <div class="w-full h-[44px] px-3.5 bg-surface border border-border rounded-lg flex items-center justify-between">
                   <span class="font-sans text-sm text-muted-foreground">{{ profile.role }}</span>
                   <span class="material-symbols-rounded text-[16px] text-muted-foreground">lock</span>
                 </div>
@@ -160,7 +160,7 @@ async function handleSave() {
               :disabled="saving || saved"
               class="flex items-center gap-2 px-6 py-2.5 rounded-lg font-mono text-[13px] font-semibold transition-all"
               :class="saved
-                ? 'bg-[#DFE6E1] text-[#004D1A]'
+                ? 'bg-st-green-bg text-st-green-text'
                 : 'bg-primary text-white hover:bg-primary/90'"
             >
               <span v-if="saving" class="material-symbols-rounded text-[18px] animate-spin">progress_activity</span>

@@ -149,7 +149,7 @@ async function handleSubmit() {
             class="flex items-center gap-3 px-4 py-3.5 w-full text-left hover:bg-surface transition-colors cursor-pointer"
             :class="i < FIELD_CHECKLIST.length - 1 ? 'border-b border-border' : ''"
           >
-            <span class="material-symbols-rounded text-[20px]" :class="checklistState[item.key] ? 'text-[#004D1A]' : 'text-muted-foreground'">
+            <span class="material-symbols-rounded text-[20px]" :class="checklistState[item.key] ? 'text-st-green-text' : 'text-muted-foreground'">
               {{ checklistState[item.key] ? 'check_circle' : 'radio_button_unchecked' }}
             </span>
             <span class="font-sans text-[13px]" :class="checklistState[item.key] ? 'text-foreground' : 'text-muted-foreground'">{{ item.label }}</span>
@@ -164,7 +164,7 @@ async function handleSubmit() {
         <button
           v-if="photos.length < 10"
           type="button"
-          class="w-full py-6 border-2 border-dashed border-border rounded-xl flex flex-col items-center gap-2 hover:border-primary hover:bg-[#FFF8F0] transition-colors"
+          class="w-full py-6 border-2 border-dashed border-border rounded-xl flex flex-col items-center gap-2 hover:border-primary hover:bg-primary/5 transition-colors"
           :class="{ 'opacity-50 pointer-events-none': uploading }"
           @click="fileInput?.click()">
           <span class="material-symbols-rounded text-[28px] text-muted-foreground">add_a_photo</span>
@@ -229,14 +229,14 @@ async function handleSubmit() {
           <button
             @click="result = 'verified'"
             class="flex-1 flex items-center justify-center gap-2 h-11 rounded-xl text-[13px] font-mono font-semibold transition-colors"
-            :class="result === 'verified' ? 'bg-[#DFE6E1] border-[1.5px] border-[#004D1A] text-[#004D1A]' : 'bg-card border border-border text-muted-foreground'"
+            :class="result === 'verified' ? 'bg-st-green-bg border-[1.5px] border-st-green-text text-st-green-text' : 'bg-card border border-border text-muted-foreground'"
           >
             <span class="material-symbols-rounded text-[18px]">check_circle</span> Verified
           </button>
           <button
             @click="result = 'flagged'"
             class="flex-1 flex items-center justify-center gap-2 h-11 rounded-xl text-[13px] font-mono font-semibold transition-colors"
-            :class="result === 'flagged' ? 'bg-[#E5DCDA] border-[1.5px] border-[#8C1C00] text-[#8C1C00]' : 'bg-card border border-border text-muted-foreground'"
+            :class="result === 'flagged' ? 'bg-st-red-bg border-[1.5px] border-st-red-text text-st-red-text' : 'bg-card border border-border text-muted-foreground'"
           >
             <span class="material-symbols-rounded text-[18px]">flag</span> Flagged
           </button>

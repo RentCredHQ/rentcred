@@ -14,11 +14,11 @@ const categoryTabs = [
 ]
 
 const categoryStyles: Record<string, { bg: string; text: string }> = {
-  Case: { bg: 'bg-[#DFDFE6]', text: 'text-[#000066]' },
-  Report: { bg: 'bg-[#DFE6E1]', text: 'text-[#004D1A]' },
-  System: { bg: 'bg-[#E5DCDA]', text: 'text-[#8C1C00]' },
-  Auth: { bg: 'bg-[#E9E3D8]', text: 'text-[#804200]' },
-  Payment: { bg: 'bg-[#E9E3D8]', text: 'text-[#804200]' },
+  Case: { bg: 'bg-st-blue-bg', text: 'text-st-blue-text' },
+  Report: { bg: 'bg-st-green-bg', text: 'text-st-green-text' },
+  System: { bg: 'bg-st-red-bg', text: 'text-st-red-text' },
+  Auth: { bg: 'bg-st-amber-bg', text: 'text-st-amber-text' },
+  Payment: { bg: 'bg-st-amber-bg', text: 'text-st-amber-text' },
 }
 
 const summary = ref<any[]>([])
@@ -60,7 +60,7 @@ onMounted(async () => {
         category,
         time: evt.createdAt ? new Date(evt.createdAt).toLocaleString('en-NG', { month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' }) : evt.time ?? '—',
         ip: evt.ipAddress ?? evt.ip ?? '—',
-        categoryBg: categoryStyles[category]?.bg ?? 'bg-[#E7E8E5]',
+        categoryBg: categoryStyles[category]?.bg ?? 'bg-surface',
         categoryText: categoryStyles[category]?.text ?? 'text-foreground',
       }
     })
@@ -70,9 +70,9 @@ onMounted(async () => {
     } else {
       summary.value = [
         { label: 'Events (24h)', value: String(events.value.length), valueColor: 'text-foreground' },
-        { label: 'Critical Flags', value: String(events.value.filter((e: any) => e.category === 'System').length), valueColor: 'text-[#8C1C00]' },
+        { label: 'Critical Flags', value: String(events.value.filter((e: any) => e.category === 'System').length), valueColor: 'text-st-red-text' },
         { label: 'Unique Users', value: String(new Set(events.value.map((e: any) => e.user)).size), valueColor: 'text-foreground' },
-        { label: 'Failed Logins', value: String(events.value.filter((e: any) => e.action?.toLowerCase().includes('failed login')).length), valueColor: 'text-[#804200]' },
+        { label: 'Failed Logins', value: String(events.value.filter((e: any) => e.action?.toLowerCase().includes('failed login')).length), valueColor: 'text-st-amber-text' },
       ]
     }
   } catch { /* empty */ }
@@ -98,7 +98,7 @@ const { searchQuery, activeFilter, filtered, resultCount } = useFilter({
 
     <!-- Summary Row -->
     <div class="grid grid-cols-2 lg:grid-cols-4 gap-3">
-      <div v-for="s in summary" :key="s.label" class="bg-white border border-border rounded-lg px-4 py-3.5 flex flex-col gap-1.5">
+      <div v-for="s in summary" :key="s.label" class="bg-card border border-border rounded-lg px-4 py-3.5 flex flex-col gap-1.5">
         <span class="font-mono text-[11px] font-semibold text-muted-foreground tracking-wider">{{ s.label }}</span>
         <span class="font-mono text-xl font-bold" :class="s.valueColor">{{ s.value }}</span>
       </div>
@@ -111,7 +111,7 @@ const { searchQuery, activeFilter, filtered, resultCount } = useFilter({
     </div>
 
     <!-- Log Table -->
-    <div class="bg-white border border-border rounded-lg overflow-hidden">
+    <div class="bg-card border border-border rounded-lg overflow-hidden">
       <!-- Desktop -->
       <div class="hidden lg:block">
         <div class="flex bg-background px-6 py-2.5 border-b border-border">
@@ -124,7 +124,7 @@ const { searchQuery, activeFilter, filtered, resultCount } = useFilter({
 
         <!-- Empty State -->
         <div v-if="filtered.length === 0 && !loading" class="flex flex-col items-center justify-center py-16 gap-4">
-          <div class="w-16 h-16 rounded-full bg-[#E7E8E5] flex items-center justify-center">
+          <div class="w-16 h-16 rounded-full bg-surface flex items-center justify-center">
             <span class="material-symbols-rounded text-[28px] text-muted-foreground">history</span>
           </div>
           <div class="flex flex-col items-center gap-1">
@@ -147,7 +147,7 @@ const { searchQuery, activeFilter, filtered, resultCount } = useFilter({
       <!-- Mobile -->
       <div class="lg:hidden">
         <div v-if="filtered.length === 0 && !loading" class="flex flex-col items-center justify-center py-16 gap-4">
-          <div class="w-16 h-16 rounded-full bg-[#E7E8E5] flex items-center justify-center">
+          <div class="w-16 h-16 rounded-full bg-surface flex items-center justify-center">
             <span class="material-symbols-rounded text-[28px] text-muted-foreground">history</span>
           </div>
           <div class="flex flex-col items-center gap-1">
@@ -172,7 +172,7 @@ const { searchQuery, activeFilter, filtered, resultCount } = useFilter({
       <div class="flex items-center justify-between px-6 py-3 border-t border-border">
         <span class="font-sans text-[12px] text-muted-foreground">Showing {{ resultCount }} of {{ totalEvents }} events</span>
         <div class="flex items-center gap-1.5">
-          <button @click="goPage(-1)" :disabled="currentPage <= 1" class="px-2.5 py-1 bg-white border border-border rounded-md text-[12px] font-sans text-foreground disabled:opacity-40">Prev</button>
+          <button @click="goPage(-1)" :disabled="currentPage <= 1" class="px-2.5 py-1 bg-card border border-border rounded-md text-[12px] font-sans text-foreground disabled:opacity-40">Prev</button>
           <span class="px-2.5 py-1 bg-foreground rounded-md text-[12px] font-sans text-white">{{ currentPage }}</span>
           <button @click="goPage(1)" :disabled="currentPage >= totalPages" class="px-2.5 py-1 bg-primary rounded-md text-[12px] font-sans text-white disabled:opacity-40">Next</button>
         </div>

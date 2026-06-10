@@ -43,10 +43,10 @@ const completedReports = computed(() =>
 
 function statusBadgeClasses(status: string) {
   switch (status) {
-    case 'completed': return 'bg-[#DFE6E1] text-[#004D1A]'
+    case 'completed': return 'bg-st-green-bg text-st-green-text'
     case 'rejected': return 'bg-red-50 text-red-700'
     case 'field_visit': return 'bg-blue-50 text-blue-600'
-    default: return 'bg-[#E9E3D8] text-[#804200]'
+    default: return 'bg-st-amber-bg text-st-amber-text'
   }
 }
 
@@ -77,23 +77,23 @@ onMounted(async () => {
     <!-- KPI Cards -->
     <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
       <!-- Profile Completion -->
-      <div class="bg-white border border-border rounded-xl p-5 flex flex-col gap-3 shadow-sm">
+      <div class="bg-card border border-border rounded-xl p-5 flex flex-col gap-3 shadow-sm">
         <div class="flex items-center justify-between">
           <span class="font-sans text-[13px] text-muted-foreground">Profile Completion</span>
           <span class="material-symbols-rounded text-[18px] text-muted-foreground">person</span>
         </div>
         <span class="font-mono text-[28px] font-bold text-foreground">{{ completionPercent }}%</span>
-        <div class="h-1.5 bg-[#E7E8E5] rounded-full overflow-hidden">
+        <div class="h-1.5 bg-surface rounded-full overflow-hidden">
           <div class="h-full bg-primary rounded-full transition-all duration-500" :style="{ width: `${completionPercent}%` }" />
         </div>
         <NuxtLink v-if="completionPercent < 100 && nextIncompleteStep" :to="`/tenant/profile/${nextIncompleteStep}`" class="font-sans text-[13px] text-primary font-medium hover:underline">
           Continue Profile
         </NuxtLink>
-        <span v-else-if="completionPercent === 100" class="font-sans text-[13px] text-[#004D1A] font-medium">Complete</span>
+        <span v-else-if="completionPercent === 100" class="font-sans text-[13px] text-st-green-text font-medium">Complete</span>
       </div>
 
       <!-- Active Verifications -->
-      <div class="bg-white border border-border rounded-xl p-5 flex flex-col gap-3 shadow-sm">
+      <div class="bg-card border border-border rounded-xl p-5 flex flex-col gap-3 shadow-sm">
         <div class="flex items-center justify-between">
           <span class="font-sans text-[13px] text-muted-foreground">Active Verifications</span>
           <span class="material-symbols-rounded text-[18px] text-muted-foreground">verified</span>
@@ -103,7 +103,7 @@ onMounted(async () => {
       </div>
 
       <!-- Reports Available -->
-      <div class="bg-white border border-border rounded-xl p-5 flex flex-col gap-3 shadow-sm">
+      <div class="bg-card border border-border rounded-xl p-5 flex flex-col gap-3 shadow-sm">
         <div class="flex items-center justify-between">
           <span class="font-sans text-[13px] text-muted-foreground">Reports Available</span>
           <span class="material-symbols-rounded text-[18px] text-muted-foreground">description</span>
@@ -114,7 +114,7 @@ onMounted(async () => {
     </div>
 
     <!-- Profile Completion Checklist -->
-    <div v-if="profileStatus && completionPercent < 100" class="bg-white border border-border rounded-xl p-5 lg:p-6 flex flex-col gap-4 shadow-sm">
+    <div v-if="profileStatus && completionPercent < 100" class="bg-card border border-border rounded-xl p-5 lg:p-6 flex flex-col gap-4 shadow-sm">
       <div class="flex items-center justify-between">
         <h2 class="font-mono text-base font-semibold text-foreground">Complete Your Profile</h2>
         <span class="font-sans text-[13px] text-muted-foreground">{{ completionSteps.filter(s => s.done).length }}/{{ completionSteps.length }} done</span>
@@ -126,7 +126,7 @@ onMounted(async () => {
           :to="`/tenant/profile/${step.step}`"
           class="flex items-center gap-3 px-3 py-3 rounded-lg hover:bg-surface/30 transition-colors"
         >
-          <span class="material-symbols-rounded text-[22px]" :class="step.done ? 'text-[#004D1A]' : 'text-muted-foreground'">
+          <span class="material-symbols-rounded text-[22px]" :class="step.done ? 'text-st-green-text' : 'text-muted-foreground'">
             {{ step.done ? 'check_circle' : 'radio_button_unchecked' }}
           </span>
           <div class="flex-1">
@@ -138,7 +138,7 @@ onMounted(async () => {
     </div>
 
     <!-- Recent Verifications -->
-    <div v-if="submissions.length > 0" class="bg-white border border-border rounded-xl p-5 lg:p-6 flex flex-col gap-4 shadow-sm">
+    <div v-if="submissions.length > 0" class="bg-card border border-border rounded-xl p-5 lg:p-6 flex flex-col gap-4 shadow-sm">
       <div class="flex items-center justify-between">
         <h2 class="font-mono text-base font-semibold text-foreground">Recent Verifications</h2>
         <NuxtLink to="/tenant/verification" class="font-sans text-[13px] text-primary font-medium hover:underline">View all</NuxtLink>
@@ -158,7 +158,7 @@ onMounted(async () => {
     </div>
 
     <!-- Empty State -->
-    <div v-if="!loading && submissions.length === 0 && completionPercent === 100" class="bg-white border border-border rounded-xl p-8 flex flex-col items-center gap-4 text-center">
+    <div v-if="!loading && submissions.length === 0 && completionPercent === 100" class="bg-card border border-border rounded-xl p-8 flex flex-col items-center gap-4 text-center">
       <span class="material-symbols-rounded text-[48px] text-muted-foreground">hourglass_empty</span>
       <h3 class="font-mono text-lg font-semibold text-foreground">No Verifications Yet</h3>
       <p class="font-sans text-sm text-muted-foreground max-w-[400px]">Your profile is complete. You'll see verification requests here when an agent submits you for screening.</p>

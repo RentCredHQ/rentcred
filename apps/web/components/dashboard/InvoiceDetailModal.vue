@@ -56,14 +56,14 @@ watch(() => props.modelValue, async (open) => {
         <div class="absolute inset-0 bg-black/50" @click="close" />
 
         <!-- Modal -->
-        <div class="relative w-full mx-4 max-w-[520px] bg-white rounded-2xl border border-border shadow-xl flex flex-col max-h-[85vh] overflow-hidden">
+        <div class="relative w-full mx-4 max-w-[520px] bg-card rounded-2xl border border-border shadow-xl flex flex-col max-h-[85vh] overflow-hidden">
           <!-- Header -->
           <div class="flex items-center justify-between px-6 py-5 border-b border-border flex-shrink-0">
             <div class="flex items-center gap-3">
               <h2 class="font-mono text-[16px] font-bold text-foreground">Invoice #{{ invoice.id }}</h2>
-              <span class="inline-flex px-2.5 py-1 rounded-full bg-[#DFE6E1] text-[11px] font-semibold text-[#004D1A]">{{ invoice.status }}</span>
+              <span class="inline-flex px-2.5 py-1 rounded-full bg-st-green-bg text-[11px] font-semibold text-st-green-text">{{ invoice.status }}</span>
             </div>
-            <button @click="close" class="w-8 h-8 flex items-center justify-center rounded-lg bg-[#E7E8E5] hover:bg-border transition-colors" aria-label="Close">
+            <button @click="close" class="w-8 h-8 flex items-center justify-center rounded-lg bg-surface hover:bg-border transition-colors" aria-label="Close">
               <span class="material-symbols-rounded text-[18px] text-muted-foreground">close</span>
             </button>
           </div>
@@ -75,7 +75,7 @@ watch(() => props.modelValue, async (open) => {
 
           <!-- Error -->
           <div v-else-if="error" class="p-6">
-            <div class="font-sans text-[13px] text-[#8C1C00]">{{ error }}</div>
+            <div class="font-sans text-[13px] text-st-red-text">{{ error }}</div>
           </div>
 
           <!-- Body -->
@@ -103,7 +103,7 @@ watch(() => props.modelValue, async (open) => {
             <!-- Line Items Table -->
             <div class="border border-border rounded-lg overflow-hidden">
               <!-- Table Header -->
-              <div class="flex items-center bg-[#E7E8E5] px-4 py-2.5 border-b border-border">
+              <div class="flex items-center bg-surface px-4 py-2.5 border-b border-border">
                 <span class="flex-1 font-sans text-[12px] font-semibold text-muted-foreground">Description</span>
                 <span class="w-[50px] font-sans text-[12px] font-semibold text-muted-foreground">Qty</span>
                 <span class="w-[90px] font-sans text-[12px] font-semibold text-muted-foreground">Unit Price</span>

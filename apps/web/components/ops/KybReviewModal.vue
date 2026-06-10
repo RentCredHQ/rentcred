@@ -47,7 +47,7 @@ watch(() => props.modelValue, async (open) => {
         status: uploaded ? 'uploaded' : 'missing',
         detail: uploaded ? 'Uploaded — click to view' : 'Not provided',
         icon: uploaded ? 'description' : 'cancel',
-        iconColor: uploaded ? 'text-[#004D1A]' : 'text-[#991B1B]',
+        iconColor: uploaded ? 'text-st-green-text' : 'text-st-red-text',
       }
     })
   } catch (e: any) {
@@ -88,14 +88,14 @@ async function reject() {
       <div v-if="modelValue" class="fixed inset-0 z-50 flex items-start justify-center pt-10 sm:pt-20 px-4" @click.self="close">
         <div class="absolute inset-0 bg-black/50" @click="close" />
 
-        <div class="relative w-full mx-4 max-w-lg bg-white rounded-2xl border border-border shadow-xl flex flex-col max-h-[85vh] overflow-hidden">
+        <div class="relative w-full mx-4 max-w-lg bg-card rounded-2xl border border-border shadow-xl flex flex-col max-h-[85vh] overflow-hidden">
           <!-- Header -->
           <div class="flex items-center justify-between px-5 py-4 border-b border-border flex-shrink-0">
             <div class="flex items-center gap-3">
               <span class="material-symbols-rounded text-[20px] text-foreground">arrow_back</span>
               <h2 class="font-mono text-[16px] font-bold text-foreground">KYB Review</h2>
             </div>
-            <button @click="close" class="w-8 h-8 flex items-center justify-center rounded-lg bg-[#E7E8E5] hover:bg-border transition-colors" aria-label="Close">
+            <button @click="close" class="w-8 h-8 flex items-center justify-center rounded-lg bg-surface hover:bg-border transition-colors" aria-label="Close">
               <span class="material-symbols-rounded text-[18px] text-muted-foreground">close</span>
             </button>
           </div>
@@ -103,7 +103,7 @@ async function reject() {
           <!-- Body -->
           <div class="flex-1 overflow-y-auto px-5 py-5 flex flex-col gap-5">
             <!-- Company Info -->
-            <div class="bg-white border border-border rounded-xl p-4 flex flex-col gap-2.5">
+            <div class="bg-card border border-border rounded-xl p-4 flex flex-col gap-2.5">
               <span class="font-mono text-[11px] font-semibold text-muted-foreground tracking-wider">COMPANY INFORMATION</span>
               <span class="font-mono text-[15px] font-bold text-foreground">{{ company.name }}</span>
               <div class="flex justify-between">
@@ -116,13 +116,13 @@ async function reject() {
               </div>
               <div class="flex justify-between items-center">
                 <span class="font-sans text-[12px] text-muted-foreground">Status</span>
-                <span class="inline-flex px-2 py-0.5 rounded bg-[#E9E3D8] text-[11px] font-semibold text-[#804200]">{{ company.status }}</span>
+                <span class="inline-flex px-2 py-0.5 rounded bg-st-amber-bg text-[11px] font-semibold text-st-amber-text">{{ company.status }}</span>
               </div>
             </div>
 
             <!-- Document Checklist -->
             <span class="font-mono text-[13px] font-semibold text-foreground">Document Checklist</span>
-            <div class="bg-white border border-border rounded-xl overflow-hidden">
+            <div class="bg-card border border-border rounded-xl overflow-hidden">
               <component
                 :is="doc.url ? 'a' : 'div'"
                 v-for="(doc, idx) in documents"
@@ -136,7 +136,7 @@ async function reject() {
                 <span class="material-symbols-rounded text-[20px]" :class="doc.iconColor">{{ doc.icon }}</span>
                 <div class="flex flex-col gap-0.5 flex-1 min-w-0">
                   <span class="font-sans text-[13px] font-medium text-foreground">{{ doc.name }}</span>
-                  <span class="font-sans text-[11px]" :class="doc.status === 'missing' ? 'text-[#991B1B]' : 'text-muted-foreground'">
+                  <span class="font-sans text-[11px]" :class="doc.status === 'missing' ? 'text-st-red-text' : 'text-muted-foreground'">
                     {{ doc.detail }}
                   </span>
                 </div>
@@ -150,21 +150,21 @@ async function reject() {
               <textarea
                 v-model="reviewNotes"
                 placeholder="Add notes about this KYB review..."
-                class="w-full h-20 px-3.5 py-3 border border-border rounded-lg bg-white text-[13px] font-sans text-foreground placeholder:text-muted-foreground outline-none focus:ring-1 focus:ring-primary resize-none"
+                class="w-full h-20 px-3.5 py-3 border border-border rounded-lg bg-card text-[13px] font-sans text-foreground placeholder:text-muted-foreground outline-none focus:ring-1 focus:ring-primary resize-none"
               />
             </div>
 
             <!-- Error -->
-            <div v-if="error" class="font-sans text-[13px] text-[#8C1C00]">{{ error }}</div>
+            <div v-if="error" class="font-sans text-[13px] text-st-red-text">{{ error }}</div>
 
             <!-- Action Buttons (only when pending/submitted/under_review) -->
             <div v-if="canAction" class="flex gap-3">
-              <button @click="reject" :disabled="actionLoading" class="flex-1 flex items-center justify-center gap-2 h-12 border-[1.5px] border-[#991B1B] rounded-lg text-[13px] font-mono font-semibold text-[#991B1B] hover:bg-[#FDECEC] transition-colors disabled:opacity-50 disabled:cursor-not-allowed">
+              <button @click="reject" :disabled="actionLoading" class="flex-1 flex items-center justify-center gap-2 h-12 border-[1.5px] border-st-red-text rounded-lg text-[13px] font-mono font-semibold text-st-red-text hover:bg-st-red-bg transition-colors disabled:opacity-50 disabled:cursor-not-allowed">
                 <span v-if="actionLoading" class="material-symbols-rounded text-[18px] animate-spin">progress_activity</span>
                 <span v-else class="material-symbols-rounded text-[18px]">close</span>
                 {{ actionLoading ? 'Processing...' : 'Reject' }}
               </button>
-              <button @click="approve" :disabled="actionLoading" class="flex-1 flex items-center justify-center gap-2 h-12 bg-[#004D1A] rounded-lg text-[13px] font-mono font-semibold text-white hover:opacity-90 transition-opacity disabled:opacity-50 disabled:cursor-not-allowed">
+              <button @click="approve" :disabled="actionLoading" class="flex-1 flex items-center justify-center gap-2 h-12 bg-st-green-text rounded-lg text-[13px] font-mono font-semibold text-white hover:opacity-90 transition-opacity disabled:opacity-50 disabled:cursor-not-allowed">
                 <span v-if="actionLoading" class="material-symbols-rounded text-[18px] animate-spin">progress_activity</span>
                 <span v-else class="material-symbols-rounded text-[18px]">check</span>
                 {{ actionLoading ? 'Processing...' : 'Approve' }}

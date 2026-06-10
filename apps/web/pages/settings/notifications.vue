@@ -21,8 +21,8 @@ onMounted(async () => {
       desc: n.message ?? n.desc ?? '',
       time: n.createdAt ? new Date(n.createdAt).toLocaleTimeString('en-NG', { hour: '2-digit', minute: '2-digit' }) : n.time ?? '',
       unread: n.readAt == null && n.read !== true,
-      iconBg: n.iconBg ?? 'bg-[#DFDFE6]',
-      iconColor: n.iconColor ?? 'text-[#000066]',
+      iconBg: n.iconBg ?? 'bg-st-blue-bg',
+      iconColor: n.iconColor ?? 'text-st-blue-text',
       icon: n.icon ?? 'notifications',
     }))
   } catch { /* empty */ }
@@ -101,21 +101,21 @@ async function handleMarkAllAsRead() {
 
     <!-- Summary Strip -->
     <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
-      <div class="flex items-center gap-2 px-3 py-2.5 bg-white border border-border rounded-lg">
+      <div class="flex items-center gap-2 px-3 py-2.5 bg-card border border-border rounded-lg">
         <span class="material-symbols-rounded text-[16px] text-primary">notifications</span>
         <span class="font-mono text-[12px] font-semibold text-foreground">{{ unreadCount }} unread</span>
       </div>
-      <div class="flex items-center gap-2 px-3 py-2.5 bg-white border border-border rounded-lg">
-        <span class="font-mono text-[12px] font-semibold text-[#804200]">{{ needActionCount }} need action</span>
+      <div class="flex items-center gap-2 px-3 py-2.5 bg-card border border-border rounded-lg">
+        <span class="font-mono text-[12px] font-semibold text-st-amber-text">{{ needActionCount }} need action</span>
       </div>
-      <div class="flex items-center gap-2 px-3 py-2.5 bg-white border border-border rounded-lg">
+      <div class="flex items-center gap-2 px-3 py-2.5 bg-card border border-border rounded-lg">
         <span class="font-mono text-[12px] font-medium text-muted-foreground">{{ resolvedThisWeek }} resolved this week</span>
       </div>
     </div>
 
     <!-- Empty State (no notifications at all) -->
     <div v-if="allNotifications.length === 0 && !loading" class="flex flex-col items-center justify-center py-16 gap-4">
-      <div class="w-16 h-16 rounded-full bg-[#E7E8E5] flex items-center justify-center">
+      <div class="w-16 h-16 rounded-full bg-surface flex items-center justify-center">
         <span class="material-symbols-rounded text-[28px] text-muted-foreground">notifications_none</span>
       </div>
       <div class="flex flex-col items-center gap-1">
@@ -127,8 +127,8 @@ async function handleMarkAllAsRead() {
     <!-- Today -->
     <div v-if="allNotifications.length > 0" class="flex flex-col gap-0">
       <span class="font-mono text-[12px] font-semibold text-muted-foreground tracking-wider mb-3">TODAY · {{ todayNotifications.length }}</span>
-      <div class="bg-white border border-border rounded-lg overflow-hidden">
-        <div v-for="(notif, i) in todayNotifications" :key="i" class="flex gap-3.5 p-4 border-b border-border last:border-0" :class="notif.unread ? 'bg-white' : ''">
+      <div class="bg-card border border-border rounded-lg overflow-hidden">
+        <div v-for="(notif, i) in todayNotifications" :key="i" class="flex gap-3.5 p-4 border-b border-border last:border-0" :class="notif.unread ? 'bg-card' : ''">
           <div class="w-10 h-10 rounded-full flex items-center justify-center flex-shrink-0" :class="notif.iconBg">
             <span class="material-symbols-rounded text-[20px]" :class="notif.iconColor">{{ notif.icon }}</span>
           </div>
@@ -145,7 +145,7 @@ async function handleMarkAllAsRead() {
     <!-- Yesterday -->
     <div v-if="allNotifications.length > 0" class="flex flex-col gap-0">
       <span class="font-mono text-[12px] font-semibold text-muted-foreground tracking-wider mb-3">YESTERDAY · {{ yesterdayNotifications.length }}</span>
-      <div class="bg-white border border-border rounded-lg overflow-hidden">
+      <div class="bg-card border border-border rounded-lg overflow-hidden">
         <div v-for="(notif, i) in yesterdayNotifications" :key="i" class="flex gap-3.5 p-4 border-b border-border last:border-0">
           <div class="w-10 h-10 rounded-full flex items-center justify-center flex-shrink-0" :class="notif.iconBg">
             <span class="material-symbols-rounded text-[20px]" :class="notif.iconColor">{{ notif.icon }}</span>
@@ -162,7 +162,7 @@ async function handleMarkAllAsRead() {
     <!-- Earlier -->
     <div v-if="allNotifications.length > 0" class="flex flex-col gap-0">
       <span class="font-mono text-[12px] font-semibold text-muted-foreground tracking-wider mb-3">EARLIER</span>
-      <div class="flex items-center gap-2.5 px-4.5 py-4 bg-[#E7E8E5] border border-border rounded-lg">
+      <div class="flex items-center gap-2.5 px-4.5 py-4 bg-surface border border-border rounded-lg">
         <span class="material-symbols-rounded text-[18px] text-muted-foreground">inbox</span>
         <span class="font-sans text-[13px] font-medium text-muted-foreground">No older notifications</span>
       </div>

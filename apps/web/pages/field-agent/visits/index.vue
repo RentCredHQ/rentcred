@@ -47,8 +47,8 @@ function statusLabel(status: string) {
 }
 
 function statusClasses(status: string) {
-  if (status === 'completed') return 'bg-[#DFE6E1] text-[#004D1A]'
-  if (status === 'in_progress') return 'bg-[#E9E3D8] text-[#804200]'
+  if (status === 'completed') return 'bg-st-green-bg text-st-green-text'
+  if (status === 'in_progress') return 'bg-st-amber-bg text-st-amber-text'
   return 'bg-blue-50 text-blue-600'
 }
 </script>
@@ -80,7 +80,7 @@ function statusClasses(status: string) {
 
     <!-- Empty State -->
     <div v-else-if="assignments.length === 0" class="flex flex-col items-center justify-center py-16 gap-4">
-      <div class="w-16 h-16 rounded-full bg-[#E7E8E5] flex items-center justify-center">
+      <div class="w-16 h-16 rounded-full bg-surface flex items-center justify-center">
         <span class="material-symbols-rounded text-[28px] text-muted-foreground">assignment</span>
       </div>
       <div class="flex flex-col items-center gap-1">

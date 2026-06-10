@@ -91,7 +91,7 @@ onMounted(async () => {
         <div class="divide-y divide-border">
           <!-- Empty State -->
           <div v-if="recentCases.length === 0" class="flex flex-col items-center justify-center py-16 gap-4">
-            <div class="w-16 h-16 rounded-full bg-[#E7E8E5] flex items-center justify-center">
+            <div class="w-16 h-16 rounded-full bg-surface flex items-center justify-center">
               <span class="material-symbols-rounded text-[28px] text-muted-foreground">inbox</span>
             </div>
             <div class="flex flex-col items-center gap-1">

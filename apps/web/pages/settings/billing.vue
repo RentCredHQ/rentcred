@@ -30,8 +30,8 @@ async function fetchInvoices() {
         desc: tx.description || tx.type || '',
         amount: `₦${(tx.amount ?? 0).toLocaleString()}`,
         status: statusLabel,
-        statusBg: statusLabel === 'Paid' ? 'bg-[#DFE6E1]' : 'bg-[#E9E3D8]',
-        statusText: statusLabel === 'Paid' ? 'text-[#004D1A]' : 'text-[#804200]',
+        statusBg: statusLabel === 'Paid' ? 'bg-st-green-bg' : 'bg-st-amber-bg',
+        statusText: statusLabel === 'Paid' ? 'text-st-green-text' : 'text-st-amber-text',
       }
     })
     totalInvoices.value = (historyRes as any)?.pagination?.total ?? invoices.value.length
@@ -49,8 +49,8 @@ onMounted(async () => {
       const s = statsRes as any
       kpis.value = [
         { label: 'TOTAL SPENT', value: `₦${(s.totalSpent ?? 0).toLocaleString()}`, sub: '', valueColor: 'text-foreground' },
-        { label: 'THIS MONTH', value: `₦${(s.thisMonth ?? 0).toLocaleString()}`, sub: '', valueColor: 'text-[#804200]' },
-        { label: 'TRANSACTIONS', value: String(s.transactionCount ?? 0), sub: '', valueColor: 'text-[#004D1A]' },
+        { label: 'THIS MONTH', value: `₦${(s.thisMonth ?? 0).toLocaleString()}`, sub: '', valueColor: 'text-st-amber-text' },
+        { label: 'TRANSACTIONS', value: String(s.transactionCount ?? 0), sub: '', valueColor: 'text-st-green-text' },
         { label: 'PAYMENT METHOD', value: 'Paystack', sub: '', valueColor: 'text-foreground', smallValue: true },
       ]
     }
@@ -65,8 +65,8 @@ onMounted(async () => {
           desc: tx.description || tx.type || '',
           amount: `₦${(tx.amount ?? 0).toLocaleString()}`,
           status: statusLabel,
-          statusBg: statusLabel === 'Paid' ? 'bg-[#DFE6E1]' : 'bg-[#E9E3D8]',
-          statusText: statusLabel === 'Paid' ? 'text-[#004D1A]' : 'text-[#804200]',
+          statusBg: statusLabel === 'Paid' ? 'bg-st-green-bg' : 'bg-st-amber-bg',
+          statusText: statusLabel === 'Paid' ? 'text-st-green-text' : 'text-st-amber-text',
         }
       })
       totalInvoices.value = (historyRes as any)?.pagination?.total ?? invoices.value.length
@@ -88,7 +88,7 @@ onMounted(async () => {
 
     <!-- KPI Row -->
     <div class="grid grid-cols-2 lg:grid-cols-4 gap-5">
-      <div v-for="kpi in kpis" :key="kpi.label" class="bg-white border border-border rounded-lg p-5 flex flex-col gap-2">
+      <div v-for="kpi in kpis" :key="kpi.label" class="bg-card border border-border rounded-lg p-5 flex flex-col gap-2">
         <span class="font-mono text-[11px] font-semibold text-muted-foreground tracking-wider">{{ kpi.label }}</span>
         <span class="font-mono font-bold" :class="[kpi.valueColor, kpi.smallValue ? 'text-xl' : 'text-[28px]']">{{ kpi.value }}</span>
         <span class="font-sans text-[12px] text-muted-foreground">{{ kpi.sub }}</span>
@@ -96,7 +96,7 @@ onMounted(async () => {
     </div>
 
     <!-- Invoice Table -->
-    <div class="bg-white border border-border rounded-lg overflow-hidden">
+    <div class="bg-card border border-border rounded-lg overflow-hidden">
       <!-- Title -->
       <div class="flex items-center justify-between px-6 py-4">
         <span class="font-mono text-[11px] font-semibold text-muted-foreground tracking-wider">INVOICE HISTORY</span>
@@ -115,7 +115,7 @@ onMounted(async () => {
 
         <!-- Empty State -->
         <div v-if="invoices.length === 0 && !loading" class="flex flex-col items-center justify-center py-16 gap-4">
-          <div class="w-16 h-16 rounded-full bg-[#E7E8E5] flex items-center justify-center">
+          <div class="w-16 h-16 rounded-full bg-surface flex items-center justify-center">
             <span class="material-symbols-rounded text-[28px] text-muted-foreground">receipt_long</span>
           </div>
           <div class="flex flex-col items-center gap-1">
@@ -141,7 +141,7 @@ onMounted(async () => {
       <!-- Mobile -->
       <div class="lg:hidden">
         <div v-if="invoices.length === 0 && !loading" class="flex flex-col items-center justify-center py-16 gap-4">
-          <div class="w-16 h-16 rounded-full bg-[#E7E8E5] flex items-center justify-center">
+          <div class="w-16 h-16 rounded-full bg-surface flex items-center justify-center">
             <span class="material-symbols-rounded text-[28px] text-muted-foreground">receipt_long</span>
           </div>
           <div class="flex flex-col items-center gap-1">
@@ -165,7 +165,7 @@ onMounted(async () => {
       <div class="flex items-center justify-between px-6 py-3 border-t border-border">
         <span class="font-sans text-[12px] text-muted-foreground">Showing {{ invoices.length }} of {{ totalInvoices }} invoices</span>
         <div class="flex items-center gap-1.5">
-          <button @click="goPage(-1)" :disabled="currentPage <= 1" class="px-2.5 py-1 bg-white border border-border rounded-md text-[12px] font-sans text-foreground disabled:opacity-40">Prev</button>
+          <button @click="goPage(-1)" :disabled="currentPage <= 1" class="px-2.5 py-1 bg-card border border-border rounded-md text-[12px] font-sans text-foreground disabled:opacity-40">Prev</button>
           <span class="px-2.5 py-1 bg-foreground rounded-md text-[12px] font-sans text-white">{{ currentPage }}</span>
           <button @click="goPage(1)" :disabled="currentPage >= totalPages" class="px-2.5 py-1 bg-primary rounded-md text-[12px] font-sans text-white disabled:opacity-40">Next</button>
         </div>

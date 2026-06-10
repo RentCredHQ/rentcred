@@ -61,7 +61,7 @@ onMounted(async () => {
     </div>
 
     <!-- Review Form -->
-    <div v-if="showForm && selectedSubmission" class="bg-white border border-border rounded-xl p-5 lg:p-6">
+    <div v-if="showForm && selectedSubmission" class="bg-card border border-border rounded-xl p-5 lg:p-6">
       <TenantReviewForm
         :submission-id="selectedSubmission.id"
         :property-address="selectedSubmission.propertyAddress"
@@ -75,7 +75,7 @@ onMounted(async () => {
     <!-- Completed submissions eligible for review -->
     <div
       v-if="!showForm && completedSubmissions.length > 0"
-      class="bg-white border border-border rounded-xl overflow-hidden"
+      class="bg-card border border-border rounded-xl overflow-hidden"
     >
       <div class="px-5 py-4 border-b border-border flex items-center justify-between">
         <h2 class="font-mono text-sm font-semibold text-foreground">Pending Reviews</h2>
@@ -111,7 +111,7 @@ onMounted(async () => {
     <!-- Submitted reviews list -->
     <div v-if="reviews.length > 0" class="flex flex-col gap-4">
       <h2 class="font-mono text-sm font-semibold text-foreground">Submitted Reviews</h2>
-      <div v-for="review in reviews" :key="review.id" class="bg-white border border-border rounded-xl p-5 lg:p-6 flex flex-col gap-4 shadow-sm">
+      <div v-for="review in reviews" :key="review.id" class="bg-card border border-border rounded-xl p-5 lg:p-6 flex flex-col gap-4 shadow-sm">
         <div class="flex items-start justify-between">
           <div class="flex flex-col gap-0.5">
             <span class="font-sans text-[15px] font-medium text-foreground">{{ review.submission?.propertyAddress }}</span>
@@ -163,7 +163,7 @@ onMounted(async () => {
     </div>
 
     <!-- Empty state -->
-    <div v-if="!loading && reviews.length === 0 && completedSubmissions.length === 0" class="bg-white border border-border rounded-xl p-8 flex flex-col items-center gap-4 text-center">
+    <div v-if="!loading && reviews.length === 0 && completedSubmissions.length === 0" class="bg-card border border-border rounded-xl p-8 flex flex-col items-center gap-4 text-center">
       <span class="material-symbols-rounded text-[48px] text-muted-foreground">rate_review</span>
       <h3 class="font-mono text-lg font-semibold text-foreground">No Reviews Yet</h3>
       <p class="font-sans text-sm text-muted-foreground max-w-[400px]">After a verification is completed, you'll be able to review the agent, landlord, and property.</p>

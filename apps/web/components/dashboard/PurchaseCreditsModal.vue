@@ -68,11 +68,11 @@ async function handlePurchase() {
       <div v-if="modelValue" class="fixed inset-0 z-50 flex items-center justify-center">
         <div class="absolute inset-0 bg-black/40" @click="close" />
 
-        <div class="relative w-full mx-4 max-w-[560px] max-h-[90vh] bg-white rounded-2xl border border-border shadow-2xl flex flex-col overflow-hidden">
+        <div class="relative w-full mx-4 max-w-[560px] max-h-[90vh] bg-card rounded-2xl border border-border shadow-2xl flex flex-col overflow-hidden">
           <!-- Header -->
           <div class="flex items-center justify-between px-6 py-5 border-b border-border">
             <h2 class="font-mono text-base font-bold text-foreground">Purchase Verification Credits</h2>
-            <button @click="close" class="w-8 h-8 rounded-lg bg-[#E7E8E5] flex items-center justify-center hover:bg-border transition-colors" aria-label="Close">
+            <button @click="close" class="w-8 h-8 rounded-lg bg-surface flex items-center justify-center hover:bg-border transition-colors" aria-label="Close">
               <span class="material-symbols-rounded text-[18px] text-muted-foreground">close</span>
             </button>
           </div>

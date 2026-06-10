@@ -18,16 +18,16 @@ const statusTabs = [
 
 const statusStyleMap: Record<string, { bg: string; text: string; label: string }> = {
   draft: { bg: 'bg-background', text: 'text-muted-foreground', label: 'Draft' },
-  pending_approval: { bg: 'bg-[#E9E3D8]', text: 'text-[#804200]', label: 'Pending Approval' },
-  approved: { bg: 'bg-[#DFE6E1]', text: 'text-[#004D1A]', label: 'Approved' },
-  rejected: { bg: 'bg-[#E5DCDA]', text: 'text-[#8C1C00]', label: 'Rejected' },
+  pending_approval: { bg: 'bg-st-amber-bg', text: 'text-st-amber-text', label: 'Pending Approval' },
+  approved: { bg: 'bg-st-green-bg', text: 'text-st-green-text', label: 'Approved' },
+  rejected: { bg: 'bg-st-red-bg', text: 'text-st-red-text', label: 'Rejected' },
 }
 
 const kpis = ref([
   { label: 'TOTAL REPORTS', value: '—', sub: '', valueColor: 'text-foreground' },
   { label: 'PENDING REVIEW', value: '—', sub: '', valueColor: 'text-primary' },
-  { label: 'APPROVED', value: '—', sub: '', valueColor: 'text-[#004D1A]' },
-  { label: 'REJECTED', value: '—', sub: '', valueColor: 'text-[#8C1C00]' },
+  { label: 'APPROVED', value: '—', sub: '', valueColor: 'text-st-green-text' },
+  { label: 'REJECTED', value: '—', sub: '', valueColor: 'text-st-red-text' },
 ])
 
 const reports = ref<any[]>([])
@@ -54,7 +54,7 @@ async function fetchReports(page = 1) {
         tenant: r.submission?.tenantName ?? '',
         agent: r.submission?.agent?.name ?? '',
         risk: '—',
-        riskBg: 'bg-[#E7E8E5]',
+        riskBg: 'bg-surface',
         riskText: 'text-foreground',
         status: style.label,
         statusBg: style.bg,
@@ -70,8 +70,8 @@ async function fetchReports(page = 1) {
     kpis.value = [
       { label: 'TOTAL REPORTS', value: String(totalReports.value), sub: '', valueColor: 'text-foreground' },
       { label: 'PENDING REVIEW', value: String(pendingCount), sub: '', valueColor: 'text-primary' },
-      { label: 'APPROVED', value: String(approvedCount), sub: '', valueColor: 'text-[#004D1A]' },
-      { label: 'REJECTED', value: String(rejectedCount), sub: '', valueColor: 'text-[#8C1C00]' },
+      { label: 'APPROVED', value: String(approvedCount), sub: '', valueColor: 'text-st-green-text' },
+      { label: 'REJECTED', value: String(rejectedCount), sub: '', valueColor: 'text-st-red-text' },
     ]
   } catch { /* empty */ }
   finally { loading.value = false }
@@ -140,7 +140,7 @@ const { searchQuery, activeFilter, filtered, resultCount } = useFilter({
 
         <!-- Empty State -->
         <div v-if="filtered.length === 0 && !loading" class="flex flex-col items-center justify-center py-16 gap-4">
-          <div class="w-16 h-16 rounded-full bg-[#E7E8E5] flex items-center justify-center">
+          <div class="w-16 h-16 rounded-full bg-surface flex items-center justify-center">
             <span class="material-symbols-rounded text-[28px] text-muted-foreground">assessment</span>
           </div>
           <div class="flex flex-col items-center gap-1">
@@ -170,7 +170,7 @@ const { searchQuery, activeFilter, filtered, resultCount } = useFilter({
       <!-- Mobile Cards -->
       <div class="lg:hidden">
         <div v-if="filtered.length === 0 && !loading" class="flex flex-col items-center justify-center py-16 gap-4">
-          <div class="w-16 h-16 rounded-full bg-[#E7E8E5] flex items-center justify-center">
+          <div class="w-16 h-16 rounded-full bg-surface flex items-center justify-center">
             <span class="material-symbols-rounded text-[28px] text-muted-foreground">assessment</span>
           </div>
           <div class="flex flex-col items-center gap-1">
@@ -199,9 +199,9 @@ const { searchQuery, activeFilter, filtered, resultCount } = useFilter({
       <div class="flex items-center justify-between px-6 py-3 border-t border-border">
         <span class="font-sans text-[12px] text-muted-foreground">Showing {{ resultCount }} of {{ totalReports }} reports</span>
         <div class="flex items-center gap-1.5">
-          <button @click="goPage(currentPage - 1)" :disabled="currentPage <= 1" class="px-2.5 py-1 bg-white border border-border rounded-md text-[12px] font-sans text-foreground disabled:opacity-40">Prev</button>
+          <button @click="goPage(currentPage - 1)" :disabled="currentPage <= 1" class="px-2.5 py-1 bg-card border border-border rounded-md text-[12px] font-sans text-foreground disabled:opacity-40">Prev</button>
           <template v-for="p in totalPages" :key="p">
-            <button @click="goPage(p)" class="px-2.5 py-1 rounded-md text-[12px] font-sans" :class="p === currentPage ? 'bg-foreground text-white' : 'bg-white border border-border text-foreground'">{{ p }}</button>
+            <button @click="goPage(p)" class="px-2.5 py-1 rounded-md text-[12px] font-sans" :class="p === currentPage ? 'bg-foreground text-white' : 'bg-card border border-border text-foreground'">{{ p }}</button>
           </template>
           <button @click="goPage(currentPage + 1)" :disabled="currentPage >= totalPages" class="px-2.5 py-1 bg-primary rounded-md text-[12px] font-sans text-white disabled:opacity-40">Next</button>
         </div>

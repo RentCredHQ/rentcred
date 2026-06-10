@@ -6,11 +6,11 @@ const { getSubmissions } = useSubmissions()
 const loading = ref(true)
 
 const columnDefs = [
-  { status: 'pending', title: 'Pending Assignment', color: 'bg-[#E9E3D8]', textColor: 'text-[#804200]' },
+  { status: 'pending', title: 'Pending Assignment', color: 'bg-st-amber-bg', textColor: 'text-st-amber-text' },
   { status: 'in_progress', title: 'In Progress', color: 'bg-blue-50', textColor: 'text-blue-600' },
-  { status: 'field_visit', title: 'Field Visit', color: 'bg-[#E9E3D8]', textColor: 'text-[#804200]' },
-  { status: 'report_building', title: 'Pending Review', color: 'bg-[#E9E3D8]', textColor: 'text-[#804200]' },
-  { status: 'completed', title: 'Completed', color: 'bg-[#DFE6E1]', textColor: 'text-[#004D1A]' },
+  { status: 'field_visit', title: 'Field Visit', color: 'bg-st-amber-bg', textColor: 'text-st-amber-text' },
+  { status: 'report_building', title: 'Pending Review', color: 'bg-st-amber-bg', textColor: 'text-st-amber-text' },
+  { status: 'completed', title: 'Completed', color: 'bg-st-green-bg', textColor: 'text-st-green-text' },
 ]
 
 const columns = ref<any[]>(columnDefs.map(c => ({ ...c, cards: [] })))
@@ -41,8 +41,8 @@ onMounted(async () => {
         tenant: s.tenantName ?? '',
         agent: s.agent?.name ?? '—',
         priority: '—',
-        priorityBg: 'bg-[#E9E3D8]',
-        priorityText: 'text-[#804200]',
+        priorityBg: 'bg-st-amber-bg',
+        priorityText: 'text-st-amber-text',
         updated: s.updatedAt ? timeAgo(s.updatedAt) : '—',
         assignee: '',
       })

@@ -138,9 +138,9 @@ async function saveStep() {
   <div class="flex flex-col items-center">
     <!-- Completion Screen -->
     <div v-if="showCompletion" class="flex items-center justify-center min-h-[60vh]">
-      <div class="bg-white border border-border rounded-xl p-8 lg:p-10 w-full max-w-[560px] flex flex-col items-center gap-5 text-center">
-        <div class="w-20 h-20 rounded-full bg-[#DFE6E1] flex items-center justify-center">
-          <span class="material-symbols-rounded text-[40px] text-[#004D1A]">check</span>
+      <div class="bg-card border border-border rounded-xl p-8 lg:p-10 w-full max-w-[560px] flex flex-col items-center gap-5 text-center">
+        <div class="w-20 h-20 rounded-full bg-st-green-bg flex items-center justify-center">
+          <span class="material-symbols-rounded text-[40px] text-st-green-text">check</span>
         </div>
         <h1 class="font-mono text-2xl font-bold text-foreground">Profile Complete</h1>
         <p class="font-sans text-sm text-muted-foreground max-w-[440px]" style="line-height: 1.5">Your profile is ready for verification. You'll be notified when an agent submits you for tenant screening.</p>
@@ -164,7 +164,7 @@ async function saveStep() {
       </div>
 
       <!-- Step 1: Personal Info -->
-      <div v-if="currentStep === 1" class="bg-white border border-border rounded-lg p-6 lg:p-8 flex flex-col gap-6">
+      <div v-if="currentStep === 1" class="bg-card border border-border rounded-lg p-6 lg:p-8 flex flex-col gap-6">
         <div class="flex flex-col gap-1.5">
           <h2 class="font-mono text-xl font-bold text-foreground">Personal Information</h2>
           <p class="font-sans text-sm text-muted-foreground">Tell us about yourself</p>
@@ -217,7 +217,7 @@ async function saveStep() {
       </div>
 
       <!-- Step 2: Employment -->
-      <div v-if="currentStep === 2" class="bg-white border border-border rounded-lg p-6 lg:p-8 flex flex-col gap-6">
+      <div v-if="currentStep === 2" class="bg-card border border-border rounded-lg p-6 lg:p-8 flex flex-col gap-6">
         <div class="flex flex-col gap-1.5">
           <h2 class="font-mono text-xl font-bold text-foreground">Employment Details</h2>
           <p class="font-sans text-sm text-muted-foreground">Your current employment information</p>
@@ -259,7 +259,7 @@ async function saveStep() {
       </div>
 
       <!-- Step 3: References -->
-      <div v-if="currentStep === 3" class="bg-white border border-border rounded-lg p-6 lg:p-8 flex flex-col gap-6">
+      <div v-if="currentStep === 3" class="bg-card border border-border rounded-lg p-6 lg:p-8 flex flex-col gap-6">
         <div class="flex flex-col gap-1.5">
           <h2 class="font-mono text-xl font-bold text-foreground">References</h2>
           <p class="font-sans text-sm text-muted-foreground">Provide two personal or professional references</p>
@@ -307,7 +307,7 @@ async function saveStep() {
       </div>
 
       <!-- Step 4: Documents -->
-      <div v-if="currentStep === 4" class="bg-white border border-border rounded-lg p-6 lg:p-8 flex flex-col gap-6">
+      <div v-if="currentStep === 4" class="bg-card border border-border rounded-lg p-6 lg:p-8 flex flex-col gap-6">
         <div class="flex flex-col gap-1.5">
           <h2 class="font-mono text-xl font-bold text-foreground">Upload Documents</h2>
           <p class="font-sans text-sm text-muted-foreground">Upload your verification documents</p>
@@ -317,12 +317,12 @@ async function saveStep() {
           <!-- ID Document -->
           <div class="flex flex-col gap-1.5">
             <label class="font-sans text-[13px] font-medium text-foreground">ID Document <span class="text-error">*</span></label>
-            <div v-if="step4.idDocumentUrl" class="flex items-center gap-3 p-3 bg-[#DFE6E1] rounded-lg">
-              <span class="material-symbols-rounded text-[20px] text-[#004D1A]">check_circle</span>
-              <span class="font-sans text-sm text-[#004D1A] flex-1">Document uploaded</span>
+            <div v-if="step4.idDocumentUrl" class="flex items-center gap-3 p-3 bg-st-green-bg rounded-lg">
+              <span class="material-symbols-rounded text-[20px] text-st-green-text">check_circle</span>
+              <span class="font-sans text-sm text-st-green-text flex-1">Document uploaded</span>
               <button @click="step4.idDocumentUrl = ''" class="font-sans text-[13px] text-muted-foreground hover:text-foreground">Replace</button>
             </div>
-            <label v-else class="w-full py-6 border-2 border-dashed border-border rounded-lg flex flex-col items-center gap-2 cursor-pointer hover:border-primary hover:bg-[#FFF8F0] transition-colors" :class="{ 'opacity-50 pointer-events-none': uploading }">
+            <label v-else class="w-full py-6 border-2 border-dashed border-border rounded-lg flex flex-col items-center gap-2 cursor-pointer hover:border-primary hover:bg-primary/5 transition-colors" :class="{ 'opacity-50 pointer-events-none': uploading }">
               <span class="material-symbols-rounded text-[28px] text-muted-foreground">upload_file</span>
               <span class="font-sans text-sm text-muted-foreground">{{ uploading ? `Uploading... ${progress}%` : 'Click to upload (JPG, PNG, PDF)' }}</span>
               <input type="file" accept="image/jpeg,image/png,image/webp,application/pdf" class="hidden" @change="handleDocUpload($event, 'idDocumentUrl')" />
@@ -332,12 +332,12 @@ async function saveStep() {
           <!-- Proof of Income -->
           <div class="flex flex-col gap-1.5">
             <label class="font-sans text-[13px] font-medium text-foreground">Proof of Income <span class="text-muted-foreground font-normal">(optional)</span></label>
-            <div v-if="step4.proofOfIncomeUrl" class="flex items-center gap-3 p-3 bg-[#DFE6E1] rounded-lg">
-              <span class="material-symbols-rounded text-[20px] text-[#004D1A]">check_circle</span>
-              <span class="font-sans text-sm text-[#004D1A] flex-1">Document uploaded</span>
+            <div v-if="step4.proofOfIncomeUrl" class="flex items-center gap-3 p-3 bg-st-green-bg rounded-lg">
+              <span class="material-symbols-rounded text-[20px] text-st-green-text">check_circle</span>
+              <span class="font-sans text-sm text-st-green-text flex-1">Document uploaded</span>
               <button @click="step4.proofOfIncomeUrl = ''" class="font-sans text-[13px] text-muted-foreground hover:text-foreground">Replace</button>
             </div>
-            <label v-else class="w-full py-6 border-2 border-dashed border-border rounded-lg flex flex-col items-center gap-2 cursor-pointer hover:border-primary hover:bg-[#FFF8F0] transition-colors" :class="{ 'opacity-50 pointer-events-none': uploading }">
+            <label v-else class="w-full py-6 border-2 border-dashed border-border rounded-lg flex flex-col items-center gap-2 cursor-pointer hover:border-primary hover:bg-primary/5 transition-colors" :class="{ 'opacity-50 pointer-events-none': uploading }">
               <span class="material-symbols-rounded text-[28px] text-muted-foreground">upload_file</span>
               <span class="font-sans text-sm text-muted-foreground">{{ uploading ? `Uploading... ${progress}%` : 'Click to upload' }}</span>
               <input type="file" accept="image/jpeg,image/png,image/webp,application/pdf" class="hidden" @change="handleDocUpload($event, 'proofOfIncomeUrl')" />
@@ -347,12 +347,12 @@ async function saveStep() {
           <!-- Utility Bill -->
           <div class="flex flex-col gap-1.5">
             <label class="font-sans text-[13px] font-medium text-foreground">Utility Bill <span class="text-muted-foreground font-normal">(optional)</span></label>
-            <div v-if="step4.utilityBillUrl" class="flex items-center gap-3 p-3 bg-[#DFE6E1] rounded-lg">
-              <span class="material-symbols-rounded text-[20px] text-[#004D1A]">check_circle</span>
-              <span class="font-sans text-sm text-[#004D1A] flex-1">Document uploaded</span>
+            <div v-if="step4.utilityBillUrl" class="flex items-center gap-3 p-3 bg-st-green-bg rounded-lg">
+              <span class="material-symbols-rounded text-[20px] text-st-green-text">check_circle</span>
+              <span class="font-sans text-sm text-st-green-text flex-1">Document uploaded</span>
               <button @click="step4.utilityBillUrl = ''" class="font-sans text-[13px] text-muted-foreground hover:text-foreground">Replace</button>
             </div>
-            <label v-else class="w-full py-6 border-2 border-dashed border-border rounded-lg flex flex-col items-center gap-2 cursor-pointer hover:border-primary hover:bg-[#FFF8F0] transition-colors" :class="{ 'opacity-50 pointer-events-none': uploading }">
+            <label v-else class="w-full py-6 border-2 border-dashed border-border rounded-lg flex flex-col items-center gap-2 cursor-pointer hover:border-primary hover:bg-primary/5 transition-colors" :class="{ 'opacity-50 pointer-events-none': uploading }">
               <span class="material-symbols-rounded text-[28px] text-muted-foreground">upload_file</span>
               <span class="font-sans text-sm text-muted-foreground">{{ uploading ? `Uploading... ${progress}%` : 'Click to upload' }}</span>
               <input type="file" accept="image/jpeg,image/png,image/webp,application/pdf" class="hidden" @change="handleDocUpload($event, 'utilityBillUrl')" />
@@ -364,7 +364,7 @@ async function saveStep() {
       </div>
 
       <!-- Step 5: Consent -->
-      <div v-if="currentStep === 5" class="bg-white border border-border rounded-lg p-6 lg:p-8 flex flex-col gap-6">
+      <div v-if="currentStep === 5" class="bg-card border border-border rounded-lg p-6 lg:p-8 flex flex-col gap-6">
         <div class="flex flex-col gap-1.5">
           <h2 class="font-mono text-xl font-bold text-foreground">NDPR Consent</h2>
           <p class="font-sans text-sm text-muted-foreground">Review and accept data processing terms</p>

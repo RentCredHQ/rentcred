@@ -64,7 +64,7 @@ onMounted(async () => {
       </div>
     </template>
     <template v-else-if="visit">
-    <span class="inline-flex self-start px-2.5 py-0.5 rounded-full text-[11px] font-semibold bg-[#E9E3D8] text-[#804200]">{{ visit.status }}</span>
+    <span class="inline-flex self-start px-2.5 py-0.5 rounded-full text-[11px] font-semibold bg-st-amber-bg text-st-amber-text">{{ visit.status }}</span>
     <div class="bg-card border border-border rounded-xl p-4 flex flex-col gap-3">
       <span class="font-sans text-base font-medium text-foreground">{{ visit.tenantName }}</span>
       <span class="font-sans text-[13px] text-muted-foreground">{{ visit.propertyType }}</span>
@@ -91,7 +91,7 @@ onMounted(async () => {
       <span class="font-mono text-[13px] font-semibold text-foreground">Verification Checklist</span>
       <div class="bg-card border border-border rounded-xl overflow-hidden">
         <div v-for="(item, i) in checklist" :key="item.key" class="flex items-center gap-3 px-4 py-3.5" :class="i < checklist.length - 1 ? 'border-b border-border' : ''">
-          <span class="material-symbols-rounded text-[20px]" :class="item.checked ? 'text-[#004D1A]' : 'text-muted-foreground'">
+          <span class="material-symbols-rounded text-[20px]" :class="item.checked ? 'text-st-green-text' : 'text-muted-foreground'">
             {{ item.checked ? 'check_circle' : 'radio_button_unchecked' }}
           </span>
           <span class="font-sans text-[13px] text-foreground">{{ item.label }}</span>
@@ -107,7 +107,7 @@ onMounted(async () => {
     </NuxtLink>
 
     <!-- Show completed state -->
-    <div v-else class="flex items-center justify-center gap-2 h-12 bg-[#DFE6E1] text-[#004D1A] rounded-xl font-mono text-sm font-semibold">
+    <div v-else class="flex items-center justify-center gap-2 h-12 bg-st-green-bg text-st-green-text rounded-xl font-mono text-sm font-semibold">
       <span class="material-symbols-rounded text-[18px]">check_circle</span>
       {{ hasVisitReport ? 'Visit Report Submitted' : 'Case Completed' }}
     </div>

@@ -72,7 +72,7 @@ onMounted(() => fetchNotifications())
     </div>
 
     <div v-else-if="notifications.length === 0" class="flex flex-col items-center justify-center py-16 gap-4">
-      <div class="w-16 h-16 rounded-full bg-[#E7E8E5] flex items-center justify-center">
+      <div class="w-16 h-16 rounded-full bg-surface flex items-center justify-center">
         <span class="material-symbols-rounded text-[28px] text-muted-foreground">notifications_off</span>
       </div>
       <div class="flex flex-col items-center gap-1">
@@ -89,7 +89,7 @@ onMounted(() => fetchNotifications())
         class="flex items-start gap-3 px-4 py-4 border-b border-border last:border-0 text-left transition-colors"
         :class="n.read ? 'bg-background' : 'bg-card hover:bg-surface'"
       >
-        <div class="w-9 h-9 rounded-full flex items-center justify-center flex-shrink-0" :class="n.read ? 'bg-[#E7E8E5]' : 'bg-primary/10'">
+        <div class="w-9 h-9 rounded-full flex items-center justify-center flex-shrink-0" :class="n.read ? 'bg-surface' : 'bg-primary/10'">
           <span class="material-symbols-rounded text-[18px]" :class="n.read ? 'text-muted-foreground' : 'text-primary'">{{ iconForType(n.type) }}</span>
         </div>
         <div class="flex-1 min-w-0">
