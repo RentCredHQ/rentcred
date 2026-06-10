@@ -1,5 +1,5 @@
 <script setup lang="ts">
-definePageMeta({ layout: 'default' })
+definePageMeta({ colorMode: 'light', layout: 'default' })
 useSeoMeta({
   title: 'Careers — RentCred',
   description: 'Join the team building trust in Nigerian real estate. See open positions at RentCred.',

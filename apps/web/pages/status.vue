@@ -1,5 +1,5 @@
 <script setup lang="ts">
-definePageMeta({ layout: 'default' })
+definePageMeta({ colorMode: 'light', layout: 'default' })
 useSeoMeta({
   title: 'Track Your Verification — RentCred',
   description: 'Enter your case ID to check the real-time progress of your tenant verification.',

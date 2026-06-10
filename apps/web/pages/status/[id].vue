@@ -1,5 +1,5 @@
 <script setup lang="ts">
-definePageMeta({ layout: 'default' })
+definePageMeta({ colorMode: 'light', layout: 'default' })
 
 const route = useRoute()
 const caseId = computed(() => route.params.id as string)

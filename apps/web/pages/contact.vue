@@ -1,5 +1,5 @@
 <script setup lang="ts">
-definePageMeta({ layout: 'default' })
+definePageMeta({ colorMode: 'light', layout: 'default' })
 useSeoMeta({ title: 'Contact — RentCred', description: 'Get in touch with the RentCred team.' })
 
 const form = reactive({ name: '', email: '', subject: '', message: '' })

@@ -1,5 +1,5 @@
 <script setup lang="ts">
-definePageMeta({ layout: 'default' })
+definePageMeta({ colorMode: 'light', layout: 'default' })
 useSeoMeta({ title: 'About — RentCred', description: 'Building trust in Nigerian rentals.' })
 </script>
 

@@ -1,5 +1,5 @@
 <script setup lang="ts">
-definePageMeta({ layout: 'auth' })
+definePageMeta({ colorMode: 'light', layout: 'auth' })
 
 const { api } = useApi()
 const email = ref('')

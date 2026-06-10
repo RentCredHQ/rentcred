@@ -1,5 +1,5 @@
 <script setup lang="ts">
-definePageMeta({ layout: 'default' })
+definePageMeta({ colorMode: 'light', layout: 'default' })
 useSeoMeta({ title: 'For Landlords — RentCred', description: 'Know who you\'re renting to. Get verified tenant reports before signing any lease.' })
 </script>
 
