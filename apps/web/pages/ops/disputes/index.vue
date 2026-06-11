@@ -106,7 +106,7 @@ onMounted(loadDisputes)
         <button
           v-for="tab in statusTabs" :key="tab.value"
           class="px-3 py-1.5 rounded-full text-[12px] font-mono font-semibold transition-colors whitespace-nowrap"
-          :class="activeStatus === tab.value ? 'bg-foreground text-white' : 'bg-surface text-muted-foreground hover:text-foreground'"
+          :class="activeStatus === tab.value ? 'bg-foreground text-background' : 'bg-surface text-muted-foreground hover:text-foreground'"
           @click="activeStatus = tab.value"
         >
           {{ tab.label }}

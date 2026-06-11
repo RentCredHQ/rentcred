@@ -201,7 +201,7 @@ const { searchQuery, activeFilter, filtered, resultCount } = useFilter({
         <div class="flex items-center gap-1.5">
           <button @click="goPage(currentPage - 1)" :disabled="currentPage <= 1" class="px-2.5 py-1 bg-card border border-border rounded-md text-[12px] font-sans text-foreground disabled:opacity-40">Prev</button>
           <template v-for="p in totalPages" :key="p">
-            <button @click="goPage(p)" class="px-2.5 py-1 rounded-md text-[12px] font-sans" :class="p === currentPage ? 'bg-foreground text-white' : 'bg-card border border-border text-foreground'">{{ p }}</button>
+            <button @click="goPage(p)" class="px-2.5 py-1 rounded-md text-[12px] font-sans" :class="p === currentPage ? 'bg-foreground text-background' : 'bg-card border border-border text-foreground'">{{ p }}</button>
           </template>
           <button @click="goPage(currentPage + 1)" :disabled="currentPage >= totalPages" class="px-2.5 py-1 bg-primary rounded-md text-[12px] font-sans text-white disabled:opacity-40">Next</button>
         </div>

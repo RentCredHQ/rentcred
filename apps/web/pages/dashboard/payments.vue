@@ -191,7 +191,7 @@ onMounted(async () => {
         <span class="font-sans text-[12px] text-muted-foreground">Showing {{ resultCount }} of {{ totalTransactions }} transactions</span>
         <div class="flex items-center gap-1.5">
           <button @click="goPage(-1)" :disabled="currentPage <= 1" class="px-2.5 py-1 bg-card border border-border rounded-md text-[12px] font-sans text-foreground disabled:opacity-40">Prev</button>
-          <span class="px-2.5 py-1 bg-foreground rounded-md text-[12px] font-sans text-white">{{ currentPage }}</span>
+          <span class="px-2.5 py-1 bg-foreground rounded-md text-[12px] font-sans text-background">{{ currentPage }}</span>
           <button @click="goPage(1)" :disabled="currentPage >= totalPages" class="px-2.5 py-1 bg-primary rounded-md text-[12px] font-sans text-white disabled:opacity-40">Next</button>
         </div>
       </div>

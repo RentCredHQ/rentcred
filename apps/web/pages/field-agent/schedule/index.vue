@@ -42,7 +42,7 @@ function statusClasses(status: string) {
     <div class="flex gap-2 overflow-x-auto">
       <button v-for="d in days" :key="d" @click="activeDay = d"
         class="px-4 py-2 rounded-full text-[12px] font-mono font-semibold whitespace-nowrap transition-colors"
-        :class="activeDay === d ? 'bg-foreground text-white' : 'bg-card border border-border text-muted-foreground'">
+        :class="activeDay === d ? 'bg-foreground text-background' : 'bg-card border border-border text-muted-foreground'">
         {{ d }}
       </button>
     </div>

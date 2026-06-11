@@ -159,7 +159,7 @@ async function handlePasswordChange() {
             </div>
           </div>
 
-          <button @click="showEditProfile = true" class="w-fit px-5 py-2.5 bg-foreground text-white font-mono text-[13px] font-medium hover:opacity-90 transition-opacity">Edit Profile</button>
+          <button @click="showEditProfile = true" class="w-fit px-5 py-2.5 bg-foreground text-background font-mono text-[13px] font-medium hover:opacity-90 transition-opacity">Edit Profile</button>
         </div>
 
         <!-- Security Card -->
@@ -184,7 +184,7 @@ async function handlePasswordChange() {
           <div v-if="passwordError" class="text-red-600 text-sm font-sans">{{ passwordError }}</div>
           <div v-if="passwordSuccess" class="text-green-700 text-sm font-sans">{{ passwordSuccess }}</div>
           <button
-            class="w-fit px-5 py-2.5 bg-foreground text-white font-mono text-[13px] font-medium hover:opacity-90 transition-opacity disabled:opacity-50"
+            class="w-fit px-5 py-2.5 bg-foreground text-background font-mono text-[13px] font-medium hover:opacity-90 transition-opacity disabled:opacity-50"
             :disabled="passwordLoading"
             @click="handlePasswordChange"
           >

@@ -67,7 +67,7 @@ function statusClasses(status: string) {
         :key="tab.value"
         @click="activeFilter = tab.value"
         class="px-4 py-2 rounded-full text-[12px] font-mono font-semibold whitespace-nowrap transition-colors"
-        :class="activeFilter === tab.value ? 'bg-foreground text-white' : 'bg-card border border-border text-muted-foreground'"
+        :class="activeFilter === tab.value ? 'bg-foreground text-background' : 'bg-card border border-border text-muted-foreground'"
       >
         {{ tab.label }}
       </button>

@@ -94,7 +94,7 @@ onMounted(async () => {
     <div class="hidden lg:flex items-center justify-between py-2">
       <span class="font-sans text-[12px] font-medium text-muted-foreground">3 selected</span>
       <div class="flex items-center gap-2">
-        <button class="px-3 py-2 bg-foreground rounded-lg font-mono text-[12px] font-semibold text-white hover:opacity-90 transition-opacity">Export</button>
+        <button class="px-3 py-2 bg-foreground rounded-lg font-mono text-[12px] font-semibold text-background hover:opacity-90 transition-opacity">Export</button>
       </div>
     </div>
 

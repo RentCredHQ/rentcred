@@ -66,7 +66,7 @@ async function sendEmail() {
                 <div class="flex-1 h-10 px-3 flex items-center rounded-lg bg-surface border border-border overflow-hidden">
                   <span class="font-sans text-xs text-muted-foreground truncate">{{ shareLink }}</span>
                 </div>
-                <button @click="copyLink" class="h-10 px-4 flex items-center gap-1.5 rounded-lg bg-foreground text-white font-sans text-[13px] font-medium hover:bg-foreground/90 transition-colors flex-shrink-0">
+                <button @click="copyLink" class="h-10 px-4 flex items-center gap-1.5 rounded-lg bg-foreground text-background font-sans text-[13px] font-medium hover:bg-foreground/90 transition-colors flex-shrink-0">
                   <span class="material-symbols-rounded text-[16px]">content_copy</span>
                   Copy
                 </button>

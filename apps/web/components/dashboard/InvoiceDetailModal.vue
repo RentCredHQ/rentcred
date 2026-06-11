@@ -146,7 +146,7 @@ watch(() => props.modelValue, async (open) => {
               <span class="material-symbols-rounded text-[16px]">download</span>
               Download PDF
             </button>
-            <button @click="close" class="px-5 h-10 bg-foreground text-white rounded-lg text-[13px] font-sans font-medium hover:opacity-90 transition-opacity">
+            <button @click="close" class="px-5 h-10 bg-foreground text-background rounded-lg text-[13px] font-sans font-medium hover:opacity-90 transition-opacity">
               Close
             </button>
           </div>
