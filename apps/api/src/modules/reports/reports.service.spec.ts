@@ -489,6 +489,85 @@ describe('ReportsService', () => {
       await expect(service.findByShareToken('bad-token')).rejects.toThrow(NotFoundException);
     });
 
+    // The share link is public — anyone holding the token reads this with no
+    // account — so the full report blob must never go out over it.
+    describe('redaction', () => {
+      const fullContent = {
+        tenant: { name: 'John', email: 'john@example.com', phone: '+234800' },
+        property: {
+          address: '12 Elm Street',
+          annualRent: 1200000,
+          propertyType: 'flat',
+          landlordName: 'Chief Ade',
+          landlordPhone: '+234801',
+        },
+        employment: { employer: 'Dangote', address: '1 Alfred Rewane', income: 850000 },
+        verification: {
+          identityVerified: true,
+          employmentVerified: true,
+          referencesVerified: false,
+          addressVerified: true,
+          criminalCheckDone: true,
+          fieldVisitCompleted: true,
+        },
+        fieldVisit: {
+          date: new Date('2025-01-10'),
+          gps: { lat: 6.5, lng: 3.3 },
+          summary: 'Property matches description.',
+          photos: ['field-visit-photos/a.jpg'],
+        },
+        generatedAt: '2025-01-15T00:00:00.000Z',
+      };
+
+      beforeEach(() => {
+        mockPrismaService.report.findUnique.mockResolvedValue({
+          ...mockReport,
+          content: fullContent,
+        });
+      });
+
+      it('strips tenant contact details', async () => {
+        const { content } = (await service.findByShareToken('valid-token')) as any;
+
+        expect(content.tenant).toEqual({ name: 'John' });
+        expect(content.tenant.email).toBeUndefined();
+        expect(content.tenant.phone).toBeUndefined();
+      });
+
+      it('strips landlord contact and employment income', async () => {
+        const { content } = (await service.findByShareToken('valid-token')) as any;
+
+        expect(content.property.landlordName).toBeUndefined();
+        expect(content.property.landlordPhone).toBeUndefined();
+        expect(content.employment).toEqual({ employer: 'Dangote' });
+        expect(content.employment.income).toBeUndefined();
+      });
+
+      it('strips field visit GPS coordinates and photos', async () => {
+        const { content } = (await service.findByShareToken('valid-token')) as any;
+
+        expect(content.fieldVisit.gps).toBeUndefined();
+        expect(content.fieldVisit.photos).toBeUndefined();
+        expect(content.fieldVisit.summary).toBe('Property matches description.');
+      });
+
+      it('keeps the verification block the public page renders', async () => {
+        const { content } = (await service.findByShareToken('valid-token')) as any;
+
+        // The shared page hides its verdict band entirely when this is missing.
+        expect(content.verification).toEqual(fullContent.verification);
+      });
+
+      it('leaks no personal data anywhere in the serialized payload', async () => {
+        const result = await service.findByShareToken('valid-token');
+        const serialized = JSON.stringify(result);
+
+        for (const secret of ['john@example.com', '+234800', '+234801', 'Chief Ade', '850000']) {
+          expect(serialized).not.toContain(secret);
+        }
+      });
+    });
+
     it('should throw NotFoundException when report is not approved', async () => {
       mockPrismaService.report.findUnique.mockResolvedValue({
         ...mockReport,

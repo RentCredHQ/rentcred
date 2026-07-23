@@ -152,7 +152,15 @@ describe('AuthService', () => {
       role: 'agent',
       passwordHash: 'hashed',
       isVerified: true,
+      isActive: true,
     };
+
+    it('should reject login for a suspended account', async () => {
+      mockPrismaService.user.findUnique.mockResolvedValue({ ...mockUser, isActive: false });
+      (bcrypt.compare as jest.Mock).mockResolvedValue(true);
+
+      await expect(service.login(loginDto)).rejects.toThrow(UnauthorizedException);
+    });
 
     it('should successfully login with valid credentials', async () => {
       mockPrismaService.user.findUnique.mockResolvedValue(mockUser);

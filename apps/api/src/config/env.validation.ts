@@ -1,5 +1,17 @@
 import { z } from 'zod';
 
+/**
+ * Fragments of the JWT_SECRET values shipped in .env.example. Matching on a
+ * fragment rather than the whole string means a lightly-edited placeholder is
+ * still rejected.
+ */
+const PLACEHOLDER_JWT_SECRETS = [
+  'your-super-secret-jwt-key',
+  'change-in-production',
+  'change-me-in-production',
+  'your-secret-minimum-32-characters',
+];
+
 const envSchema = z
   .object({
     // Database
@@ -55,6 +67,38 @@ const envSchema = z
   .superRefine((data, ctx) => {
     // In production, enforce that critical secrets are set and not placeholders
     if (data.NODE_ENV === 'production') {
+      // The .env.example JWT_SECRET is 76 characters, so the length rule alone
+      // happily accepts it. Copying .env.example to .env would otherwise boot
+      // production with a signing key published in the repository, letting
+      // anyone mint valid tokens for any account.
+      if (PLACEHOLDER_JWT_SECRETS.some((p) => data.JWT_SECRET.includes(p))) {
+        ctx.addIssue({
+          code: z.ZodIssueCode.custom,
+          message: 'JWT_SECRET is still the example placeholder — generate a unique secret',
+          path: ['JWT_SECRET'],
+        });
+      }
+      if (/localhost|127\.0\.0\.1|example\.com/.test(data.DATABASE_URL)) {
+        ctx.addIssue({
+          code: z.ZodIssueCode.custom,
+          message: 'DATABASE_URL still points at a local/example host in production',
+          path: ['DATABASE_URL'],
+        });
+      }
+      if (data.ADMIN_PASSWORD && data.ADMIN_PASSWORD === 'Admin123!') {
+        ctx.addIssue({
+          code: z.ZodIssueCode.custom,
+          message: 'ADMIN_PASSWORD is the published demo password — set a real one',
+          path: ['ADMIN_PASSWORD'],
+        });
+      }
+      if (data.CREATE_DEMO_DATA === 'true') {
+        ctx.addIssue({
+          code: z.ZodIssueCode.custom,
+          message: 'CREATE_DEMO_DATA must not be true in production',
+          path: ['CREATE_DEMO_DATA'],
+        });
+      }
       if (!data.PAYSTACK_SECRET_KEY || data.PAYSTACK_SECRET_KEY.includes('dummy') || data.PAYSTACK_SECRET_KEY.includes('placeholder')) {
         ctx.addIssue({ code: z.ZodIssueCode.custom, message: 'PAYSTACK_SECRET_KEY must be a real key in production', path: ['PAYSTACK_SECRET_KEY'] });
       }

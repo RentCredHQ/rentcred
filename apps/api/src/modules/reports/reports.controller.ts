@@ -55,7 +55,7 @@ export class ReportsController {
   @Get(':id')
   @ApiOperation({ summary: 'Get a single report' })
   async findOne(@Param('id') id: string, @Req() req: any) {
-    return this.reportsService.findOne(id, req.user.sub, req.user.role);
+    return this.reportsService.findOne(id, req.user.sub, req.user.role, req.user.email);
   }
 
   @ApiBearerAuth()

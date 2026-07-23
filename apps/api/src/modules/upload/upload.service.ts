@@ -1,4 +1,4 @@
-import { Injectable, Logger, BadRequestException } from '@nestjs/common';
+import { Injectable, Logger, BadRequestException, ForbiddenException } from '@nestjs/common';
 import {
   S3Client,
   PutObjectCommand,
@@ -18,6 +18,47 @@ const ALLOWED_MIME_TYPES = [
 const MAX_FILE_SIZE = 10 * 1024 * 1024; // 10MB
 
 const ALLOWED_FOLDERS = ['property-images', 'kyb-documents', 'field-visit-photos', 'profile-photos', 'documents', 'tenant-documents'];
+
+/**
+ * Folders whose contents must never be reachable from a public bucket URL.
+ * These hold identity and business documents — CAC certificates, director IDs,
+ * utility bills, proof of income — which were previously served from the same
+ * permanent public URLs as property photos. Objects here are read through
+ * short-lived presigned GETs instead (see getPresignedDownloadUrl).
+ *
+ * 'documents' is on this list because that is the folder the tenant profile
+ * wizard uploads ID and income documents to.
+ */
+const PRIVATE_FOLDERS = ['kyb-documents', 'tenant-documents', 'documents'];
+
+/** Which roles may write to which folder. */
+const FOLDER_ROLES: Record<string, string[]> = {
+  'property-images': ['agent', 'ops', 'admin'],
+  'kyb-documents': ['agent', 'ops', 'admin'],
+  'field-visit-photos': ['field_agent', 'ops', 'admin'],
+  'profile-photos': ['agent', 'ops', 'admin', 'tenant', 'field_agent'],
+  documents: ['tenant', 'ops', 'admin'],
+  'tenant-documents': ['tenant', 'ops', 'admin'],
+};
+
+export function isPrivateFolder(folder: string): boolean {
+  return PRIVATE_FOLDERS.includes(folder);
+}
+
+/**
+ * Pulls a safe extension off a client-supplied filename. Splitting on '.' and
+ * taking the last segment accepted anything, including slashes, so a filename
+ * like "a.jpg/../x" injected extra path segments into the object key.
+ */
+function safeExtension(filename: string): string {
+  const match = /\.([a-zA-Z0-9]{1,10})$/.exec(filename ?? '');
+  return match ? match[1].toLowerCase() : 'bin';
+}
+
+/** True when the object key lives under a folder that requires authorization. */
+export function isPrivateKey(key: string): boolean {
+  return PRIVATE_FOLDERS.some((f) => key.startsWith(`${f}/`));
+}
 
 @Injectable()
 export class UploadService {
@@ -56,7 +97,8 @@ export class UploadService {
     folder: string,
     filename: string,
     contentType: string,
-  ): Promise<{ uploadUrl: string; key: string; publicUrl: string }> {
+    role?: string,
+  ): Promise<{ uploadUrl: string; key: string; publicUrl: string | null }> {
     if (!ALLOWED_MIME_TYPES.includes(contentType)) {
       throw new BadRequestException(
         `File type not allowed. Accepted: ${ALLOWED_MIME_TYPES.join(', ')}`,
@@ -68,8 +110,13 @@ export class UploadService {
       throw new BadRequestException(`Invalid upload folder. Allowed: ${ALLOWED_FOLDERS.join(', ')}`);
     }
 
-    const ext = filename.split('.').pop() || 'bin';
-    const key = `${safeFolder}/${randomUUID()}.${ext}`;
+    // Any authenticated user could previously request a slot in any folder,
+    // including the KYB and tenant document folders.
+    if (role && !(FOLDER_ROLES[safeFolder] ?? []).includes(role)) {
+      throw new ForbiddenException(`Your role cannot upload to ${safeFolder}`);
+    }
+
+    const key = `${safeFolder}/${randomUUID()}.${safeExtension(filename)}`;
 
     // NOTE: S3/R2 presigned PutObject URLs do not natively support content-length-range
     // conditions (unlike presigned POST). File size enforcement is handled on the frontend
@@ -83,7 +130,9 @@ export class UploadService {
 
     const uploadUrl = await getSignedUrl(this.s3, command, { expiresIn: 600 }); // 10 min
 
-    const publicUrl = this.buildPublicUrl(key);
+    // Private folders get no public URL at all — callers store the key and read
+    // it back through GET /upload/download-url.
+    const publicUrl = isPrivateFolder(safeFolder) ? null : this.buildPublicUrl(key);
 
     return { uploadUrl, key, publicUrl };
   }
@@ -131,18 +180,21 @@ export class UploadService {
 
   /**
    * Build the public-facing URL for a stored object key.
-   * R2_PUBLIC_URL  →  https://pub-xxx.r2.dev  or a custom domain
-   * Fallback       →  standard AWS S3 URL
+   * Storage is Cloudflare R2, so R2_PUBLIC_URL is the only correct base; the
+   * previous s3.amazonaws.com fallback produced URLs that resolve to nothing.
    */
   private buildPublicUrl(key: string): string {
-    if (process.env.R2_PUBLIC_URL) {
-      return `${process.env.R2_PUBLIC_URL.replace(/\/$/, '')}/${key}`;
+    const base = process.env.R2_PUBLIC_URL || process.env.S3_PUBLIC_URL;
+    if (!base) {
+      this.logger.warn('R2_PUBLIC_URL is not set — returning bare object key');
+      return key;
     }
-    return `https://${this.bucket}.s3.${process.env.S3_REGION || 'us-east-1'}.amazonaws.com/${key}`;
+    return `${base.replace(/\/$/, '')}/${key}`;
   }
 
   /**
-   * Generate a presigned download URL for private files.
+   * Generate a short-lived presigned download URL for a private object.
+   * Callers are responsible for authorizing the request first.
    */
   async getPresignedDownloadUrl(key: string): Promise<string> {
     const command = new GetObjectCommand({
@@ -150,7 +202,22 @@ export class UploadService {
       Key: key,
     });
 
-    return getSignedUrl(this.s3, command, { expiresIn: 3600 }); // 1 hour
+    return getSignedUrl(this.s3, command, { expiresIn: 300 }); // 5 min
+  }
+
+  /**
+   * Normalizes whatever is stored on a record into a bare object key.
+   * Documents were historically stored as full public URLs (and in some early
+   * rows, as a raw filename), so stored values come in more than one shape.
+   */
+  toObjectKey(value: string): string {
+    if (!value) return value;
+    if (!value.startsWith('http')) return value.replace(/^\/+/, '');
+    try {
+      return new URL(value).pathname.replace(/^\/+/, '');
+    } catch {
+      return value;
+    }
   }
 
   /**

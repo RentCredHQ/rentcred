@@ -5,7 +5,7 @@ import {
   BadRequestException,
   ForbiddenException,
 } from '@nestjs/common';
-import { createHmac } from 'crypto';
+import { createHmac, timingSafeEqual } from 'crypto';
 import { PrismaService } from '../../prisma/prisma.service';
 import { NotificationsService } from '../notifications/notifications.service';
 import { AuditService } from '../audit/audit.service';
@@ -59,6 +59,10 @@ export class PaymentsService {
         agentId: userId,
         type: 'purchase',
         amount: bundle.credits,
+        // Recorded so the webhook can check what Paystack actually collected
+        // against what we asked for. `amount` holds credits, not naira.
+        priceNgn: Math.round(bundle.priceNgn),
+        bundleId: bundle.id,
         description: `Purchase: ${bundle.name} (${bundle.credits} credits)`,
         status: 'pending',
       },
@@ -112,15 +116,20 @@ export class PaymentsService {
    * Verify a transaction after payment (called from frontend callback).
    */
   async verifyTransaction(reference: string, userId: string) {
-    // Ownership check: verify the transaction belongs to this user
     const transaction = await this.prisma.transaction.findFirst({
       where: {
         OR: [{ id: reference }, { paystackRef: reference }],
       },
     });
 
-    if (transaction && transaction.agentId !== userId) {
+    // The ownership check used to be skipped entirely when no local row matched,
+    // which let any authenticated agent push arbitrary references at Paystack.
+    if (!transaction) throw new NotFoundException('Transaction not found');
+    if (transaction.agentId !== userId) {
       throw new ForbiddenException('Transaction does not belong to this user');
+    }
+    if (transaction.status === 'completed') {
+      return { verified: true, message: 'Payment already confirmed' };
     }
 
     const response = await fetch(
@@ -151,7 +160,11 @@ export class PaymentsService {
       .update(rawBody)
       .digest('hex');
 
-    if (hash !== signature) {
+    // Constant-time compare so the comparison itself leaks nothing about the
+    // expected digest. timingSafeEqual throws on length mismatch, so guard it.
+    const expected = Buffer.from(hash, 'utf8');
+    const provided = Buffer.from(signature ?? '', 'utf8');
+    if (expected.length !== provided.length || !timingSafeEqual(expected, provided)) {
       this.logger.warn('Invalid Paystack webhook signature');
       throw new ForbiddenException('Invalid signature');
     }
@@ -193,6 +206,31 @@ export class PaymentsService {
           return null;
         }
 
+        // Confirm Paystack actually collected what we asked for before handing
+        // out credits. Note this row comes from raw SQL, so the column is
+        // snake_case; `amount` on this table is credits, not naira.
+        //
+        // A null price means the row predates this column and cannot be
+        // checked — those are credited with a warning rather than withheld,
+        // since the payment itself is legitimate.
+        const expectedKobo = pendingTx.price_ngn != null ? Number(pendingTx.price_ngn) * 100 : null;
+        const paidKobo = Number(paystackData.amount);
+
+        if (expectedKobo == null) {
+          this.logger.warn(
+            `Transaction ${pendingTx.id} has no recorded price; crediting without amount verification.`,
+          );
+        } else if (Number.isFinite(paidKobo) && paidKobo < expectedKobo) {
+          await tx.transaction.update({
+            where: { id: pendingTx.id },
+            data: { status: 'failed', paystackRef: paystackData.reference },
+          });
+          this.logger.error(
+            `Payment amount mismatch on ${pendingTx.id}: expected ${expectedKobo} kobo, received ${paidKobo}. No credits issued.`,
+          );
+          return { ...pendingTx, __mismatch: true, __paidKobo: paidKobo, __expectedKobo: expectedKobo };
+        }
+
         // Update transaction status to completed
         await tx.transaction.update({
           where: { id: pendingTx.id },
@@ -222,6 +260,21 @@ export class PaymentsService {
     if (!transaction) {
       this.logger.warn(`No pending transaction found for reference: ${reference}`);
       return; // Idempotent — already processed
+    }
+
+    if (transaction.__mismatch) {
+      await this.audit.log({
+        userId: transaction.agent_id,
+        action: 'payment_amount_mismatch',
+        entityType: 'transaction',
+        entityId: transaction.id,
+        metadata: {
+          expectedKobo: transaction.__expectedKobo,
+          paidKobo: transaction.__paidKobo,
+          paystackRef: paystackData.reference,
+        },
+      });
+      return;
     }
 
     // Notify the agent (after transaction commits)

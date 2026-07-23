@@ -1,5 +1,6 @@
 import {
   Injectable,
+  Logger,
   NotFoundException,
   BadRequestException,
   ForbiddenException,
@@ -7,14 +8,18 @@ import {
 import { PrismaService } from '../../prisma/prisma.service';
 import { NotificationsService } from '../notifications/notifications.service';
 import { AuditService } from '../audit/audit.service';
+import { UploadService } from '../upload/upload.service';
 import { ApplyKybDto, ReviewKybDto } from './dto/kyb.dto';
 
 @Injectable()
 export class KybService {
+  private readonly logger = new Logger(KybService.name);
+
   constructor(
     private readonly prisma: PrismaService,
     private readonly notifications: NotificationsService,
     private readonly audit: AuditService,
+    private readonly upload: UploadService,
   ) {}
 
   async applyForKyb(userId: string, dto: ApplyKybDto) {
@@ -110,7 +115,7 @@ export class KybService {
     };
   }
 
-  async getApplication(id: string) {
+  async getApplication(id: string, userId?: string, role?: string) {
     const app = await this.prisma.kybApplication.findUnique({
       where: { id },
       include: {
@@ -121,21 +126,37 @@ export class KybService {
     });
     if (!app) throw new NotFoundException('KYB application not found');
 
-    // Resolve document keys to full URLs
-    return {
-      ...app,
-      cacDocument: this.resolveUrl(app.cacDocument),
-      directorIdUrl: this.resolveUrl(app.directorIdUrl),
-      utilityBillUrl: this.resolveUrl(app.utilityBillUrl),
-    };
+    // The list endpoint scopes agents to their own application but this one
+    // never did, so any agent holding another agent's application id could read
+    // their CAC certificate, director ID and utility bill.
+    if (role === 'agent' && app.agentProfile.userId !== userId) {
+      throw new ForbiddenException('Access denied');
+    }
+
+    const [cacDocument, directorIdUrl, utilityBillUrl] = await Promise.all([
+      this.resolveDocumentUrl(app.cacDocument),
+      this.resolveDocumentUrl(app.directorIdUrl),
+      this.resolveDocumentUrl(app.utilityBillUrl),
+    ]);
+
+    return { ...app, cacDocument, directorIdUrl, utilityBillUrl };
   }
 
-  private resolveUrl(value: string | null | undefined): string | null {
+  /**
+   * KYB documents live in a private folder, so they are handed out as
+   * short-lived presigned links rather than the permanent public bucket URLs
+   * these used to resolve to. Values may be stored as a bare key or as a legacy
+   * full URL, so normalize before signing.
+   */
+  private async resolveDocumentUrl(value: string | null | undefined): Promise<string | null> {
     if (!value) return null;
-    if (value.startsWith('http')) return value;
-    const publicBase = process.env.R2_PUBLIC_URL?.replace(/\/$/, '');
-    if (publicBase) return `${publicBase}/${value}`;
-    return value;
+    const key = this.upload.toObjectKey(value);
+    try {
+      return await this.upload.getPresignedDownloadUrl(key);
+    } catch (e) {
+      this.logger.warn(`Could not sign KYB document ${key}: ${(e as Error).message}`);
+      return null;
+    }
   }
 
   async reviewApplication(id: string, reviewerId: string, dto: ReviewKybDto) {

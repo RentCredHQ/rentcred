@@ -411,6 +411,77 @@ describe('PaymentsService', () => {
       expect(mockPrismaService.$queryRawUnsafe).not.toHaveBeenCalled();
     });
 
+    it('should reject a signature of a different length without throwing', async () => {
+      const rawBody = Buffer.from(JSON.stringify(payload));
+      // timingSafeEqual throws on length mismatch, so this must be guarded.
+      await expect(service.handleWebhook(rawBody, 'short')).rejects.toThrow(ForbiddenException);
+    });
+
+    it('should withhold credits when Paystack collected less than the bundle price', async () => {
+      const secret = 'sk_test_secret_key';
+      const underpaid = {
+        event: 'charge.success',
+        data: { reference: 'txn-1', amount: 100_000, metadata: {} }, // ₦1,000 in kobo
+      };
+      const rawBody = Buffer.from(JSON.stringify(underpaid));
+      const hash = createHmac('sha512', secret).update(rawBody).digest('hex');
+
+      mockPrismaService.$queryRawUnsafe.mockResolvedValue([
+        {
+          id: 'txn-1',
+          agent_id: 'user-1',
+          amount: 15,
+          price_ngn: 60000, // expects 6,000,000 kobo
+          status: 'pending',
+          paystack_ref: 'txn-1',
+        },
+      ]);
+      mockPrismaService.transaction.update.mockResolvedValue({});
+      mockPrismaService.agentProfile.update.mockResolvedValue({});
+
+      await service.handleWebhook(rawBody, hash);
+
+      // No credits issued, transaction flagged failed, mismatch recorded.
+      expect(mockPrismaService.agentProfile.update).not.toHaveBeenCalled();
+      expect(mockPrismaService.transaction.update).toHaveBeenCalledWith(
+        expect.objectContaining({ data: expect.objectContaining({ status: 'failed' }) }),
+      );
+      expect(mockAuditService.log).toHaveBeenCalledWith(
+        expect.objectContaining({ action: 'payment_amount_mismatch' }),
+      );
+      expect(mockNotificationsService.emit).not.toHaveBeenCalled();
+    });
+
+    it('should still credit when the row predates price tracking', async () => {
+      const secret = 'sk_test_secret_key';
+      const legacy = {
+        event: 'charge.success',
+        data: { reference: 'txn-old', amount: 6_000_000, metadata: {} },
+      };
+      const rawBody = Buffer.from(JSON.stringify(legacy));
+      const hash = createHmac('sha512', secret).update(rawBody).digest('hex');
+
+      mockPrismaService.$queryRawUnsafe.mockResolvedValue([
+        {
+          id: 'txn-old',
+          agent_id: 'user-1',
+          amount: 15,
+          price_ngn: null, // predates the column — cannot be verified
+          status: 'pending',
+          paystack_ref: 'txn-old',
+        },
+      ]);
+      mockPrismaService.transaction.update.mockResolvedValue({});
+      mockPrismaService.agentProfile.update.mockResolvedValue({});
+
+      await service.handleWebhook(rawBody, hash);
+
+      // A real payment must not be withheld just because we cannot check it.
+      expect(mockPrismaService.agentProfile.update).toHaveBeenCalledWith(
+        expect.objectContaining({ data: { creditBalance: { increment: 15 } } }),
+      );
+    });
+
     it('should skip processing when no pending transaction found', async () => {
       const secret = 'sk_test_secret_key';
       const rawBody = Buffer.from(JSON.stringify(payload));

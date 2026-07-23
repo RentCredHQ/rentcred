@@ -43,8 +43,8 @@ export class KybController {
   @UseGuards(RolesGuard)
   @Roles('agent', 'ops', 'admin')
   @ApiOperation({ summary: 'Get a single KYB application' })
-  async getApplication(@Param('id') id: string) {
-    return this.kybService.getApplication(id);
+  async getApplication(@Param('id') id: string, @Req() req: any) {
+    return this.kybService.getApplication(id, req.user.sub, req.user.role);
   }
 
   @Patch('applications/:id/review')

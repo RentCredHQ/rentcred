@@ -48,7 +48,7 @@ export class SubmissionsController {
   @Get(':id')
   @ApiOperation({ summary: 'Get a single submission with full details' })
   findOne(@Param('id') id: string, @Request() req: any) {
-    return this.submissionsService.findById(id, req.user.sub, req.user.role);
+    return this.submissionsService.findById(id, req.user.sub, req.user.role, req.user.email);
   }
 
   @Patch(':id/status')

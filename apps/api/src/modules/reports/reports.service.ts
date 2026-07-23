@@ -9,6 +9,7 @@ import { PrismaService } from '../../prisma/prisma.service';
 import { NotificationsService } from '../notifications/notifications.service';
 import { AuditService } from '../audit/audit.service';
 import { ReviewReportDto } from './dto/report.dto';
+import { assertCanAccessSubmission } from '../../common/access/submission-access';
 
 @Injectable()
 export class ReportsService {
@@ -161,7 +162,7 @@ export class ReportsService {
   /**
    * Get a single report with authorization check.
    */
-  async findOne(id: string, userId: string, role: string) {
+  async findOne(id: string, userId: string, role: string, userEmail?: string) {
     const report = await this.prisma.report.findUnique({
       where: { id },
       include: {
@@ -193,9 +194,11 @@ export class ReportsService {
 
     if (!report) throw new NotFoundException('Report not found');
 
-    if (role === 'agent' && report.submission.agentId !== userId) {
-      throw new ForbiddenException('Access denied');
-    }
+    await assertCanAccessSubmission(
+      this.prisma,
+      { sub: userId, role, email: userEmail },
+      report.submission,
+    );
 
     return report;
   }
@@ -326,10 +329,54 @@ export class ReportsService {
 
     return {
       id: report.id,
-      content: report.content,
+      content: this.redactContent(report.content),
       submission: report.submission,
       approvedAt: report.approvedAt,
       sharedAt: report.sharedAt,
+    };
+  }
+
+  /**
+   * Strips personal data from a report before it goes out over the public share
+   * link. Anyone holding the token can read this with no account, so it carries
+   * the verification outcome and the property facts the recipient already knows
+   * — not the tenant's contact details, income, the landlord's phone number, or
+   * the GPS coordinates and interior photos from the field visit.
+   *
+   * The submission fields returned alongside this (tenant name, property
+   * address, rent) are deliberately kept: the share audience is the prospective
+   * landlord for that property.
+   */
+  private redactContent(content: unknown) {
+    if (!content || typeof content !== 'object') return content;
+    const c = content as Record<string, any>;
+
+    return {
+      tenant: c.tenant ? { name: c.tenant.name } : undefined,
+      property: c.property
+        ? {
+            address: c.property.address,
+            annualRent: c.property.annualRent,
+            monthlyRent: c.property.monthlyRent,
+            propertyType: c.property.propertyType,
+            bedrooms: c.property.bedrooms,
+            state: c.property.state,
+            lga: c.property.lga,
+            neighborhood: c.property.neighborhood,
+            propertyCondition: c.property.propertyCondition,
+          }
+        : undefined,
+      employment: c.employment ? { employer: c.employment.employer } : undefined,
+      // The verdict band on the public page is driven entirely by this object,
+      // so it has to survive redaction intact.
+      verification: c.verification,
+      fieldVisit: c.fieldVisit
+        ? { date: c.fieldVisit.date, summary: c.fieldVisit.summary }
+        : null,
+      summary: c.summary,
+      recommendations: c.recommendations,
+      riskLevel: c.riskLevel,
+      generatedAt: c.generatedAt,
     };
   }
 }

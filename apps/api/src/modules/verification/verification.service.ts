@@ -1,8 +1,13 @@
-import { Injectable, NotFoundException, BadRequestException } from '@nestjs/common';
+import { Injectable, NotFoundException, BadRequestException, ForbiddenException } from '@nestjs/common';
 import { PrismaService } from '../../prisma/prisma.service';
 import { NotificationsService } from '../notifications/notifications.service';
 import { AuditService } from '../audit/audit.service';
 import { UpdateChecklistDto } from './dto/update-checklist.dto';
+import {
+  assertCanAccessSubmission,
+  assertCanModifyAsFieldAgent,
+  RequestUser,
+} from '../../common/access/submission-access';
 
 @Injectable()
 export class VerificationService {
@@ -12,17 +17,21 @@ export class VerificationService {
     private readonly audit: AuditService,
   ) {}
 
-  async getChecklist(submissionId: string) {
+  async getChecklist(submissionId: string, user?: RequestUser) {
     const checklist = await this.prisma.verificationChecklist.findUnique({
       where: { submissionId },
       include: {
         submission: {
-          select: { id: true, tenantName: true, status: true, agentId: true },
+          select: { id: true, tenantName: true, status: true, agentId: true, tenantEmail: true },
         },
       },
     });
 
     if (!checklist) throw new NotFoundException('Checklist not found');
+
+    if (user) {
+      await assertCanAccessSubmission(this.prisma, user, checklist.submission);
+    }
 
     const items = [
       checklist.identityVerified,
@@ -42,13 +51,31 @@ export class VerificationService {
     };
   }
 
-  async updateChecklist(submissionId: string, userId: string, dto: UpdateChecklistDto) {
+  async updateChecklist(
+    submissionId: string,
+    userId: string,
+    dto: UpdateChecklistDto,
+    user?: RequestUser,
+  ) {
     const checklist = await this.prisma.verificationChecklist.findUnique({
       where: { submissionId },
-      include: { submission: { select: { agentId: true, tenantName: true } } },
+      include: {
+        submission: { select: { id: true, agentId: true, tenantName: true, tenantEmail: true } },
+      },
     });
 
     if (!checklist) throw new NotFoundException('Checklist not found');
+
+    // Ops and admin own this workflow. A field agent may only touch a checklist
+    // for a case they are actively assigned to; previously any field agent could
+    // edit any case's verification results.
+    if (user) {
+      if (user.role === 'field_agent') {
+        await assertCanModifyAsFieldAgent(this.prisma, user.sub, submissionId);
+      } else if (user.role !== 'ops' && user.role !== 'admin') {
+        throw new ForbiddenException('Access denied');
+      }
+    }
 
     if (checklist.completedAt) {
       throw new BadRequestException('Checklist has been finalized and cannot be modified');

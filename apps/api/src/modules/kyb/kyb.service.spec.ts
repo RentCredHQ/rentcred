@@ -2,11 +2,13 @@ import { Test, TestingModule } from '@nestjs/testing';
 import {
   NotFoundException,
   BadRequestException,
+  ForbiddenException,
 } from '@nestjs/common';
 import { KybService } from './kyb.service';
 import { PrismaService } from '../../prisma/prisma.service';
 import { NotificationsService } from '../notifications/notifications.service';
 import { AuditService } from '../audit/audit.service';
+import { UploadService } from '../upload/upload.service';
 
 describe('KybService', () => {
   let service: KybService;
@@ -36,6 +38,13 @@ describe('KybService', () => {
     log: jest.fn(),
   };
 
+  // KYB documents are private, so the service signs short-lived download URLs
+  // rather than building public bucket URLs.
+  const mockUploadService = {
+    toObjectKey: jest.fn((v: string) => v),
+    getPresignedDownloadUrl: jest.fn(async (key: string) => `https://signed.test/${key}?sig=abc`),
+  };
+
   beforeEach(async () => {
     process.env.R2_PUBLIC_URL = 'https://test.r2.dev';
 
@@ -45,6 +54,10 @@ describe('KybService', () => {
         {
           provide: PrismaService,
           useValue: mockPrismaService,
+        },
+        {
+          provide: UploadService,
+          useValue: mockUploadService,
         },
         {
           provide: NotificationsService,
@@ -242,10 +255,11 @@ describe('KybService', () => {
       const mockApp = {
         id: 'kyb-1',
         status: 'pending',
-        cacDocument: 'kyb-docs/cac.pdf',
-        directorIdUrl: 'kyb-docs/id.jpg',
-        utilityBillUrl: 'kyb-docs/bill.pdf',
+        cacDocument: 'kyb-documents/cac.pdf',
+        directorIdUrl: 'kyb-documents/id.jpg',
+        utilityBillUrl: 'kyb-documents/bill.pdf',
         agentProfile: {
+          userId: 'user-1',
           user: { id: 'user-1', name: 'Agent', email: 'agent@test.com' },
         },
       };
@@ -253,11 +267,13 @@ describe('KybService', () => {
 
       const result = await service.getApplication('kyb-1');
 
+      // Documents are private: they come back as signed, expiring URLs rather
+      // than permanent public bucket links.
       expect(result).toEqual({
         ...mockApp,
-        cacDocument: 'https://test.r2.dev/kyb-docs/cac.pdf',
-        directorIdUrl: 'https://test.r2.dev/kyb-docs/id.jpg',
-        utilityBillUrl: 'https://test.r2.dev/kyb-docs/bill.pdf',
+        cacDocument: 'https://signed.test/kyb-documents/cac.pdf?sig=abc',
+        directorIdUrl: 'https://signed.test/kyb-documents/id.jpg?sig=abc',
+        utilityBillUrl: 'https://signed.test/kyb-documents/bill.pdf?sig=abc',
       });
     });
 
@@ -265,6 +281,42 @@ describe('KybService', () => {
       mockPrismaService.kybApplication.findUnique.mockResolvedValue(null);
 
       await expect(service.getApplication('non-existent')).rejects.toThrow(NotFoundException);
+    });
+
+    it('should deny an agent access to another agent\'s application', async () => {
+      mockPrismaService.kybApplication.findUnique.mockResolvedValue({
+        id: 'kyb-1',
+        status: 'pending',
+        cacDocument: null,
+        directorIdUrl: null,
+        utilityBillUrl: null,
+        agentProfile: {
+          userId: 'someone-else',
+          user: { id: 'someone-else', name: 'Other', email: 'other@test.com' },
+        },
+      });
+
+      await expect(service.getApplication('kyb-1', 'user-1', 'agent')).rejects.toThrow(
+        ForbiddenException,
+      );
+    });
+
+    it('should allow ops to read any application', async () => {
+      mockPrismaService.kybApplication.findUnique.mockResolvedValue({
+        id: 'kyb-1',
+        status: 'pending',
+        cacDocument: null,
+        directorIdUrl: null,
+        utilityBillUrl: null,
+        agentProfile: {
+          userId: 'someone-else',
+          user: { id: 'someone-else', name: 'Other', email: 'other@test.com' },
+        },
+      });
+
+      await expect(service.getApplication('kyb-1', 'ops-1', 'ops')).resolves.toMatchObject({
+        id: 'kyb-1',
+      });
     });
   });
 

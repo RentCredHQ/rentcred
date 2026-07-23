@@ -5,6 +5,7 @@ import {
   BadRequestException,
 } from '@nestjs/common';
 import { PrismaService } from '../../prisma/prisma.service';
+import { normalizeEmail } from '../auth/auth.service';
 import {
   UpdatePersonalInfoDto,
   UpdateEmploymentDto,
@@ -184,7 +185,7 @@ export class TenantsService {
 
     const [submissions, total] = await Promise.all([
       this.prisma.submission.findMany({
-        where: { tenantEmail: user.email },
+        where: { tenantEmail: normalizeEmail(user.email) },
         orderBy: { createdAt: 'desc' },
         skip,
         take: limit,
@@ -203,7 +204,7 @@ export class TenantsService {
           report: { select: { id: true, status: true, shareToken: true } },
         },
       }),
-      this.prisma.submission.count({ where: { tenantEmail: user.email } }),
+      this.prisma.submission.count({ where: { tenantEmail: normalizeEmail(user.email) } }),
     ]);
 
     return {
@@ -222,7 +223,7 @@ export class TenantsService {
     const reports = await this.prisma.report.findMany({
       where: {
         status: 'approved',
-        submission: { tenantEmail: user.email },
+        submission: { tenantEmail: normalizeEmail(user.email) },
       },
       orderBy: { createdAt: 'desc' },
       include: {

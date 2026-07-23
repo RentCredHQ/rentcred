@@ -5,6 +5,7 @@ import {
   BadRequestException,
 } from '@nestjs/common';
 import { PrismaService } from '../../prisma/prisma.service';
+import { normalizeEmail } from '../auth/auth.service';
 import { AuditService } from '../audit/audit.service';
 import { CreateReviewDto, UpdateReviewStatusDto } from './dto/review.dto';
 
@@ -31,7 +32,7 @@ export class ReviewsService {
 
     // Verify tenant's email matches submission
     const user = await this.prisma.user.findUnique({ where: { id: tenantId } });
-    if (!user || user.email !== submission.tenantEmail) {
+    if (!user || normalizeEmail(user.email) !== normalizeEmail(submission.tenantEmail)) {
       throw new ForbiddenException('You can only review verifications about you');
     }
 

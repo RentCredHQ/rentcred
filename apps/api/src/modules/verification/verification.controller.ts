@@ -15,10 +15,10 @@ export class VerificationController {
 
   @Get('checklist/:submissionId')
   @UseGuards(RolesGuard)
-  @Roles('agent', 'ops', 'admin')
+  @Roles('agent', 'ops', 'admin', 'tenant', 'field_agent')
   @ApiOperation({ summary: 'Get verification checklist for a submission' })
-  async getChecklist(@Param('submissionId') submissionId: string) {
-    return this.verificationService.getChecklist(submissionId);
+  async getChecklist(@Param('submissionId') submissionId: string, @Req() req: any) {
+    return this.verificationService.getChecklist(submissionId, req.user);
   }
 
   @Patch('checklist/:submissionId')
@@ -30,6 +30,6 @@ export class VerificationController {
     @Req() req: any,
     @Body() dto: UpdateChecklistDto,
   ) {
-    return this.verificationService.updateChecklist(submissionId, req.user.sub, dto);
+    return this.verificationService.updateChecklist(submissionId, req.user.sub, dto, req.user);
   }
 }

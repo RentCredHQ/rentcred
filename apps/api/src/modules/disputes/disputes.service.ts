@@ -5,6 +5,7 @@ import {
   BadRequestException,
 } from '@nestjs/common';
 import { PrismaService } from '../../prisma/prisma.service';
+import { normalizeEmail } from '../auth/auth.service';
 import { NotificationsService } from '../notifications/notifications.service';
 import { AuditService } from '../audit/audit.service';
 import { CreateDisputeDto, ResolveDisputeDto } from './dto/dispute.dto';
@@ -216,7 +217,7 @@ export class DisputesService {
 
     // Notify the tenant if their email matches a user account
     const tenantUser = await this.prisma.user.findUnique({
-      where: { email: dispute.submission.tenantEmail },
+      where: { email: normalizeEmail(dispute.submission.tenantEmail) },
     });
     if (tenantUser && tenantUser.id !== dispute.raisedById) {
       await this.notifications.emit({

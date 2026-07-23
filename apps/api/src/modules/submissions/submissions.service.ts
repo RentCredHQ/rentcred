@@ -10,6 +10,8 @@ import { AuditService } from '../audit/audit.service';
 import { CreateSubmissionDto } from './dto/create-submission.dto';
 import { UpdateSubmissionStatusDto, AssignFieldAgentDto } from './dto/update-submission.dto';
 import { MailService } from '../mail/mail.service';
+import { assertCanAccessSubmission } from '../../common/access/submission-access';
+import { normalizeEmail } from '../auth/auth.service';
 
 const VALID_TRANSITIONS: Record<string, string[]> = {
   pending: ['in_progress', 'rejected'],
@@ -55,7 +57,9 @@ export class SubmissionsService {
         data: {
           agentId,
           tenantName: dto.tenantName,
-          tenantEmail: dto.tenantEmail,
+          // Normalized because this string is the only link between a
+          // submission and the tenant's account.
+          tenantEmail: normalizeEmail(dto.tenantEmail),
           tenantPhone: dto.tenantPhone,
           propertyAddress: dto.propertyAddress,
           annualRent: dto.annualRent ?? 0,
@@ -192,7 +196,7 @@ export class SubmissionsService {
     };
   }
 
-  async findById(id: string, userId: string, role: string) {
+  async findById(id: string, userId: string, role: string, userEmail?: string) {
     const submission = await this.prisma.submission.findUnique({
       where: { id },
       include: {
@@ -212,9 +216,11 @@ export class SubmissionsService {
 
     if (!submission) throw new NotFoundException('Submission not found');
 
-    if (role === 'agent' && submission.agentId !== userId) {
-      throw new ForbiddenException('Access denied');
-    }
+    await assertCanAccessSubmission(
+      this.prisma,
+      { sub: userId, role, email: userEmail },
+      submission,
+    );
 
     return {
       ...submission,

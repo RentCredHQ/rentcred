@@ -6,7 +6,7 @@ import {
 } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import * as bcrypt from 'bcrypt';
-import { randomUUID } from 'crypto';
+import { randomUUID, createHash } from 'crypto';
 import { PrismaService } from '../../prisma/prisma.service';
 import { MailService } from '../mail/mail.service';
 import { RegisterDto } from './dto/register.dto';
@@ -15,6 +15,19 @@ import { LoginDto } from './dto/login.dto';
 const BCRYPT_ROUNDS = 12;
 const EMAIL_VERIFY_EXPIRY_MS = 24 * 60 * 60 * 1000; // 24 hours
 const RESET_TOKEN_EXPIRY_MS = 60 * 60 * 1000; // 1 hour
+
+/**
+ * Verification and reset tokens are stored hashed so that a database dump does
+ * not hand out usable links. They are already single-use, high-entropy and
+ * short-lived, so a plain SHA-256 is enough here — this is not a password.
+ */
+export function hashToken(token: string): string {
+  return createHash('sha256').update(token).digest('hex');
+}
+
+export function normalizeEmail(email: string): string {
+  return (email ?? '').toLowerCase().trim();
+}
 
 @Injectable()
 export class AuthService {
@@ -30,7 +43,11 @@ export class AuthService {
     // The login endpoint already uses constant-time comparison and generic messages.
     // If stricter anti-enumeration is needed in the future, return a generic success
     // response here and send a "someone tried to register" notification email instead.
-    const existing = await this.prisma.user.findUnique({ where: { email: dto.email } });
+    // Submissions link a tenant to their case by email string, so casing has to
+    // be normalized at every write or the two never match up.
+    const email = normalizeEmail(dto.email);
+
+    const existing = await this.prisma.user.findUnique({ where: { email } });
     if (existing) {
       throw new ConflictException('Email already registered');
     }
@@ -42,11 +59,13 @@ export class AuthService {
     const user = await this.prisma.user.create({
       data: {
         name: dto.name,
-        email: dto.email,
+        email,
         phone: dto.phone,
         passwordHash: hashedPassword,
         role: dto.role,
-        emailVerifyToken,
+        // Only the hash is stored: a database or backup leak would otherwise
+        // hand over working verification and password-reset links.
+        emailVerifyToken: hashToken(emailVerifyToken),
         emailVerifyExpires,
       },
     });
@@ -75,7 +94,7 @@ export class AuthService {
 
   async login(dto: LoginDto) {
     const user = await this.prisma.user.findUnique({
-      where: { email: dto.email },
+      where: { email: normalizeEmail(dto.email) },
       include: { agentProfile: { select: { kybStatus: true, creditBalance: true, companyName: true } } },
     });
     if (!user) {
@@ -85,6 +104,10 @@ export class AuthService {
     const isPasswordValid = await bcrypt.compare(dto.password, user.passwordHash);
     if (!isPasswordValid) {
       throw new UnauthorizedException('Invalid email or password');
+    }
+
+    if (!user.isActive) {
+      throw new UnauthorizedException('This account has been suspended. Contact support.');
     }
 
     const token = this.jwtService.sign({ sub: user.id, role: user.role });
@@ -144,7 +167,7 @@ export class AuthService {
   async verifyEmail(token: string) {
     const user = await this.prisma.user.findFirst({
       where: {
-        emailVerifyToken: token,
+        emailVerifyToken: hashToken(token),
         emailVerifyExpires: { gt: new Date() },
       },
     });
@@ -166,7 +189,7 @@ export class AuthService {
   }
 
   async forgotPassword(email: string) {
-    const user = await this.prisma.user.findUnique({ where: { email } });
+    const user = await this.prisma.user.findUnique({ where: { email: normalizeEmail(email) } });
 
     // Always return same response to prevent email enumeration
     const response = { message: 'If the email exists, a reset link has been sent' };
@@ -178,7 +201,7 @@ export class AuthService {
 
     await this.prisma.user.update({
       where: { id: user.id },
-      data: { resetToken, resetTokenExpires },
+      data: { resetToken: hashToken(resetToken), resetTokenExpires },
     });
 
     // Send reset email (fire-and-forget)
@@ -198,7 +221,7 @@ export class AuthService {
 
     const user = await this.prisma.user.findFirst({
       where: {
-        resetToken: token,
+        resetToken: hashToken(token),
         resetTokenExpires: { gt: new Date() },
       },
     });
