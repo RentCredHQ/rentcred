@@ -48,8 +48,8 @@ docker-compose up -d
 # Generate Prisma client
 npm run db:generate
 
-# Push schema to database
-npm run db:push
+# Apply migrations
+npm run db:migrate:deploy
 
 # Seed database with demo data
 npm run db:seed
@@ -122,8 +122,10 @@ rentcred/
 - `npm run lint` - Lint all apps
 - `npm run test` - Run tests
 - `npm run db:generate` - Generate Prisma client
-- `npm run db:push` - Push schema to database
-- `npm run db:migrate` - Run migrations
+- `npm run db:migrate` - Create and apply a migration after a schema change (dev)
+- `npm run db:migrate:deploy` - Apply pending migrations (staging/production)
+- `npm run db:migrate:status` - Show which migrations have been applied
+- `npm run db:push` - Push schema with no migration history (throwaway/local only)
 - `npm run db:studio` - Open Prisma Studio
 - `npm run db:seed` - Seed database with demo data
 

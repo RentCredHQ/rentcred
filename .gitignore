@@ -37,9 +37,6 @@ coverage/
 # Turbo
 .turbo/
 
-# Prisma
-apps/api/prisma/migrations/
-
 # Claude Code
 .claude/
 

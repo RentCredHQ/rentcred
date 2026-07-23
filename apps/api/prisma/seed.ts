@@ -12,6 +12,9 @@ const DEFAULT_CREDIT_BUNDLES = [
 // Flag to control whether to create demo data (set to false in production)
 const CREATE_DEMO_DATA = process.env.CREATE_DEMO_DATA === 'true' || process.env.NODE_ENV !== 'production';
 
+// Matches BCRYPT_ROUNDS in auth.service.ts so seeded logins hash like real ones.
+const BCRYPT_ROUNDS = 12;
+
 async function main() {
   console.log('🌱 Seeding database...\n');
 
@@ -28,9 +31,18 @@ async function main() {
 
   // --- Admin User ---
   console.log('\nCreating admin user...');
-  const adminEmail = process.env.ADMIN_EMAIL || 'admin@rentcred.ng';
+  const adminEmail = (process.env.ADMIN_EMAIL || 'admin@rentcred.ng').toLowerCase().trim();
   const adminPassword = process.env.ADMIN_PASSWORD || 'Admin123!';
-  const passwordHash = await bcrypt.hash(adminPassword, 10);
+
+  // The fallback password is published in the README and this file, so it must
+  // never reach a production database.
+  if (process.env.NODE_ENV === 'production' && (!process.env.ADMIN_PASSWORD || adminPassword === 'Admin123!')) {
+    throw new Error(
+      'Refusing to seed production: set ADMIN_PASSWORD to something other than the default "Admin123!".',
+    );
+  }
+
+  const passwordHash = await bcrypt.hash(adminPassword, BCRYPT_ROUNDS);
 
   const admin = await prisma.user.upsert({
     where: { email: adminEmail },
@@ -378,10 +390,131 @@ async function createDemoData(passwordHash: string) {
     },
   ];
 
+  // Submissions have no natural unique key, so re-running the seed would stack up
+  // duplicates. Clear the previous demo set first and rebuild it from scratch.
+  const demoAgentIds = [agent1.id, agent2.id, agent3.id];
+  await prisma.transaction.deleteMany({ where: { agentId: { in: demoAgentIds } } });
+  await prisma.submission.deleteMany({ where: { agentId: { in: demoAgentIds } } });
+
   for (const sub of demoSubmissions) {
-    const submission = await prisma.submission.create({ data: sub });
-    await prisma.verificationChecklist.create({ data: { submissionId: submission.id } });
+    const submission = await prisma.submission.create({
+      data: { ...sub, tenantEmail: sub.tenantEmail.toLowerCase().trim() },
+    });
+
+    // Build state consistent with the submission's status, so a demo case that
+    // says "completed" actually has the visit, checklist and report behind it.
+    const isCompleted = sub.status === 'completed';
+    const isFieldVisit = sub.status === 'field_visit';
+    const isInProgress = sub.status === 'in_progress';
+
+    await prisma.verificationChecklist.create({
+      data: {
+        submissionId: submission.id,
+        identityVerified: isCompleted || isFieldVisit || isInProgress,
+        employmentVerified: isCompleted || isFieldVisit,
+        referencesVerified: isCompleted || isFieldVisit,
+        addressVerified: isCompleted,
+        criminalCheckDone: isCompleted,
+        fieldVisitCompleted: isCompleted,
+        completedAt: isCompleted ? new Date() : null,
+        notes: isCompleted ? 'All verification items confirmed.' : null,
+      },
+    });
+
+    if (isFieldVisit) {
+      await prisma.fieldAssignment.create({
+        data: {
+          submissionId: submission.id,
+          fieldAgentId: fieldAgent1.id,
+          status: 'assigned',
+          scheduledDate: new Date(Date.now() + 2 * 24 * 60 * 60 * 1000),
+        },
+      });
+    }
+
+    if (isCompleted) {
+      await prisma.fieldAssignment.create({
+        data: {
+          submissionId: submission.id,
+          fieldAgentId: fieldAgent2.id,
+          status: 'completed',
+          scheduledDate: new Date(Date.now() - 5 * 24 * 60 * 60 * 1000),
+          completedAt: new Date(Date.now() - 4 * 24 * 60 * 60 * 1000),
+        },
+      });
+
+      const visit = await prisma.fieldVisit.create({
+        data: {
+          submissionId: submission.id,
+          fieldAgentId: fieldAgent2.id,
+          visitDate: new Date(Date.now() - 4 * 24 * 60 * 60 * 1000),
+          gpsLatitude: 9.0765,
+          gpsLongitude: 7.3986,
+          photos: ['field-visit-photos/demo/maitama-visit-1.jpg'],
+          summary: 'Property matches the description. Tenant met on site; documents confirmed.',
+        },
+      });
+
+      await prisma.report.create({
+        data: {
+          submissionId: submission.id,
+          status: 'approved',
+          approvedBy: ops1.id,
+          approvedAt: new Date(),
+          content: buildReportContent(sub, visit),
+        },
+      });
+    }
+
     console.log(`  ✓ Submission: ${sub.tenantName} — ${sub.propertyType} in ${sub.neighborhood}, ${sub.state} (${sub.status})`);
+  }
+
+  // KYB applications matching each agent profile's kybStatus.
+  console.log('Creating KYB applications...');
+  const kybSeed: Array<{ userId: string; companyName: string; rcNumber: string; status: string; reviewNotes?: string }> = [
+    { userId: agent1.id, companyName: 'Premier Realty Ltd', rcNumber: 'RC-284819', status: 'approved' },
+    { userId: agent2.id, companyName: 'Luxe Homes Nigeria', rcNumber: 'RC-195742', status: 'approved' },
+    { userId: agent3.id, companyName: 'Urban Spaces Realty', rcNumber: 'RC-341092', status: 'under_review' },
+  ];
+
+  for (const kyb of kybSeed) {
+    const profile = await prisma.agentProfile.findUnique({ where: { userId: kyb.userId } });
+    if (!profile) continue;
+    await prisma.kybApplication.upsert({
+      where: { agentProfileId: profile.id },
+      update: {},
+      create: {
+        agentProfileId: profile.id,
+        companyName: kyb.companyName,
+        rcNumber: kyb.rcNumber,
+        status: kyb.status,
+        reviewedBy: kyb.status === 'approved' ? ops2.id : null,
+        cacDocument: 'kyb-documents/demo/cac-certificate.pdf',
+        directorIdUrl: 'kyb-documents/demo/director-id.jpg',
+        utilityBillUrl: 'kyb-documents/demo/utility-bill.pdf',
+      },
+    });
+  }
+  console.log(`  ✓ Created ${kybSeed.length} KYB applications`);
+
+  // A completed credit purchase, so the payments views have something real to
+  // show and price_ngn is populated the way the webhook now expects.
+  console.log('Creating demo transaction...');
+  const standardBundle = await prisma.creditBundle.findUnique({ where: { id: 'standard' } });
+  if (standardBundle) {
+    await prisma.transaction.create({
+      data: {
+        agentId: agent1.id,
+        type: 'purchase',
+        amount: standardBundle.credits,
+        priceNgn: Math.round(standardBundle.priceNgn),
+        bundleId: standardBundle.id,
+        description: `Purchased ${standardBundle.name} bundle`,
+        paystackRef: `demo_ref_${Date.now()}`,
+        status: 'completed',
+      },
+    });
+    console.log(`  ✓ Purchase of ${standardBundle.name} bundle for ${agent1.name}`);
   }
 
   console.log('\n📝 Demo credentials (all passwords: Admin123!):');
@@ -390,6 +523,55 @@ async function createDemoData(passwordHash: string) {
   console.log('   Agent: contact@premierrealty.ng, info@luxehomes.ng');
   console.log('   Field Agent: ola.adeyemi@rentcred.ng');
   console.log('   Tenant: a.okonkwo@email.com (complete profile), grace.obi@email.com (partial profile)');
+}
+
+/**
+ * Mirrors the content blob built by ReportsService.generate() so seeded reports
+ * render through the same code paths as generated ones. Keep in sync with it.
+ */
+function buildReportContent(sub: any, visit: { visitDate: Date; gpsLatitude: number | null; gpsLongitude: number | null; summary: string | null; photos: string[] }) {
+  return {
+    tenant: {
+      name: sub.tenantName,
+      email: sub.tenantEmail,
+      phone: sub.tenantPhone,
+    },
+    property: {
+      address: sub.propertyAddress,
+      annualRent: sub.annualRent,
+      monthlyRent: sub.monthlyRent,
+      propertyType: sub.propertyType,
+      bedrooms: sub.bedrooms,
+      state: sub.state,
+      lga: sub.lga,
+      neighborhood: sub.neighborhood,
+      landlordName: sub.landlordName,
+      landlordPhone: sub.landlordPhone,
+      propertyCondition: sub.propertyCondition,
+      propertyImages: sub.propertyImages,
+    },
+    employment: {
+      employer: sub.employerName ?? null,
+      address: sub.employerAddress ?? null,
+      income: sub.monthlyIncome ?? null,
+    },
+    verification: {
+      identityVerified: true,
+      employmentVerified: true,
+      referencesVerified: true,
+      addressVerified: true,
+      criminalCheckDone: true,
+      fieldVisitCompleted: true,
+      completedAt: new Date(),
+    },
+    fieldVisit: {
+      date: visit.visitDate,
+      gps: visit.gpsLatitude ? { lat: visit.gpsLatitude, lng: visit.gpsLongitude } : null,
+      summary: visit.summary,
+      photos: visit.photos,
+    },
+    generatedAt: new Date().toISOString(),
+  };
 }
 
 main()

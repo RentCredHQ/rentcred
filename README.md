@@ -84,10 +84,15 @@ docker-compose up -d   # starts PostgreSQL + Redis
 ### 4. Set up database
 
 ```bash
-npm run db:generate    # generate Prisma client
-npm run db:push        # sync schema to database
-npm run db:seed        # seed demo data
+npm run db:generate       # generate Prisma client
+npm run db:migrate:deploy # apply migrations
+npm run db:seed           # seed demo data
 ```
+
+Use `npm run db:migrate` (`prisma migrate dev`) when you change `schema.prisma` — it
+creates a new migration and applies it. `db:push` exists for throwaway experiments
+only; it writes schema changes with no migration history, so never use it against
+staging or production.
 
 ### 5. Start dev servers
 
