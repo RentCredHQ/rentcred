@@ -4,6 +4,9 @@ import {
   IsNumber,
   IsArray,
   IsDateString,
+  IsEmail,
+  IsBoolean,
+  MinLength,
 } from 'class-validator';
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
 
@@ -50,4 +53,26 @@ export class UpdateAssignmentStatusDto {
   @ApiProperty({ enum: ['assigned', 'in_progress', 'completed'] })
   @IsString()
   status: string;
+}
+
+export class CreateFieldAgentDto {
+  @ApiProperty({ example: 'Ola Adeyemi' })
+  @IsString()
+  @MinLength(2)
+  name: string;
+
+  @ApiProperty({ example: 'ola.adeyemi@rentcred.ng' })
+  @IsEmail()
+  email: string;
+
+  @ApiPropertyOptional({ example: '+234 801 111 1111' })
+  @IsOptional()
+  @IsString()
+  phone?: string;
+}
+
+export class UpdateFieldAgentStatusDto {
+  @ApiProperty({ description: 'false suspends the account, true reactivates it' })
+  @IsBoolean()
+  isActive: boolean;
 }

@@ -30,23 +30,36 @@ export class KybService {
 
     if (!profile) throw new NotFoundException('Agent profile not found');
 
-    if (profile.kybApplication) {
+    const existing = profile.kybApplication;
+
+    // A rejected application can be resubmitted. The settings page has always
+    // offered "Submit New Application", but the row is unique per agent so this
+    // threw unconditionally — leaving a rejected agent permanently unable to
+    // reapply without direct database access.
+    if (existing && existing.status !== 'rejected') {
       throw new BadRequestException(
-        'KYB application already exists. Current status: ' + profile.kybApplication.status,
+        'KYB application already exists. Current status: ' + existing.status,
       );
     }
 
-    const application = await this.prisma.kybApplication.create({
-      data: {
-        agentProfileId: profile.id,
-        companyName: dto.companyName,
-        rcNumber: dto.rcNumber,
-        cacDocument: dto.cacDocumentUrl,
-        directorIdUrl: dto.directorIdUrl,
-        utilityBillUrl: dto.utilityBillUrl,
-        status: 'pending',
-      },
-    });
+    const data = {
+      companyName: dto.companyName,
+      rcNumber: dto.rcNumber,
+      cacDocument: dto.cacDocumentUrl,
+      directorIdUrl: dto.directorIdUrl,
+      utilityBillUrl: dto.utilityBillUrl,
+      status: 'pending',
+    };
+
+    const application = existing
+      ? await this.prisma.kybApplication.update({
+          where: { id: existing.id },
+          // Clear the previous decision so the case reads as fresh for ops.
+          data: { ...data, reviewNotes: null, reviewedBy: null },
+        })
+      : await this.prisma.kybApplication.create({
+          data: { agentProfileId: profile.id, ...data },
+        });
 
     // Update agent profile KYB status
     await this.prisma.agentProfile.update({
@@ -62,7 +75,7 @@ export class KybService {
     // Audit
     await this.audit.log({
       userId,
-      action: 'kyb_application_submitted',
+      action: existing ? 'kyb_application_resubmitted' : 'kyb_application_submitted',
       entityType: 'kyb_application',
       entityId: application.id,
     });

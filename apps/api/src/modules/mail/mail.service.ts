@@ -127,4 +127,38 @@ export class MailService {
       this.logger.error(`Failed to send welcome email to ${to}`, error);
     }
   }
+
+  /**
+   * Sends a newly-created field agent their temporary password. This is the
+   * only place it is ever disclosed — the create endpoint does not return it.
+   */
+  async sendFieldAgentWelcome(to: string, name: string, tempPassword: string) {
+    try {
+      await this.resend.emails.send({
+        from: `RentCred <${this.fromEmail}>`,
+        to,
+        subject: 'Your RentCred field agent account',
+        html: `
+          <div style="font-family: 'Geist', Arial, sans-serif; max-width: 480px; margin: 0 auto; padding: 32px;">
+            <h2 style="color: #111; font-family: 'JetBrains Mono', monospace;">RentCred</h2>
+            <p>Hi ${name},</p>
+            <p>An account has been created for you as a RentCred field agent.</p>
+            <p style="margin: 16px 0;">
+              <strong>Email:</strong> ${to}<br />
+              <strong>Temporary password:</strong>
+              <code style="background: #f2f3f0; padding: 2px 6px; border-radius: 4px;">${tempPassword}</code>
+            </p>
+            <p>Please sign in and change this password from your profile straight away.</p>
+            <a href="${this.frontendUrl}/auth/login" style="display: inline-block; background: #FF8400; color: #fff; padding: 12px 24px; border-radius: 6px; text-decoration: none; font-weight: 600; margin: 16px 0;">
+              Sign in
+            </a>
+            <hr style="border: none; border-top: 1px solid #e0e0e0; margin: 24px 0;" />
+            <p style="color: #999; font-size: 12px;">RentCred — Tenant Verification Made Simple</p>
+          </div>
+        `,
+      });
+    } catch (error) {
+      this.logger.error(`Failed to send field agent welcome email to ${to}`, error);
+    }
+  }
 }

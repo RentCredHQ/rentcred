@@ -4,7 +4,12 @@ import { JwtAuthGuard } from '../../common/guards/jwt-auth.guard';
 import { RolesGuard } from '../../common/guards/roles.guard';
 import { Roles } from '../../common/decorators/roles.decorator';
 import { FieldAgentsService } from './field-agents.service';
-import { SubmitVisitDto, UpdateAssignmentStatusDto } from './dto/field-agent.dto';
+import {
+  SubmitVisitDto,
+  UpdateAssignmentStatusDto,
+  CreateFieldAgentDto,
+  UpdateFieldAgentStatusDto,
+} from './dto/field-agent.dto';
 
 @ApiTags('Field Agents')
 @ApiBearerAuth()
@@ -30,6 +35,14 @@ export class FieldAgentsController {
       limit: limit ? parseInt(limit, 10) : undefined,
       search,
     });
+  }
+
+  @Post()
+  @UseGuards(RolesGuard)
+  @Roles('ops', 'admin')
+  @ApiOperation({ summary: 'Create a field agent account (ops/admin only)' })
+  async create(@Req() req: any, @Body() dto: CreateFieldAgentDto) {
+    return this.fieldAgentsService.create(req.user.sub, dto);
   }
 
   @Get('dashboard/stats')
@@ -66,6 +79,18 @@ export class FieldAgentsController {
   @ApiOperation({ summary: 'Get single field agent with stats (ops/admin only)' })
   async findOne(@Param('id') id: string) {
     return this.fieldAgentsService.findOne(id);
+  }
+
+  @Patch(':id/status')
+  @UseGuards(RolesGuard)
+  @Roles('ops', 'admin')
+  @ApiOperation({ summary: 'Suspend or reactivate a field agent (ops/admin only)' })
+  async setActive(
+    @Param('id') id: string,
+    @Req() req: any,
+    @Body() dto: UpdateFieldAgentStatusDto,
+  ) {
+    return this.fieldAgentsService.setActive(id, req.user.sub, dto.isActive);
   }
 
   @Patch('assignments/:id/status')

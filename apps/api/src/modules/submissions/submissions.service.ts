@@ -14,13 +14,17 @@ import { assertCanAccessSubmission } from '../../common/access/submission-access
 import { normalizeEmail } from '../auth/auth.service';
 
 const VALID_TRANSITIONS: Record<string, string[]> = {
-  pending: ['in_progress', 'rejected'],
+  pending: ['in_progress', 'rejected', 'cancelled'],
   in_progress: ['field_visit', 'report_building', 'rejected'],
   field_visit: ['report_building', 'rejected'],
   report_building: ['completed', 'rejected'],
   completed: [],
   rejected: ['pending'],
+  cancelled: [],
 };
+
+/** Statuses that release the credit taken when the submission was created. */
+const REFUNDABLE_STATUSES = ['rejected', 'cancelled'];
 
 @Injectable()
 export class SubmissionsService {
@@ -247,17 +251,34 @@ export class SubmissionsService {
       );
     }
 
-    const updated = await this.prisma.submission.update({
-      where: { id },
-      data: { status: dto.status },
+    const { updated, refunded } = await this.prisma.$transaction(async (tx) => {
+      const result = await tx.submission.update({
+        where: { id },
+        data: { status: dto.status },
+      });
+
+      const didRefund = REFUNDABLE_STATUSES.includes(dto.status)
+        ? await this.refundSubmissionCredit(tx, submission)
+        : false;
+
+      if (REFUNDABLE_STATUSES.includes(dto.status)) {
+        await this.supersedeLiveAssignments(tx, id);
+      }
+
+      return { updated: result, refunded: didRefund };
     });
+
+    // The reason ops typed only ever reached the audit log, so an agent saw
+    // "rejected" with no explanation.
+    const reason = dto.notes ? ` Reason: ${dto.notes}` : '';
+    const refundNote = refunded ? ' Your credit has been refunded.' : '';
 
     await this.notifications.emit({
       userId: submission.agentId,
       type: 'submission_update',
       title: `Submission ${dto.status.replace('_', ' ')}`,
-      message: `Verification for ${submission.tenantName} is now ${dto.status.replace('_', ' ')}.`,
-      data: { submissionId: id, status: dto.status },
+      message: `Verification for ${submission.tenantName} is now ${dto.status.replace('_', ' ')}.${reason}${refundNote}`,
+      data: { submissionId: id, status: dto.status, notes: dto.notes ?? null, refunded },
     });
 
     await this.audit.log({
@@ -265,10 +286,95 @@ export class SubmissionsService {
       action: `submission_status_${dto.status}`,
       entityType: 'submission',
       entityId: id,
-      metadata: { from: submission.status, to: dto.status, notes: dto.notes },
+      metadata: { from: submission.status, to: dto.status, notes: dto.notes, refunded },
     });
 
     return updated;
+  }
+
+  /**
+   * Agent-initiated cancellation. Only available while the case is still
+   * pending — once ops has started work the credit has been consumed.
+   */
+  async cancel(id: string, userId: string) {
+    const submission = await this.prisma.submission.findUnique({ where: { id } });
+    if (!submission) throw new NotFoundException('Submission not found');
+
+    if (submission.agentId !== userId) {
+      throw new ForbiddenException('Access denied');
+    }
+
+    if (submission.status !== 'pending') {
+      throw new BadRequestException(
+        `Only pending submissions can be cancelled. This one is '${submission.status}'.`,
+      );
+    }
+
+    const refunded = await this.prisma.$transaction(async (tx) => {
+      await tx.submission.update({ where: { id }, data: { status: 'cancelled' } });
+      await this.supersedeLiveAssignments(tx, id);
+      return this.refundSubmissionCredit(tx, submission);
+    });
+
+    await this.audit.log({
+      userId,
+      action: 'submission_cancelled',
+      entityType: 'submission',
+      entityId: id,
+      metadata: { refunded },
+    });
+
+    return { id, status: 'cancelled', refunded };
+  }
+
+  /**
+   * Returns the credit taken at submission time, exactly once.
+   *
+   * A submission can reach a refundable state by more than one route (an agent
+   * cancelling, ops rejecting), so the refund is keyed on an existing refund
+   * transaction for this submission rather than on the status change itself.
+   * Runs inside the caller's transaction and locks the agent's profile row, so
+   * it composes with the same FOR UPDATE pattern used when credits are spent.
+   */
+  private async refundSubmissionCredit(
+    tx: any,
+    submission: { id: string; agentId: string; tenantName: string },
+  ): Promise<boolean> {
+    const alreadyRefunded = await tx.transaction.findFirst({
+      where: { submissionId: submission.id, type: 'refund' },
+      select: { id: true },
+    });
+    if (alreadyRefunded) return false;
+
+    await tx.$queryRawUnsafe(
+      `SELECT * FROM agent_profiles WHERE user_id = $1 FOR UPDATE`,
+      submission.agentId,
+    );
+
+    await tx.agentProfile.update({
+      where: { userId: submission.agentId },
+      data: { creditBalance: { increment: 1 } },
+    });
+
+    await tx.transaction.create({
+      data: {
+        agentId: submission.agentId,
+        type: 'refund',
+        amount: 1,
+        submissionId: submission.id,
+        description: `Refund: verification for ${submission.tenantName} did not proceed`,
+      },
+    });
+
+    return true;
+  }
+
+  /** Closes out any live field assignment so it stops counting as active work. */
+  private async supersedeLiveAssignments(tx: any, submissionId: string) {
+    await tx.fieldAssignment.updateMany({
+      where: { submissionId, status: { in: ['assigned', 'in_progress'] } },
+      data: { status: 'superseded' },
+    });
   }
 
   async assignFieldAgent(submissionId: string, userId: string, dto: AssignFieldAgentDto) {
@@ -282,13 +388,37 @@ export class SubmissionsService {
       throw new BadRequestException('Invalid field agent');
     }
 
-    const assignment = await this.prisma.fieldAssignment.create({
-      data: {
-        submissionId,
-        fieldAgentId: dto.fieldAgentId,
-        scheduledDate: dto.scheduledDate ? new Date(dto.scheduledDate) : null,
-        status: 'assigned',
-      },
+    // Reassignment used to just add another row, leaving the previous one
+    // 'assigned' forever: it kept inflating the old agent's active count, kept
+    // the case in their list, and still let them file a visit report. Close out
+    // any live assignment before creating the new one.
+    const { assignment, displaced } = await this.prisma.$transaction(async (tx) => {
+      const live = await tx.fieldAssignment.findMany({
+        where: {
+          submissionId,
+          status: { in: ['assigned', 'in_progress'] },
+          fieldAgentId: { not: dto.fieldAgentId },
+        },
+        select: { id: true, fieldAgentId: true },
+      });
+
+      if (live.length) {
+        await tx.fieldAssignment.updateMany({
+          where: { id: { in: live.map((a) => a.id) } },
+          data: { status: 'superseded' },
+        });
+      }
+
+      const created = await tx.fieldAssignment.create({
+        data: {
+          submissionId,
+          fieldAgentId: dto.fieldAgentId,
+          scheduledDate: dto.scheduledDate ? new Date(dto.scheduledDate) : null,
+          status: 'assigned',
+        },
+      });
+
+      return { assignment: created, displaced: live.map((a) => a.fieldAgentId) };
     });
 
     if (submission.status === 'in_progress') {
@@ -305,6 +435,17 @@ export class SubmissionsService {
       message: `You've been assigned to verify ${submission.tenantName} at ${submission.propertyAddress}.`,
       data: { submissionId, assignmentId: assignment.id },
     });
+
+    // Tell whoever lost the case, so it does not silently vanish from their list.
+    for (const previousAgentId of new Set(displaced)) {
+      await this.notifications.emit({
+        userId: previousAgentId,
+        type: 'submission_update',
+        title: 'Assignment Reassigned',
+        message: `The visit for ${submission.tenantName} has been reassigned to another field agent.`,
+        data: { submissionId },
+      });
+    }
 
     await this.audit.log({
       userId,

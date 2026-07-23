@@ -30,12 +30,15 @@ describe('SubmissionsService', () => {
     },
     transaction: {
       create: jest.fn(),
+      findFirst: jest.fn(),
     },
     verificationChecklist: {
       create: jest.fn(),
     },
     fieldAssignment: {
       create: jest.fn(),
+      findMany: jest.fn().mockResolvedValue([]),
+      updateMany: jest.fn(),
     },
     user: {
       findUnique: jest.fn(),
@@ -95,6 +98,11 @@ describe('SubmissionsService', () => {
       }
       return callback;
     });
+
+    // Defaults for the reassignment and refund paths: no prior assignment to
+    // supersede, and no refund already issued.
+    mockPrismaService.fieldAssignment.findMany.mockResolvedValue([]);
+    mockPrismaService.transaction.findFirst.mockResolvedValue(null);
   });
 
   it('should be defined', () => {
@@ -423,7 +431,7 @@ describe('SubmissionsService', () => {
           action: 'submission_status_in_progress',
           entityType: 'submission',
           entityId: 'sub-1',
-          metadata: { from: 'pending', to: 'in_progress', notes: 'Starting' },
+          metadata: { from: 'pending', to: 'in_progress', notes: 'Starting', refunded: false },
         }),
       );
     });
@@ -516,6 +524,146 @@ describe('SubmissionsService', () => {
       await expect(
         service.assignFieldAgent('nonexistent', 'ops-1', { fieldAgentId: 'fa-1' }),
       ).rejects.toThrow(NotFoundException);
+    });
+
+    it('should supersede a previous live assignment when reassigning', async () => {
+      mockPrismaService.submission.findUnique.mockResolvedValue(mockSubmission);
+      mockPrismaService.user.findUnique.mockResolvedValue(mockFieldAgent);
+      mockPrismaService.fieldAssignment.findMany.mockResolvedValue([
+        { id: 'assign-old', fieldAgentId: 'fa-old' },
+      ]);
+      mockPrismaService.fieldAssignment.create.mockResolvedValue(mockAssignment);
+      mockPrismaService.submission.update.mockResolvedValue({});
+
+      await service.assignFieldAgent('sub-1', 'ops-1', { fieldAgentId: 'fa-1' });
+
+      // Without this the old row stays 'assigned' forever: it keeps counting as
+      // the previous agent's active work and still lets them file a report.
+      expect(mockPrismaService.fieldAssignment.updateMany).toHaveBeenCalledWith({
+        where: { id: { in: ['assign-old'] } },
+        data: { status: 'superseded' },
+      });
+
+      // And the displaced agent is told, rather than the case silently vanishing.
+      expect(mockNotificationsService.emit).toHaveBeenCalledWith(
+        expect.objectContaining({ userId: 'fa-old', title: 'Assignment Reassigned' }),
+      );
+    });
+  });
+
+  // =============================================
+  // cancel + refunds
+  // =============================================
+  describe('cancel', () => {
+    const pendingSubmission = {
+      id: 'sub-1',
+      agentId: 'agent-1',
+      tenantName: 'John Doe',
+      status: 'pending',
+    };
+
+    it('should cancel a pending submission and refund the credit', async () => {
+      mockPrismaService.submission.findUnique.mockResolvedValue(pendingSubmission);
+      mockPrismaService.submission.update.mockResolvedValue({});
+      mockPrismaService.agentProfile.update.mockResolvedValue({});
+      mockPrismaService.transaction.create.mockResolvedValue({});
+
+      const result = await service.cancel('sub-1', 'agent-1');
+
+      expect(result).toEqual({ id: 'sub-1', status: 'cancelled', refunded: true });
+      expect(mockPrismaService.agentProfile.update).toHaveBeenCalledWith({
+        where: { userId: 'agent-1' },
+        data: { creditBalance: { increment: 1 } },
+      });
+      expect(mockPrismaService.transaction.create).toHaveBeenCalledWith(
+        expect.objectContaining({
+          data: expect.objectContaining({ type: 'refund', amount: 1, submissionId: 'sub-1' }),
+        }),
+      );
+    });
+
+    it('should not refund twice', async () => {
+      mockPrismaService.submission.findUnique.mockResolvedValue(pendingSubmission);
+      mockPrismaService.submission.update.mockResolvedValue({});
+      // A refund for this submission already exists.
+      mockPrismaService.transaction.findFirst.mockResolvedValue({ id: 'txn-refund' });
+
+      const result = await service.cancel('sub-1', 'agent-1');
+
+      expect(result.refunded).toBe(false);
+      expect(mockPrismaService.agentProfile.update).not.toHaveBeenCalled();
+      expect(mockPrismaService.transaction.create).not.toHaveBeenCalled();
+    });
+
+    it('should reject cancellation by an agent who does not own the submission', async () => {
+      mockPrismaService.submission.findUnique.mockResolvedValue(pendingSubmission);
+
+      await expect(service.cancel('sub-1', 'someone-else')).rejects.toThrow(ForbiddenException);
+    });
+
+    it('should reject cancellation once work has started', async () => {
+      mockPrismaService.submission.findUnique.mockResolvedValue({
+        ...pendingSubmission,
+        status: 'field_visit',
+      });
+
+      await expect(service.cancel('sub-1', 'agent-1')).rejects.toThrow(BadRequestException);
+    });
+
+    it('should release the field agent when a case is cancelled', async () => {
+      mockPrismaService.submission.findUnique.mockResolvedValue(pendingSubmission);
+      mockPrismaService.submission.update.mockResolvedValue({});
+      mockPrismaService.agentProfile.update.mockResolvedValue({});
+      mockPrismaService.transaction.create.mockResolvedValue({});
+
+      await service.cancel('sub-1', 'agent-1');
+
+      expect(mockPrismaService.fieldAssignment.updateMany).toHaveBeenCalledWith({
+        where: { submissionId: 'sub-1', status: { in: ['assigned', 'in_progress'] } },
+        data: { status: 'superseded' },
+      });
+    });
+  });
+
+  describe('updateStatus refunds', () => {
+    it('should refund the credit when ops rejects a submission', async () => {
+      mockPrismaService.submission.findUnique.mockResolvedValue({
+        id: 'sub-1',
+        agentId: 'agent-1',
+        tenantName: 'John Doe',
+        status: 'pending',
+      });
+      mockPrismaService.submission.update.mockResolvedValue({ status: 'rejected' });
+      mockPrismaService.agentProfile.update.mockResolvedValue({});
+      mockPrismaService.transaction.create.mockResolvedValue({});
+
+      await service.updateStatus('sub-1', 'ops-1', { status: 'rejected', notes: 'Bad address' });
+
+      expect(mockPrismaService.agentProfile.update).toHaveBeenCalledWith({
+        where: { userId: 'agent-1' },
+        data: { creditBalance: { increment: 1 } },
+      });
+
+      // The reason ops typed used to reach the audit log only.
+      expect(mockNotificationsService.emit).toHaveBeenCalledWith(
+        expect.objectContaining({
+          message: expect.stringContaining('Bad address'),
+        }),
+      );
+    });
+
+    it('should not refund on a normal forward transition', async () => {
+      mockPrismaService.submission.findUnique.mockResolvedValue({
+        id: 'sub-1',
+        agentId: 'agent-1',
+        tenantName: 'John Doe',
+        status: 'pending',
+      });
+      mockPrismaService.submission.update.mockResolvedValue({ status: 'in_progress' });
+
+      await service.updateStatus('sub-1', 'ops-1', { status: 'in_progress' });
+
+      expect(mockPrismaService.agentProfile.update).not.toHaveBeenCalled();
     });
   });
 });

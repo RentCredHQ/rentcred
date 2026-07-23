@@ -9,6 +9,7 @@ export const SUBMISSION_STATUSES = [
   'report_building',
   'completed',
   'rejected',
+  'cancelled',
 ] as const;
 
 export const SUBMISSION_STATUS_LABELS: Record<string, string> = {
@@ -18,6 +19,7 @@ export const SUBMISSION_STATUS_LABELS: Record<string, string> = {
   report_building: 'Building Report',
   completed: 'Completed',
   rejected: 'Rejected',
+  cancelled: 'Cancelled',
 };
 
 // ============================================

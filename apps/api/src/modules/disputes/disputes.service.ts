@@ -94,9 +94,17 @@ export class DisputesService {
 
     const where: any = {};
 
-    // Non-ops users only see disputes they raised
     if (!['ops', 'admin'].includes(options.role)) {
-      where.raisedById = options.userId;
+      if (options.role === 'agent') {
+        // An agent gets notified when a tenant disputes one of their cases, but
+        // the dispute itself never appeared in their list.
+        where.OR = [
+          { raisedById: options.userId },
+          { submission: { agentId: options.userId } },
+        ];
+      } else {
+        where.raisedById = options.userId;
+      }
     }
 
     if (options.status && options.status !== 'all') {

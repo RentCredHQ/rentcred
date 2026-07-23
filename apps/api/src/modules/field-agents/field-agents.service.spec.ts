@@ -7,6 +7,8 @@ import { FieldAgentsService } from './field-agents.service';
 import { PrismaService } from '../../prisma/prisma.service';
 import { NotificationsService } from '../notifications/notifications.service';
 import { AuditService } from '../audit/audit.service';
+import { VerificationService } from '../verification/verification.service';
+import { MailService } from '../mail/mail.service';
 
 describe('FieldAgentsService', () => {
   let service: FieldAgentsService;
@@ -47,6 +49,15 @@ describe('FieldAgentsService', () => {
     log: jest.fn(),
   };
 
+  // Submitting a visit report can complete the checklist, which finalizes it.
+  const mockVerificationService = {
+    finalizeIfComplete: jest.fn(),
+  };
+
+  const mockMailService = {
+    sendFieldAgentWelcome: jest.fn(),
+  };
+
   beforeEach(async () => {
     const module: TestingModule = await Test.createTestingModule({
       providers: [
@@ -62,6 +73,14 @@ describe('FieldAgentsService', () => {
         {
           provide: AuditService,
           useValue: mockAuditService,
+        },
+        {
+          provide: VerificationService,
+          useValue: mockVerificationService,
+        },
+        {
+          provide: MailService,
+          useValue: mockMailService,
         },
       ],
     }).compile();
@@ -89,7 +108,7 @@ describe('FieldAgentsService', () => {
         isVerified: true,
         createdAt: new Date(),
         assignments: [
-          { id: 'a-1', status: 'pending' },
+          { id: 'a-1', status: 'assigned' },
           { id: 'a-2', status: 'completed' },
           { id: 'a-3', status: 'in_progress' },
         ],
@@ -107,6 +126,26 @@ describe('FieldAgentsService', () => {
       expect(result.data[0].completedAssignments).toBe(1);
       expect(result.data[0].totalAssignments).toBe(3);
       expect(result.data[0].assignments).toBeUndefined();
+    });
+
+    it('should not count a superseded assignment as active work', async () => {
+      // Reassigning a case marks the previous agent's row superseded; it used
+      // to keep counting against them because anything not 'completed' counted.
+      mockPrismaService.user.findMany.mockResolvedValue([
+        {
+          ...mockAgents[0],
+          assignments: [
+            { id: 'a-1', status: 'assigned' },
+            { id: 'a-2', status: 'superseded' },
+          ],
+        },
+      ]);
+      mockPrismaService.user.count.mockResolvedValue(1);
+
+      const result = await service.findAll({ page: 1, limit: 20 });
+
+      expect(result.data[0].activeAssignments).toBe(1);
+      expect(result.data[0].totalAssignments).toBe(2);
       expect(result.pagination.total).toBe(1);
     });
 

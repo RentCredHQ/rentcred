@@ -8,6 +8,7 @@ export type NotificationType =
   | 'kyb_update'
   | 'dispute_update'
   | 'field_visit_completed'
+  | 'review_received'
   | 'credit_low'
   | 'system';
 

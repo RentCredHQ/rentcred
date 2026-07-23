@@ -7,6 +7,7 @@ import {
 import { PrismaService } from '../../prisma/prisma.service';
 import { normalizeEmail } from '../auth/auth.service';
 import { AuditService } from '../audit/audit.service';
+import { NotificationsService } from '../notifications/notifications.service';
 import { CreateReviewDto, UpdateReviewStatusDto } from './dto/review.dto';
 
 @Injectable()
@@ -14,6 +15,7 @@ export class ReviewsService {
   constructor(
     private readonly prisma: PrismaService,
     private readonly audit: AuditService,
+    private readonly notifications: NotificationsService,
   ) {}
 
   async create(tenantId: string, dto: CreateReviewDto) {
@@ -48,6 +50,17 @@ export class ReviewsService {
         propertyComment: dto.propertyComment,
         isAnonymous: dto.isAnonymous ?? false,
       },
+    });
+
+    // The agent being rated was never told a review existed.
+    await this.notifications.emit({
+      userId: submission.agentId,
+      type: 'review_received',
+      title: 'New Review Received',
+      message: dto.isAnonymous
+        ? `You received a ${dto.agentRating}-star review for a completed verification.`
+        : `${user.name} left you a ${dto.agentRating}-star review for ${submission.tenantName}'s verification.`,
+      data: { reviewId: review.id, submissionId: dto.submissionId },
     });
 
     await this.audit.log({

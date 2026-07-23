@@ -1,4 +1,9 @@
-import { Injectable, NotFoundException, ForbiddenException } from '@nestjs/common';
+import {
+  Injectable,
+  NotFoundException,
+  ForbiddenException,
+  BadRequestException,
+} from '@nestjs/common';
 import { PrismaService } from '../../prisma/prisma.service';
 
 @Injectable()
@@ -119,12 +124,44 @@ export class AgentsService {
 
     // Update agent profile fields
     if (data.companyName || data.companyAddress) {
-      await this.prisma.agentProfile.update({
+      const profile = await this.prisma.agentProfile.findUnique({
         where: { userId },
-        data: {
-          ...(data.companyName && { companyName: data.companyName }),
-          ...(data.companyAddress && { companyAddress: data.companyAddress }),
-        },
+        include: { kybApplication: { select: { id: true, status: true } } },
+      });
+      if (!profile) throw new NotFoundException('Agent profile not found');
+
+      const kyb = profile.kybApplication;
+
+      // companyName and rcNumber are stored on both the profile and the KYB
+      // application. Once ops has approved or is reviewing an application, the
+      // company it names is the one that was checked, so it must not drift.
+      if (
+        data.companyName &&
+        data.companyName !== profile.companyName &&
+        kyb &&
+        ['approved', 'under_review'].includes(kyb.status)
+      ) {
+        throw new BadRequestException(
+          'Company name cannot be changed while KYB is under review or approved. Contact support.',
+        );
+      }
+
+      await this.prisma.$transaction(async (tx) => {
+        await tx.agentProfile.update({
+          where: { userId },
+          data: {
+            ...(data.companyName && { companyName: data.companyName }),
+            ...(data.companyAddress && { companyAddress: data.companyAddress }),
+          },
+        });
+
+        // Keep the pending application's copy in step with the profile.
+        if (data.companyName && kyb && !['approved', 'under_review'].includes(kyb.status)) {
+          await tx.kybApplication.update({
+            where: { id: kyb.id },
+            data: { companyName: data.companyName },
+          });
+        }
       });
     }
 

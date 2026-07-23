@@ -94,42 +94,12 @@ export class VerificationService {
     if (dto.criminalCheckDone !== undefined) updateData.criminalCheckDone = dto.criminalCheckDone;
     if (dto.notes !== undefined) updateData.notes = dto.notes;
 
-    const updated = await this.prisma.verificationChecklist.update({
+    await this.prisma.verificationChecklist.update({
       where: { submissionId },
       data: updateData,
     });
 
-    // Check if all items are now complete
-    const allComplete =
-      updated.identityVerified &&
-      updated.employmentVerified &&
-      updated.referencesVerified &&
-      updated.addressVerified &&
-      updated.criminalCheckDone &&
-      updated.fieldVisitCompleted;
-
-    if (allComplete && !checklist.completedAt) {
-      // Mark checklist as completed
-      await this.prisma.verificationChecklist.update({
-        where: { submissionId },
-        data: { completedAt: new Date() },
-      });
-
-      // Move submission to report_building
-      await this.prisma.submission.update({
-        where: { id: submissionId },
-        data: { status: 'report_building' },
-      });
-
-      // Notify the agent
-      await this.notifications.emit({
-        userId: checklist.submission.agentId,
-        type: 'submission_update',
-        title: 'Verification Complete',
-        message: `All verification checks for ${checklist.submission.tenantName} are complete. Report is being built.`,
-        data: { submissionId },
-      });
-    }
+    await this.finalizeIfComplete(submissionId);
 
     await this.audit.log({
       userId,
@@ -141,5 +111,55 @@ export class VerificationService {
 
     // Return enriched checklist
     return this.getChecklist(submissionId);
+  }
+
+  /**
+   * Stamps completedAt and advances the submission once all six checks pass.
+   *
+   * This has to be callable from outside updateChecklist. The field agent's
+   * visit report flips fieldVisitCompleted directly, and previously nothing
+   * re-evaluated completion afterwards — so in the natural order (ops finishes
+   * its five checks while the case is still in field_visit, then the agent
+   * files their report) the checklist was never finalized and the case could
+   * never move on to report building.
+   */
+  async finalizeIfComplete(submissionId: string) {
+    const checklist = await this.prisma.verificationChecklist.findUnique({
+      where: { submissionId },
+      include: { submission: { select: { agentId: true, tenantName: true, status: true } } },
+    });
+
+    if (!checklist || checklist.completedAt) return;
+
+    const allComplete =
+      checklist.identityVerified &&
+      checklist.employmentVerified &&
+      checklist.referencesVerified &&
+      checklist.addressVerified &&
+      checklist.criminalCheckDone &&
+      checklist.fieldVisitCompleted;
+
+    if (!allComplete) return;
+
+    await this.prisma.verificationChecklist.update({
+      where: { submissionId },
+      data: { completedAt: new Date() },
+    });
+
+    // Cancelled and rejected cases stay where they are.
+    if (['pending', 'in_progress', 'field_visit'].includes(checklist.submission.status)) {
+      await this.prisma.submission.update({
+        where: { id: submissionId },
+        data: { status: 'report_building' },
+      });
+    }
+
+    await this.notifications.emit({
+      userId: checklist.submission.agentId,
+      type: 'submission_update',
+      title: 'Verification Complete',
+      message: `All verification checks for ${checklist.submission.tenantName} are complete. Report is being built.`,
+      data: { submissionId },
+    });
   }
 }

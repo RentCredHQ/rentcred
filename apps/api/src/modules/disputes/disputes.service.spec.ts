@@ -236,15 +236,32 @@ describe('DisputesService', () => {
       { id: 'd-2', status: 'resolved', raisedById: 'user-1' },
     ];
 
-    it('should filter by raisedById for non-ops users', async () => {
+    it('should scope an agent to disputes they raised or that concern their submissions', async () => {
       mockPrismaService.dispute.findMany.mockResolvedValue(mockDisputes);
       mockPrismaService.dispute.count.mockResolvedValue(2);
 
       await service.findAll({ userId: 'user-1', role: 'agent' });
 
+      // An agent is notified when a tenant disputes one of their cases, so the
+      // dispute has to be visible to them as well as to whoever raised it.
       expect(mockPrismaService.dispute.findMany).toHaveBeenCalledWith(
         expect.objectContaining({
-          where: expect.objectContaining({ raisedById: 'user-1' }),
+          where: expect.objectContaining({
+            OR: [{ raisedById: 'user-1' }, { submission: { agentId: 'user-1' } }],
+          }),
+        }),
+      );
+    });
+
+    it('should scope a tenant to disputes they raised', async () => {
+      mockPrismaService.dispute.findMany.mockResolvedValue(mockDisputes);
+      mockPrismaService.dispute.count.mockResolvedValue(2);
+
+      await service.findAll({ userId: 'tenant-1', role: 'tenant' });
+
+      expect(mockPrismaService.dispute.findMany).toHaveBeenCalledWith(
+        expect.objectContaining({
+          where: expect.objectContaining({ raisedById: 'tenant-1' }),
         }),
       );
     });

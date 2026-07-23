@@ -63,6 +63,14 @@ export class SubmissionsController {
     return this.submissionsService.updateStatus(id, req.user.sub, dto);
   }
 
+  @Patch(':id/cancel')
+  @UseGuards(RolesGuard)
+  @Roles('agent')
+  @ApiOperation({ summary: 'Cancel a pending submission and refund its credit (owning agent only)' })
+  cancel(@Param('id') id: string, @Request() req: any) {
+    return this.submissionsService.cancel(id, req.user.sub);
+  }
+
   @Post(':id/assign')
   @UseGuards(RolesGuard)
   @Roles('ops', 'admin')

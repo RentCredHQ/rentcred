@@ -198,8 +198,8 @@ describe('VerificationService', () => {
         .mockResolvedValueOnce({
           ...checklistWithVisit,
           criminalCheckDone: true,
-          completedAt: new Date(),
-          submission: { id: submissionId, tenantName: 'John Doe', status: 'report_building', agentId: 'agent-1' },
+          completedAt: null,
+          submission: { id: submissionId, tenantName: 'John Doe', status: 'field_visit', agentId: 'agent-1' },
         });
 
       mockPrismaService.verificationChecklist.update.mockResolvedValue({
@@ -232,7 +232,8 @@ describe('VerificationService', () => {
         .mockResolvedValueOnce({
           ...checklistWithVisit,
           criminalCheckDone: true,
-          submission: { id: submissionId, tenantName: 'John Doe', status: 'report_building', agentId: 'agent-1' },
+          completedAt: null,
+          submission: { id: submissionId, tenantName: 'John Doe', status: 'field_visit', agentId: 'agent-1' },
         });
 
       mockPrismaService.verificationChecklist.update.mockResolvedValue({
@@ -263,7 +264,8 @@ describe('VerificationService', () => {
         .mockResolvedValueOnce({
           ...checklistWithVisit,
           criminalCheckDone: true,
-          submission: { id: submissionId, tenantName: 'John Doe', status: 'report_building', agentId: 'agent-1' },
+          completedAt: null,
+          submission: { id: submissionId, tenantName: 'John Doe', status: 'field_visit', agentId: 'agent-1' },
         });
 
       mockPrismaService.verificationChecklist.update.mockResolvedValue({
@@ -346,6 +348,65 @@ describe('VerificationService', () => {
         entityId: 'cl-1',
         metadata: { identityVerified: true },
       });
+    });
+
+    // Regression: the field agent's visit report flips fieldVisitCompleted
+    // directly. Nothing used to re-evaluate completion afterwards, so when ops
+    // finished its five checks first (the natural order, while the case is
+    // still in field_visit) the checklist was never finalized and the case
+    // could never reach report_building.
+    it('finalizes when the field visit was the last outstanding item', async () => {
+      mockPrismaService.verificationChecklist.findUnique.mockResolvedValue({
+        ...baseChecklist,
+        fieldVisitCompleted: true,
+        completedAt: null,
+        submission: {
+          id: submissionId,
+          agentId: 'agent-1',
+          tenantName: 'John Doe',
+          status: 'field_visit',
+        },
+      });
+      mockPrismaService.verificationChecklist.update.mockResolvedValue({});
+      mockPrismaService.submission.update.mockResolvedValue({});
+
+      await service.finalizeIfComplete(submissionId);
+
+      expect(mockPrismaService.verificationChecklist.update).toHaveBeenCalledWith({
+        where: { submissionId },
+        data: { completedAt: expect.any(Date) },
+      });
+      expect(mockPrismaService.submission.update).toHaveBeenCalledWith({
+        where: { id: submissionId },
+        data: { status: 'report_building' },
+      });
+    });
+
+    it('does nothing when items are still outstanding', async () => {
+      mockPrismaService.verificationChecklist.findUnique.mockResolvedValue({
+        ...baseChecklist,
+        fieldVisitCompleted: false,
+        completedAt: null,
+        submission: { id: submissionId, agentId: 'agent-1', tenantName: 'John', status: 'field_visit' },
+      });
+
+      await service.finalizeIfComplete(submissionId);
+
+      expect(mockPrismaService.verificationChecklist.update).not.toHaveBeenCalled();
+      expect(mockPrismaService.submission.update).not.toHaveBeenCalled();
+    });
+
+    it('is idempotent once already finalized', async () => {
+      mockPrismaService.verificationChecklist.findUnique.mockResolvedValue({
+        ...baseChecklist,
+        fieldVisitCompleted: true,
+        completedAt: new Date(),
+        submission: { id: submissionId, agentId: 'agent-1', tenantName: 'John', status: 'report_building' },
+      });
+
+      await service.finalizeIfComplete(submissionId);
+
+      expect(mockPrismaService.verificationChecklist.update).not.toHaveBeenCalled();
     });
 
     it('should throw NotFoundException when checklist not found for update', async () => {

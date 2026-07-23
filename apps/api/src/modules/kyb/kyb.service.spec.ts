@@ -131,6 +131,52 @@ describe('KybService', () => {
       });
     });
 
+    // Regression: the settings page has always offered "Submit New
+    // Application" after a rejection, but the row is unique per agent so this
+    // threw unconditionally — a rejected agent could never reapply without
+    // direct database access.
+    it('should allow resubmission after a rejection', async () => {
+      mockPrismaService.agentProfile.findUnique.mockResolvedValue({
+        ...mockProfile,
+        kybApplication: { id: 'kyb-existing', status: 'rejected' },
+      });
+      mockPrismaService.kybApplication.update.mockResolvedValue({
+        id: 'kyb-existing',
+        status: 'pending',
+      });
+      mockPrismaService.agentProfile.update.mockResolvedValue({});
+
+      const result = await service.applyForKyb(userId, dto);
+
+      expect(result).toMatchObject({ id: 'kyb-existing', status: 'pending' });
+      expect(mockPrismaService.kybApplication.create).not.toHaveBeenCalled();
+      expect(mockPrismaService.kybApplication.update).toHaveBeenCalledWith({
+        where: { id: 'kyb-existing' },
+        // The previous decision is cleared so ops sees a fresh case.
+        data: expect.objectContaining({
+          status: 'pending',
+          reviewNotes: null,
+          reviewedBy: null,
+        }),
+      });
+      // And the profile gate is reopened, or submissions stay blocked.
+      expect(mockPrismaService.agentProfile.update).toHaveBeenCalledWith(
+        expect.objectContaining({ data: expect.objectContaining({ kybStatus: 'submitted' }) }),
+      );
+    });
+
+    it.each(['pending', 'under_review', 'approved'])(
+      'should still refuse a second application while status is %s',
+      async (status) => {
+        mockPrismaService.agentProfile.findUnique.mockResolvedValue({
+          ...mockProfile,
+          kybApplication: { id: 'kyb-existing', status },
+        });
+
+        await expect(service.applyForKyb(userId, dto)).rejects.toThrow(BadRequestException);
+      },
+    );
+
     it('should throw BadRequestException when application already exists', async () => {
       const profileWithApp = {
         ...mockProfile,

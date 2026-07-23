@@ -3,6 +3,7 @@ import {
   UnauthorizedException,
   ConflictException,
   BadRequestException,
+  NotFoundException,
 } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import * as bcrypt from 'bcrypt';
@@ -11,6 +12,8 @@ import { PrismaService } from '../../prisma/prisma.service';
 import { MailService } from '../mail/mail.service';
 import { RegisterDto } from './dto/register.dto';
 import { LoginDto } from './dto/login.dto';
+import { ChangePasswordDto } from './dto/change-password.dto';
+import { UpdateMeDto } from './dto/update-me.dto';
 
 const BCRYPT_ROUNDS = 12;
 const EMAIL_VERIFY_EXPIRY_MS = 24 * 60 * 60 * 1000; // 24 hours
@@ -162,6 +165,74 @@ export class AuthService {
         companyName: agentProfile.companyName,
       } : {}),
     };
+  }
+
+  /**
+   * Update the fields every role has. The settings and field-agent profile
+   * pages have been calling PATCH /auth/me since before it existed.
+   */
+  async updateMe(userId: string, dto: UpdateMeDto) {
+    const data: Record<string, unknown> = {};
+    if (dto.name !== undefined) data.name = dto.name;
+    if (dto.phone !== undefined) data.phone = dto.phone;
+    if (dto.avatarUrl !== undefined) data.avatarUrl = dto.avatarUrl;
+
+    if (Object.keys(data).length) {
+      await this.prisma.user.update({ where: { id: userId }, data });
+    }
+
+    // Same shape as GET /auth/me so callers can swap the response straight in.
+    return this.getProfile(userId);
+  }
+
+  async changePassword(userId: string, dto: ChangePasswordDto) {
+    const user = await this.prisma.user.findUnique({ where: { id: userId } });
+    if (!user) throw new NotFoundException('User not found');
+
+    const matches = await bcrypt.compare(dto.currentPassword, user.passwordHash);
+    if (!matches) {
+      throw new UnauthorizedException('Current password is incorrect');
+    }
+
+    if (dto.currentPassword === dto.newPassword) {
+      throw new BadRequestException('New password must be different from the current one');
+    }
+
+    await this.prisma.user.update({
+      where: { id: userId },
+      data: {
+        passwordHash: await bcrypt.hash(dto.newPassword, BCRYPT_ROUNDS),
+        // Any outstanding reset link is void once the password changes.
+        resetToken: null,
+        resetTokenExpires: null,
+      },
+    });
+
+    return { message: 'Password changed successfully' };
+  }
+
+  /**
+   * Re-issue a verification email. Always reports success so this cannot be
+   * used to discover which addresses have accounts.
+   */
+  async resendVerification(email: string) {
+    const response = { message: 'If the email exists and is unverified, a new link has been sent' };
+
+    const user = await this.prisma.user.findUnique({ where: { email: normalizeEmail(email) } });
+    if (!user || user.isVerified) return response;
+
+    const token = randomUUID();
+    await this.prisma.user.update({
+      where: { id: user.id },
+      data: {
+        emailVerifyToken: hashToken(token),
+        emailVerifyExpires: new Date(Date.now() + EMAIL_VERIFY_EXPIRY_MS),
+      },
+    });
+
+    this.mailService.sendEmailVerification(user.email, user.name, token);
+
+    return response;
   }
 
   async verifyEmail(token: string) {

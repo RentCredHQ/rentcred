@@ -4,10 +4,26 @@ import {
   ForbiddenException,
   BadRequestException,
 } from '@nestjs/common';
+import * as bcrypt from 'bcrypt';
+import { randomBytes } from 'crypto';
 import { PrismaService } from '../../prisma/prisma.service';
 import { NotificationsService } from '../notifications/notifications.service';
 import { AuditService } from '../audit/audit.service';
-import { SubmitVisitDto, UpdateAssignmentStatusDto } from './dto/field-agent.dto';
+import { VerificationService } from '../verification/verification.service';
+import { MailService } from '../mail/mail.service';
+import {
+  SubmitVisitDto,
+  UpdateAssignmentStatusDto,
+  CreateFieldAgentDto,
+} from './dto/field-agent.dto';
+
+const BCRYPT_ROUNDS = 12;
+
+/** Random initial password, emailed to the agent and never returned by the API. */
+function generateTempPassword(): string {
+  // Guarantees one of each required character class alongside the random part.
+  return `Rc${randomBytes(9).toString('base64url').replace(/[^a-zA-Z0-9]/g, 'x')}9!`;
+}
 
 @Injectable()
 export class FieldAgentsService {
@@ -15,6 +31,8 @@ export class FieldAgentsService {
     private readonly prisma: PrismaService,
     private readonly notifications: NotificationsService,
     private readonly audit: AuditService,
+    private readonly verification: VerificationService,
+    private readonly mail: MailService,
   ) {}
 
   /**
@@ -60,7 +78,7 @@ export class FieldAgentsService {
     // Enrich with stats
     const data = agents.map((agent) => ({
       ...agent,
-      activeAssignments: agent.assignments.filter((a) => a.status !== 'completed').length,
+      activeAssignments: agent.assignments.filter((a) => a.status === 'assigned' || a.status === 'in_progress').length,
       completedAssignments: agent.assignments.filter((a) => a.status === 'completed').length,
       totalAssignments: agent.assignments.length,
       assignments: undefined,
@@ -70,6 +88,74 @@ export class FieldAgentsService {
       data,
       pagination: { page: safePage, limit: safeLimit, total, totalPages: Math.ceil(total / safeLimit) },
     };
+  }
+
+  /**
+   * Create a field agent account. Ops has had an "Add Field Agent" form since
+   * before there was an endpoint behind it. The temporary password is emailed
+   * rather than returned, so it never lands in a browser history or log.
+   */
+  async create(createdBy: string, dto: CreateFieldAgentDto) {
+    const email = dto.email.toLowerCase().trim();
+
+    const existing = await this.prisma.user.findUnique({ where: { email } });
+    if (existing) throw new BadRequestException('A user with that email already exists');
+
+    const tempPassword = generateTempPassword();
+
+    const user = await this.prisma.user.create({
+      data: {
+        name: dto.name,
+        email,
+        phone: dto.phone,
+        role: 'field_agent',
+        passwordHash: await bcrypt.hash(tempPassword, BCRYPT_ROUNDS),
+        // Ops vouches for the address by entering it, and field agents have no
+        // self-service signup to verify through.
+        isVerified: true,
+      },
+      select: { id: true, name: true, email: true, phone: true, role: true, isActive: true },
+    });
+
+    this.mail.sendFieldAgentWelcome(user.email, user.name, tempPassword);
+
+    await this.audit.log({
+      userId: createdBy,
+      action: 'field_agent_created',
+      entityType: 'user',
+      entityId: user.id,
+      metadata: { email: user.email },
+    });
+
+    return user;
+  }
+
+  /**
+   * Suspend or reactivate a field agent. JwtStrategy re-reads isActive on every
+   * request, so suspension takes effect immediately rather than when their
+   * 7-day token happens to expire.
+   */
+  async setActive(id: string, actorId: string, isActive: boolean) {
+    const agent = await this.prisma.user.findUnique({ where: { id } });
+    if (!agent) throw new NotFoundException('Field agent not found');
+    if (agent.role !== 'field_agent') {
+      throw new BadRequestException('This endpoint only manages field agents');
+    }
+
+    const updated = await this.prisma.user.update({
+      where: { id },
+      data: { isActive },
+      select: { id: true, name: true, email: true, isActive: true },
+    });
+
+    await this.audit.log({
+      userId: actorId,
+      action: isActive ? 'field_agent_reactivated' : 'field_agent_suspended',
+      entityType: 'user',
+      entityId: id,
+    });
+
+    return updated;
   }
 
   /**
@@ -101,7 +187,9 @@ export class FieldAgentsService {
     if (!agent) throw new NotFoundException('Field agent not found');
 
     const [active, completed, total] = await Promise.all([
-      this.prisma.fieldAssignment.count({ where: { fieldAgentId: id, status: { not: 'completed' } } }),
+      this.prisma.fieldAssignment.count({
+        where: { fieldAgentId: id, status: { in: ['assigned', 'in_progress'] } },
+      }),
       this.prisma.fieldAssignment.count({ where: { fieldAgentId: id, status: 'completed' } }),
       this.prisma.fieldAssignment.count({ where: { fieldAgentId: id } }),
     ]);
@@ -190,9 +278,14 @@ export class FieldAgentsService {
    * Submit a field visit report.
    */
   async submitVisitReport(fieldAgentId: string, dto: SubmitVisitDto) {
-    // Verify the field agent is assigned to this submission
+    // Must hold a live assignment — a superseded one means this case was
+    // reassigned to someone else and is no longer theirs to report on.
     const assignment = await this.prisma.fieldAssignment.findFirst({
-      where: { submissionId: dto.submissionId, fieldAgentId },
+      where: {
+        submissionId: dto.submissionId,
+        fieldAgentId,
+        status: { in: ['assigned', 'in_progress'] },
+      },
     });
 
     if (!assignment) {
@@ -219,24 +312,33 @@ export class FieldAgentsService {
       data: { fieldVisitCompleted: true },
     });
 
+    // This may have been the last outstanding check, in which case the
+    // checklist needs finalizing and the case needs to advance.
+    await this.verification.finalizeIfComplete(dto.submissionId);
+
     // Complete the assignment
     await this.prisma.fieldAssignment.update({
       where: { id: assignment.id },
       data: { status: 'completed', completedAt: new Date() },
     });
 
-    // Notify ops about the completed visit
     const submission = await this.prisma.submission.findUnique({
       where: { id: dto.submissionId },
       select: { agentId: true, tenantName: true, assignedOpsId: true },
     });
 
-    if (submission?.agentId) {
+    // Notify the submitting agent, and the ops owner when the case has one —
+    // this previously said it notified ops but only ever told the agent.
+    const recipients = new Set<string>();
+    if (submission?.agentId) recipients.add(submission.agentId);
+    if (submission?.assignedOpsId) recipients.add(submission.assignedOpsId);
+
+    for (const userId of recipients) {
       await this.notifications.emit({
-        userId: submission.agentId,
+        userId,
         type: 'field_visit_completed',
         title: 'Field Visit Completed',
-        message: `Field visit for ${submission.tenantName} has been completed.`,
+        message: `Field visit for ${submission!.tenantName} has been completed.`,
         data: { submissionId: dto.submissionId, visitId: visit.id },
       });
     }

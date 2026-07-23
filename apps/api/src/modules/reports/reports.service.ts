@@ -33,13 +33,28 @@ export class ReportsService {
     });
 
     if (!submission) throw new NotFoundException('Submission not found');
-    if (submission.report) {
+
+    // A rejected report can be regenerated in place; anything else means a
+    // report already exists. Previously a rejected report was a dead end —
+    // review() refused to touch it again and generate() refused to replace it,
+    // stranding the submission in report_building forever.
+    const existing = submission.report;
+    if (existing && existing.status !== 'rejected') {
       throw new BadRequestException('Report already exists for this submission');
     }
 
     // Compile report content from verification data
     const checklist = submission.verificationChecklist;
     const latestVisit = submission.fieldVisits[0];
+
+    // Nothing previously stopped a report being generated — and approved,
+    // which force-completes the submission — before the field visit had even
+    // happened.
+    if (!checklist?.fieldVisitCompleted || !checklist?.completedAt) {
+      throw new BadRequestException(
+        'Verification is not complete: the field visit and all checklist items must be finished first.',
+      );
+    }
 
     const content = {
       tenant: {
@@ -88,17 +103,18 @@ export class ReportsService {
       generatedAt: new Date().toISOString(),
     };
 
-    const report = await this.prisma.report.create({
-      data: {
-        submissionId,
-        content,
-        status: 'draft',
-      },
-    });
+    const report = existing
+      ? await this.prisma.report.update({
+          where: { id: existing.id },
+          data: { content, status: 'draft', approvedBy: null, approvedAt: null },
+        })
+      : await this.prisma.report.create({
+          data: { submissionId, content, status: 'draft' },
+        });
 
     await this.audit.log({
       userId,
-      action: 'report_generated',
+      action: existing ? 'report_regenerated' : 'report_generated',
       entityType: 'report',
       entityId: report.id,
       metadata: { submissionId },
@@ -209,7 +225,7 @@ export class ReportsService {
   async review(id: string, reviewerId: string, dto: ReviewReportDto) {
     const report = await this.prisma.report.findUnique({
       where: { id },
-      include: { submission: { select: { agentId: true, tenantName: true } } },
+      include: { submission: { select: { agentId: true, tenantName: true, tenantEmail: true } } },
     });
 
     if (!report) throw new NotFoundException('Report not found');
@@ -253,6 +269,25 @@ export class ReportsService {
           : `The report for ${report.submission.tenantName} needs revision. ${dto.notes || ''}`,
       data: { reportId: id, status: dto.status },
     });
+
+    // The ops UI already tells the operator "agent and tenant notified", but
+    // only the agent ever was.
+    if (dto.status === 'approved' && report.submission.tenantEmail) {
+      const tenant = await this.prisma.user.findFirst({
+        where: { email: report.submission.tenantEmail.toLowerCase().trim(), role: 'tenant' },
+        select: { id: true },
+      });
+
+      if (tenant) {
+        await this.notifications.emit({
+          userId: tenant.id,
+          type: 'report_ready',
+          title: 'Your Verification Report Is Ready',
+          message: 'Your tenant verification report has been approved and is now available to view.',
+          data: { reportId: id },
+        });
+      }
+    }
 
     await this.audit.log({
       userId: reviewerId,
