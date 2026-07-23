@@ -40,12 +40,50 @@ jobs:
       - name: Generate Prisma client
         run: cd apps/api && npx prisma generate
 
+      # Unit tests mock Prisma, so a type error the mocks happen to route
+      # around would otherwise reach main unnoticed.
+      - name: Typecheck API
+        run: cd apps/api && npx tsc --noEmit -p tsconfig.json
+
       - name: Run API tests
         run: cd apps/api && npm test
         env:
           DATABASE_URL: postgresql://test:test@localhost:5432/rentcred_test
           JWT_SECRET: ci-test-secret-that-is-at-least-32-characters-long
           NODE_ENV: test
+
+      # Proves the committed migrations actually build the schema from empty —
+      # the deploy path, which previously applied nothing at all.
+      - name: Verify migrations apply to an empty database
+        run: cd apps/api && npx prisma migrate deploy
+        env:
+          DATABASE_URL: postgresql://test:test@localhost:5432/rentcred_test
+
+      - name: Check schema matches migrations
+        run: cd apps/api && npx prisma migrate status
+        env:
+          DATABASE_URL: postgresql://test:test@localhost:5432/rentcred_test
+
+  lint:
+    name: Lint
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Generate Prisma client
+        run: cd apps/api && npx prisma generate
+
+      - name: Lint
+        run: npx turbo lint
 
   build-web:
     name: Frontend Build

@@ -131,7 +131,7 @@ rentcred/
 │   │       │   ├── verification/   # Verification checklist
 │   │       │   ├── notifications/  # In-app notifications
 │   │       │   ├── audit/          # Audit log
-│   │       │   ├── upload/         # AWS S3 presigned URLs
+│   │       │   ├── upload/         # Cloudflare R2 presigned URLs
 │   │       │   └── agents/         # Agent profile & stats
 │   │       └── common/
 │   │           ├── guards/         # JwtAuthGuard, RolesGuard
@@ -179,7 +179,7 @@ Full permissions matrix: [docs/ROLES_AND_PERMISSIONS.md](./docs/ROLES_AND_PERMIS
 ### Tenant Verification Workflow
 - **4-step submission form**: Tenant info → Property description → Package selection → Review
 - Property types: Self-Contained, Mini Flat, 2-Bedroom, 3-Bedroom, Duplex, Detached House, Penthouse, Shop/Office Space
-- Nigerian state/LGA dropdowns, property image upload (up to 5 photos via AWS S3)
+- Nigerian state/LGA dropdowns, property image upload (up to 5 photos via Cloudflare R2)
 - Credit deduction on submission (1 credit per case)
 
 ### KYB (Know Your Business)
@@ -233,7 +233,7 @@ Full permissions matrix: [docs/ROLES_AND_PERMISSIONS.md](./docs/ROLES_AND_PERMIS
 | Passport + JWT | Authentication |
 | Zod | Request validation (shared schemas) |
 | Paystack | Payment processing |
-| AWS S3 | File/image storage |
+| Cloudflare R2 | File/image storage (S3-compatible) |
 | Resend | Transactional email |
 | Swagger | Auto-generated API docs |
 | Jest 29 | Unit testing |

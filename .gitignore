@@ -42,4 +42,5 @@ coverage/
 
 # Misc
 *.tgz
+*.zip
 .cache/

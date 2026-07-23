@@ -30,7 +30,9 @@ async function onReviewSubmitted() {
   try {
     const result = await getMyReviews()
     reviews.value = result.data || []
-  } catch {}
+  } catch {
+    // Leave the existing list in place if the refresh fails.
+  }
 }
 
 onMounted(async () => {

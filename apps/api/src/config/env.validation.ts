@@ -46,12 +46,6 @@ const envSchema = z
     REDIS_PORT: z.string().optional().default('6379'),
     REDIS_PASSWORD: z.string().optional(),
 
-    // SMS Provider (Optional)
-    SMS_PROVIDER_API_KEY: z.string().optional(),
-    SMS_PROVIDER_SENDER_ID: z.string().optional(),
-    TERMII_API_KEY: z.string().optional(),
-    TERMII_SENDER_ID: z.string().optional(),
-
     // Rate Limiting
     THROTTLE_TTL: z.string().optional().default('60'),
     THROTTLE_LIMIT: z.string().optional().default('100'),
