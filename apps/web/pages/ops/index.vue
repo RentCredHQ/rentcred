@@ -19,21 +19,22 @@ onMounted(async () => {
     const s = dashStats
     stats.value = [
       { label: 'Total Cases', value: s.totalCases ?? 0, icon: 'folder', change: '' },
-      { label: 'Pending Verification', value: s.pendingVerifications ?? 0, icon: 'pending_actions', color: 'text-[#FF8400]' },
-      { label: 'Field Visits Today', value: s.fieldVisitsToday ?? 0, icon: 'location_on', color: 'text-blue-600' },
-      { label: 'Reports Ready', value: s.reportsReady ?? 0, icon: 'rate_review', color: 'text-green-600' },
-      { label: 'In Progress', value: s.inProgress ?? 0, icon: 'groups', color: 'text-blue-600' },
-      { label: 'Completed This Week', value: s.completedThisWeek ?? 0, icon: 'verified_user', color: 'text-green-600' },
+      { label: 'Pending Verification', value: s.pendingVerifications ?? 0, icon: 'pending_actions', color: 'text-primary' },
+      { label: 'Field Visits Today', value: s.fieldVisitsToday ?? 0, icon: 'location_on', color: 'text-st-blue-text' },
+      { label: 'Reports Ready', value: s.reportsReady ?? 0, icon: 'rate_review', color: 'text-st-green-text' },
+      { label: 'In Progress', value: s.inProgress ?? 0, icon: 'groups', color: 'text-st-blue-text' },
+      { label: 'Completed This Week', value: s.completedThisWeek ?? 0, icon: 'verified_user', color: 'text-st-green-text' },
     ]
 
     const cases = (Array.isArray(casesRes) ? casesRes : casesRes?.data ?? []) as any[]
     const statusColorMap: Record<string, string> = {
-      pending: 'bg-amber-50 text-amber-600',
-      in_progress: 'bg-blue-50 text-blue-600',
-      field_visit: 'bg-amber-50 text-amber-600',
-      report_building: 'bg-purple-50 text-purple-600',
-      completed: 'bg-green-50 text-green-600',
-      rejected: 'bg-red-50 text-red-600',
+      pending: 'bg-st-amber-bg text-st-amber-text',
+      in_progress: 'bg-st-blue-bg text-st-blue-text',
+      field_visit: 'bg-st-amber-bg text-st-amber-text',
+      report_building: 'bg-st-amber-bg text-st-amber-text',
+      completed: 'bg-st-green-bg text-st-green-text',
+      rejected: 'bg-st-red-bg text-st-red-text',
+      cancelled: 'bg-st-neutral-bg text-st-neutral-text',
     }
     recentCases.value = cases.map((c: any) => ({
       id: c.id,

@@ -6,17 +6,24 @@ function close() {
   emit('update:modelValue', false)
 }
 
-const notifications = ref([
-  { id: 1, title: 'New KYB application', desc: 'Nwosu Properties Ltd submitted a KYB application for review.', time: '5 minutes ago', read: false, dot: 'bg-primary' },
-  { id: 2, title: 'Case escalated', desc: 'Case RC-1037 has been escalated due to overdue field visit.', time: '30 minutes ago', read: false, dot: 'bg-st-red-text' },
-  { id: 3, title: 'Report submitted', desc: 'Chidi Nwosu submitted verification report RPT-0089 for review.', time: '1 hour ago', read: false, dot: 'bg-st-green-text' },
-  { id: 4, title: 'Agent suspended', desc: 'Tunde Bakare has been automatically suspended after 3 failed checks.', time: '3 hours ago', read: true, dot: 'bg-st-amber-text' },
-  { id: 5, title: 'Payment processed', desc: 'Commission payment of ₦45,000 to Premier Realty completed.', time: '5 hours ago', read: true, dot: 'bg-st-green-text' },
-])
+const { notifications, loading, loaded, errored, unreadCount, load, handleRead, handleMarkAllRead } =
+  useNotificationFeed('/ops')
 
-function markAllRead() {
-  notifications.value.forEach(n => n.read = true)
+watch(() => props.modelValue, (open: boolean) => {
+  // The layout loads these for the unread badge; refresh on open so the list
+  // reflects anything that happened since.
+  if (open && (!loaded.value || !loading.value)) load()
+})
+
+async function openNotification(n: { id: string; link: string | null }) {
+  await handleRead(n.id)
+  if (n.link) {
+    close()
+    navigateTo(n.link)
+  }
 }
+
+defineExpose({ unreadCount })
 </script>
 
 <template>
@@ -25,26 +32,50 @@ function markAllRead() {
       <div class="fixed inset-0 z-[-1]" @click="close" />
 
       <div class="flex items-center justify-between px-4 py-3 border-b border-border">
-        <span class="font-mono text-sm font-semibold text-foreground">Notifications</span>
-        <button @click="markAllRead" class="text-[12px] font-sans text-primary hover:underline">Mark all read</button>
+        <span class="font-mono text-sm font-semibold text-foreground">
+          Notifications<template v-if="unreadCount"> ({{ unreadCount }})</template>
+        </span>
+        <button
+          v-if="unreadCount"
+          @click="handleMarkAllRead"
+          class="text-[12px] font-sans text-primary hover:underline"
+        >
+          Mark all read
+        </button>
       </div>
 
       <div class="max-h-[400px] overflow-y-auto">
-        <div
+        <div v-if="loading && !notifications.length" class="px-4 py-8 flex justify-center">
+          <span class="material-symbols-rounded text-[22px] text-muted-foreground animate-spin">progress_activity</span>
+        </div>
+
+        <div v-else-if="errored" class="px-4 py-8 flex flex-col items-center gap-2">
+          <span class="text-[13px] font-sans text-muted-foreground">Couldn't load notifications.</span>
+          <button @click="load" class="text-[12px] font-sans text-primary hover:underline">Try again</button>
+        </div>
+
+        <div v-else-if="!notifications.length" class="px-4 py-8 flex flex-col items-center gap-1">
+          <span class="material-symbols-rounded text-[24px] text-muted-foreground">notifications_off</span>
+          <span class="text-[13px] font-sans text-muted-foreground">No notifications yet</span>
+        </div>
+
+        <button
           v-for="n in notifications"
           :key="n.id"
-          class="flex gap-3 px-4 py-3 border-b border-border last:border-0 cursor-pointer transition-colors"
+          type="button"
+          class="flex gap-3 px-4 py-3 border-b border-border last:border-0 cursor-pointer transition-colors text-left w-full"
           :class="n.read ? 'hover:bg-surface/30' : 'bg-[#FF84000A] hover:bg-[#FF840012]'"
+          @click="openNotification(n)"
         >
           <div class="flex-shrink-0 mt-1.5">
             <div class="w-2 h-2 rounded-full" :class="n.dot" />
           </div>
           <div class="flex-1 min-w-0">
             <span class="text-[13px] font-sans block" :class="n.read ? 'text-foreground' : 'text-foreground font-semibold'">{{ n.title }}</span>
-            <span class="text-[12px] font-sans text-muted-foreground block mt-0.5 line-clamp-2">{{ n.desc }}</span>
+            <span class="text-[12px] font-sans text-muted-foreground block mt-0.5 line-clamp-2">{{ n.message }}</span>
             <span class="text-[11px] font-sans text-muted-foreground mt-1 block">{{ n.time }}</span>
           </div>
-        </div>
+        </button>
       </div>
     </div>
   </Transition>

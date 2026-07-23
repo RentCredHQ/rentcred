@@ -29,14 +29,14 @@ const kpis = computed(() => {
     { label: 'TOTAL DISPUTES', value: String(pagination.value.total || all.length), valueColor: 'text-foreground' },
     { label: 'OPEN', value: String(open), valueColor: 'text-st-amber-text' },
     { label: 'RESOLVED', value: String(resolved), valueColor: 'text-st-green-text' },
-    { label: 'UNDER REVIEW', value: String(all.filter(d => d.status === 'under_review').length), valueColor: 'text-blue-600' },
+    { label: 'UNDER REVIEW', value: String(all.filter(d => d.status === 'under_review').length), valueColor: 'text-st-blue-text' },
   ]
 })
 
 function statusBadgeClasses(status: string) {
   switch (status) {
     case 'resolved': case 'closed': return 'bg-st-green-bg text-st-green-text'
-    case 'under_review': return 'bg-blue-50 text-blue-600'
+    case 'under_review': return 'bg-st-blue-bg text-st-blue-text'
     default: return 'bg-st-amber-bg text-st-amber-text'
   }
 }

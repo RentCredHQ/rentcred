@@ -49,7 +49,7 @@ function statusLabel(status: string) {
 function statusClasses(status: string) {
   if (status === 'completed') return 'bg-st-green-bg text-st-green-text'
   if (status === 'in_progress') return 'bg-st-amber-bg text-st-amber-text'
-  return 'bg-blue-50 text-blue-600'
+  return 'bg-st-blue-bg text-st-blue-text'
 }
 </script>
 

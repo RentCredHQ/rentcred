@@ -108,7 +108,7 @@ async function handleAssign() {
                 <span class="font-sans text-[12px] text-foreground">Currently assigned to: {{ caseInfo.currentAgent }}</span>
               </div>
               <div v-else class="flex items-center gap-2">
-                <div class="w-2 h-2 rounded-full bg-blue-500" />
+                <div class="w-2 h-2 rounded-full bg-st-blue-text" />
                 <span class="font-sans text-[12px] text-muted-foreground">No field agent assigned yet</span>
               </div>
             </div>

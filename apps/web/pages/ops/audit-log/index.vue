@@ -15,14 +15,62 @@ const dateOptions = [
   { label: 'Last 90 Days', value: '90d' },
 ]
 
-const entries = ref([
-  { time: '14 Mar, 09:41 AM', user: 'Adebayo Ogunsade', action: 'Approved KYB Application', target: 'Darent Realty Ltd.', ip: '102.89.34.102', status: 'Success' },
-  { time: '14 Mar, 09:28 AM', user: 'Funke Adebayo', action: 'Assigned Field Agent', target: 'Case RC-1041', ip: '+1 (205) 432-6811', status: 'Success' },
-  { time: '14 Mar, 08:55 AM', user: 'Chidi Nwosu', action: 'Generated Report', target: 'Tenant: Amina Eze', ip: '102.215.67.89', status: 'Success' },
-  { time: '13 Mar, 06:17 PM', user: 'System', action: 'Login Failed (3 attempts)', target: 'admin@rentcred.ng', ip: '41.203.76.44', status: 'Warning' },
-  { time: '13 Mar, 04:42 PM', user: 'Ngozi Onuoha', action: 'Rejected Tenant Report', target: 'RPT-0086', ip: '197.210.53.106', status: 'Success' },
-  { time: '13 Mar, 02:10 PM', user: 'Emeka Udom', action: 'Updated Agent Permissions', target: 'Agent: Tunde Bakare', ip: '+1 (555) 671-8910', status: 'Success' },
-])
+const { getAuditLogs } = useAuditLog()
+
+const entries = ref<any[]>([])
+const loading = ref(true)
+const errored = ref(false)
+const page = ref(1)
+const totalEntries = ref(0)
+const PAGE_SIZE = 20
+
+/** "report_approved" → "Report Approved" */
+function humanizeAction(action: string) {
+  return String(action || '')
+    .replace(/_/g, ' ')
+    .replace(/\b\w/g, (c) => c.toUpperCase())
+}
+
+/** Actions that record something going wrong read as warnings. */
+function statusFor(action: string) {
+  return /fail|reject|mismatch|suspend|denied|error/i.test(action || '') ? 'Warning' : 'Success'
+}
+
+async function fetchEntries() {
+  loading.value = true
+  errored.value = false
+  try {
+    const res: any = await getAuditLogs({ page: page.value, limit: PAGE_SIZE })
+    entries.value = (res.data ?? res.events ?? []).map((e: any) => ({
+      time: e.createdAt
+        ? new Date(e.createdAt).toLocaleString('en-NG', {
+            day: 'numeric', month: 'short', hour: '2-digit', minute: '2-digit',
+          })
+        : '—',
+      user: e.user?.name ?? 'System',
+      action: humanizeAction(e.action),
+      target: e.entityType ? `${humanizeAction(e.entityType)}: ${String(e.entityId ?? '').slice(0, 10)}` : '—',
+      ip: e.ipAddress ?? '—',
+      status: statusFor(e.action),
+    }))
+    totalEntries.value = res.pagination?.total ?? entries.value.length
+  } catch {
+    errored.value = true
+    entries.value = []
+  } finally {
+    loading.value = false
+  }
+}
+
+onMounted(fetchEntries)
+
+const totalPages = computed(() => Math.max(1, Math.ceil(totalEntries.value / PAGE_SIZE)))
+
+function goPage(next: number) {
+  if (next < 1 || next > totalPages.value || next === page.value) return
+  page.value = next
+  fetchEntries()
+}
 
 const { searchQuery, activeFilter, filtered, resultCount } = useFilter({
   items: entries,
@@ -41,10 +89,8 @@ const selectedDate = ref('all')
         <h1 class="font-mono text-xl font-bold text-foreground">Audit Log</h1>
         <span class="font-sans text-sm text-muted-foreground">Track all system activities and user actions</span>
       </div>
-      <button class="hidden lg:flex items-center gap-2 px-4 py-2.5 bg-primary text-foreground rounded font-mono text-[13px] font-medium hover:opacity-90 transition-opacity">
-        <span class="material-symbols-rounded text-[16px]">download</span>
-        Export Log
-      </button>
+      <!-- Export intentionally omitted: there is no export endpoint, and a
+           button that silently does nothing is worse than no button. -->
     </div>
 
     <!-- Filters -->
@@ -54,8 +100,21 @@ const selectedDate = ref('all')
       <UiFilterDropdown v-model="selectedDate" :options="dateOptions" icon="calendar_today" />
     </UiFilterBar>
 
+    <!-- Loading / error -->
+    <div v-if="loading" class="flex items-center justify-center py-20">
+      <span class="material-symbols-rounded text-[28px] text-muted-foreground animate-spin">progress_activity</span>
+    </div>
+
+    <div v-else-if="errored" class="flex flex-col items-center gap-3 py-20">
+      <span class="material-symbols-rounded text-[28px] text-muted-foreground">cloud_off</span>
+      <span class="font-sans text-sm text-muted-foreground">Couldn't load the audit log.</span>
+      <button @click="fetchEntries" class="px-4 py-2 bg-primary text-foreground rounded font-sans text-[13px] font-medium hover:opacity-90 transition-opacity">
+        Try again
+      </button>
+    </div>
+
     <!-- Table -->
-    <div class="bg-card border border-border rounded-xl overflow-hidden">
+    <div v-else class="bg-card border border-border rounded-xl overflow-hidden">
       <!-- Desktop Table -->
       <div class="hidden lg:block">
         <div class="flex bg-background px-6 py-2.5 border-b border-border">
@@ -65,6 +124,11 @@ const selectedDate = ref('all')
           <div class="w-[160px]"><span class="font-mono text-[11px] font-semibold text-muted-foreground tracking-wider">Target</span></div>
           <div class="w-[140px]"><span class="font-mono text-[11px] font-semibold text-muted-foreground tracking-wider">IP Address</span></div>
           <div class="flex-1"><span class="font-mono text-[11px] font-semibold text-muted-foreground tracking-wider">Status</span></div>
+        </div>
+
+        <div v-if="!filtered.length" class="flex flex-col items-center gap-2 py-14">
+          <span class="material-symbols-rounded text-[26px] text-muted-foreground">history</span>
+          <span class="font-sans text-sm text-muted-foreground">No audit entries recorded yet</span>
         </div>
 
         <div v-for="(entry, i) in filtered" :key="i" class="flex items-center px-6 py-3 border-b border-border last:border-0 hover:bg-surface/30 transition-colors">
@@ -106,13 +170,21 @@ const selectedDate = ref('all')
 
       <!-- Footer -->
       <div class="flex items-center justify-between px-6 py-3 border-t border-border">
-        <span class="font-sans text-[12px] text-muted-foreground">Showing {{ resultCount }} of 1,847 actions</span>
-        <div class="flex items-center gap-1.5">
-          <button class="px-2.5 py-1 bg-card border border-border rounded-md text-[12px] font-sans text-foreground">Prev</button>
-          <button class="px-2.5 py-1 bg-foreground rounded-md text-[12px] font-sans text-background">1</button>
-          <button class="px-2.5 py-1 bg-card border border-border rounded-md text-[12px] font-sans text-foreground">2</button>
-          <button class="px-2.5 py-1 bg-card border border-border rounded-md text-[12px] font-sans text-foreground">3</button>
-          <button class="px-2.5 py-1 bg-primary rounded-md text-[12px] font-sans text-white">Next</button>
+        <span class="font-sans text-[12px] text-muted-foreground">
+          Showing {{ resultCount }} of {{ totalEntries.toLocaleString() }} actions
+        </span>
+        <div v-if="totalPages > 1" class="flex items-center gap-1.5">
+          <button
+            :disabled="page === 1"
+            @click="goPage(page - 1)"
+            class="px-2.5 py-1 bg-card border border-border rounded-md text-[12px] font-sans text-foreground disabled:opacity-40 disabled:cursor-not-allowed"
+          >Prev</button>
+          <span class="px-2.5 py-1 font-sans text-[12px] text-muted-foreground">Page {{ page }} of {{ totalPages }}</span>
+          <button
+            :disabled="page === totalPages"
+            @click="goPage(page + 1)"
+            class="px-2.5 py-1 bg-primary rounded-md text-[12px] font-sans text-foreground disabled:opacity-40 disabled:cursor-not-allowed"
+          >Next</button>
         </div>
       </div>
     </div>

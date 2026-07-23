@@ -38,7 +38,7 @@ function statusClasses(status: string) {
   const s = status.toLowerCase()
   if (s === 'completed') return 'bg-st-green-bg text-st-green-text'
   if (s === 'in_progress' || s === 'in progress') return 'bg-st-amber-bg text-st-amber-text'
-  if (s === 'assigned' || s === 'pending') return 'bg-blue-50 text-blue-600'
+  if (s === 'assigned' || s === 'pending') return 'bg-st-blue-bg text-st-blue-text'
   return 'bg-st-amber-bg text-st-amber-text'
 }
 

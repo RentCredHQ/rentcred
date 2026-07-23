@@ -524,7 +524,7 @@ async function handleSubmit() {
         </div>
 
         <!-- Error message -->
-        <div v-if="submitError" class="flex items-start gap-2.5 bg-red-50 border border-red-200 p-3.5 rounded">
+        <div v-if="submitError" class="flex items-start gap-2.5 bg-st-red-bg border border-st-red-text/20 p-3.5 rounded">
           <span class="material-symbols-rounded text-[18px] text-error mt-0.5">error</span>
           <span class="font-sans text-[13px] text-error">{{ submitError }}</span>
         </div>

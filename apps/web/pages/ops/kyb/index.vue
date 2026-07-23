@@ -23,21 +23,30 @@ function openReview(id: string) {
   showReview.value = true
 }
 
+const confirmError = ref('')
+
 function openConfirm(id: string, action: 'approve' | 'reject') {
   selectedConfirmId.value = id
   confirmAction.value = action
+  confirmError.value = ''
   showConfirm.value = true
 }
 
 async function executeConfirm() {
-  if (!selectedConfirmId.value) return
+  if (!selectedConfirmId.value || confirmLoading.value) return
   confirmLoading.value = true
+  confirmError.value = ''
   try {
     await reviewKyb(selectedConfirmId.value, { status: confirmAction.value === 'approve' ? 'approved' : 'rejected' })
     showConfirm.value = false
     await fetchApplications()
-  } catch { /* empty */ }
-  finally { confirmLoading.value = false }
+  } catch (e: any) {
+    // This used to be swallowed: the modal stayed open with no explanation,
+    // so a failed decision looked identical to one that never registered.
+    confirmError.value = e.data?.message || 'Could not record that decision. Please try again.'
+  } finally {
+    confirmLoading.value = false
+  }
 }
 
 const kpis = ref([
@@ -243,14 +252,23 @@ const { searchQuery, activeFilter, filtered, resultCount } = useFilter({
                 ? 'Are you sure you want to approve this KYB application? The agent will be notified.'
                 : 'Are you sure you want to reject this KYB application? The agent will need to resubmit.' }}
             </p>
+            <div v-if="confirmError" class="mb-4 px-3 py-2 rounded-lg bg-st-red-bg text-st-red-text font-sans text-[13px]">
+              {{ confirmError }}
+            </div>
+
             <div class="flex items-center gap-3 justify-end">
-              <button @click="showConfirm = false" class="px-4 py-2 border border-border rounded-lg text-sm font-sans text-foreground hover:bg-surface transition-colors">Cancel</button>
+              <button
+                @click="showConfirm = false"
+                :disabled="confirmLoading"
+                class="px-4 py-2 border border-border rounded-lg text-sm font-sans text-foreground hover:bg-surface transition-colors disabled:opacity-50"
+              >Cancel</button>
               <button
                 @click="executeConfirm"
-                class="px-4 py-2 rounded-lg text-sm font-mono font-semibold text-white transition-opacity hover:opacity-90"
+                :disabled="confirmLoading"
+                class="px-4 py-2 rounded-lg text-sm font-mono font-semibold text-white transition-opacity hover:opacity-90 disabled:opacity-50 disabled:cursor-not-allowed"
                 :class="confirmAction === 'approve' ? 'bg-st-green-text' : 'bg-st-red-text'"
               >
-                {{ confirmAction === 'approve' ? 'Approve' : 'Reject' }}
+                {{ confirmLoading ? 'Saving…' : (confirmAction === 'approve' ? 'Approve' : 'Reject') }}
               </button>
             </div>
           </div>

@@ -47,22 +47,22 @@ onBeforeUnmount(() => document.removeEventListener('click', onClickOutside))
 <template>
   <div ref="dropdownRef" :class="['relative', props.width]">
     <button
-      class="flex items-center gap-2 px-3 py-2 bg-white border border-[#CBCCC9] rounded-lg text-sm cursor-pointer hover:border-[#111111]/20 transition-colors w-full"
+      class="flex items-center gap-2 px-3 py-2 bg-card border border-border rounded-lg text-sm cursor-pointer hover:border-foreground/20 transition-colors w-full"
       @click="open = !open">
-      <span v-if="props.icon" class="material-symbols-rounded text-[#666666] text-[18px]">{{ props.icon }}</span>
+      <span v-if="props.icon" class="material-symbols-rounded text-muted-foreground text-[18px]">{{ props.icon }}</span>
       <span class="flex-1 text-left">{{ selectedLabel }}</span>
-      <span class="material-symbols-rounded text-[#666666] text-[18px]">keyboard_arrow_down</span>
+      <span class="material-symbols-rounded text-muted-foreground text-[18px]">keyboard_arrow_down</span>
     </button>
     <div
       v-if="open"
-      class="absolute top-full left-0 mt-1 bg-white border border-[#CBCCC9] rounded-lg shadow-lg py-1 z-50 min-w-[160px] w-full"
+      class="absolute top-full left-0 mt-1 bg-card border border-border rounded-lg shadow-lg py-1 z-50 min-w-[160px] w-full"
     >
       <div
         v-for="option in props.options"
         :key="option.value"
         :class="[
-          'px-3 py-2 text-sm hover:bg-[#F2F3F0] cursor-pointer',
-          modelValue === option.value ? 'text-[#FF8400] font-medium' : 'text-[#111111]',
+          'px-3 py-2 text-sm hover:bg-surface cursor-pointer',
+          modelValue === option.value ? 'text-primary font-medium' : 'text-foreground',
         ]"
         @click="select(option.value)"
       >

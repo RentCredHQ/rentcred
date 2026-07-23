@@ -5,6 +5,11 @@ const mobileMenuOpen = ref(false)
 const profileOpen = ref(false)
 const notificationsOpen = ref(false)
 
+// Unread badge on the bell. Shares state with the dropdown, so marking read
+// updates both.
+const { unreadCount: unreadNotifications, load: loadNotifications } = useNotificationFeed('/ops')
+onMounted(loadNotifications)
+
 const colorMode = useColorMode()
 const logoVariant = computed(() => (colorMode.value === 'dark' ? 'dark' : 'light'))
 
@@ -193,8 +198,12 @@ watch(() => route.path, () => {
         <div class="flex items-center gap-3">
           <UiThemeToggle />
           <div class="relative">
-            <button @click="notificationsOpen = !notificationsOpen" class="flex items-center justify-center w-10 h-10 rounded-lg border border-border hover:bg-surface transition-colors" aria-label="Notifications">
+            <button @click="notificationsOpen = !notificationsOpen" class="relative flex items-center justify-center w-10 h-10 rounded-lg border border-border hover:bg-surface transition-colors" aria-label="Notifications">
               <span class="material-symbols-rounded text-[20px] text-muted-foreground">notifications</span>
+              <span
+                v-if="unreadNotifications"
+                class="absolute -top-1 -right-1 min-w-[18px] h-[18px] px-1 rounded-full bg-primary text-foreground font-mono text-[10px] font-bold flex items-center justify-center"
+              >{{ unreadNotifications > 9 ? '9+' : unreadNotifications }}</span>
             </button>
             <OpsNotificationDropdown v-model="notificationsOpen" />
           </div>

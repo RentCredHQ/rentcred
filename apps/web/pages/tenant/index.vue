@@ -44,8 +44,8 @@ const completedReports = computed(() =>
 function statusBadgeClasses(status: string) {
   switch (status) {
     case 'completed': return 'bg-st-green-bg text-st-green-text'
-    case 'rejected': return 'bg-red-50 text-red-700'
-    case 'field_visit': return 'bg-blue-50 text-blue-600'
+    case 'rejected': return 'bg-st-red-bg text-st-red-text'
+    case 'field_visit': return 'bg-st-blue-bg text-st-blue-text'
     default: return 'bg-st-amber-bg text-st-amber-text'
   }
 }

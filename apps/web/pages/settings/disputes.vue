@@ -31,7 +31,7 @@ function getStatusStyle(status: string) {
     case 'resolved': case 'closed': return { bg: 'bg-st-green-bg', text: 'text-st-green-text', label: status === 'closed' ? 'Closed' : 'Resolved' }
     case 'under_review': return { bg: 'bg-st-amber-bg', text: 'text-st-amber-text', label: 'Under Review' }
     case 'open': return { bg: 'bg-st-amber-bg', text: 'text-st-amber-text', label: 'Open' }
-    default: return { bg: 'bg-blue-50', text: 'text-blue-600', label: status.replace(/_/g, ' ').replace(/\b\w/g, (c: string) => c.toUpperCase()) }
+    default: return { bg: 'bg-st-blue-bg', text: 'text-st-blue-text', label: status.replace(/_/g, ' ').replace(/\b\w/g, (c: string) => c.toUpperCase()) }
   }
 }
 

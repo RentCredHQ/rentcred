@@ -23,7 +23,7 @@ function statusBadgeClasses(status: string) {
     case 'resolved': return 'bg-st-green-bg text-st-green-text'
     case 'closed': return 'bg-surface text-foreground'
     case 'under_review': return 'bg-st-amber-bg text-st-amber-text'
-    default: return 'bg-blue-50 text-blue-600'
+    default: return 'bg-st-blue-bg text-st-blue-text'
   }
 }
 

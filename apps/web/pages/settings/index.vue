@@ -25,13 +25,6 @@ const company = ref({
   license: '',
 })
 
-const notifications = ref([
-  { id: 'email', title: 'Email Notifications', desc: 'Receive case updates via email', enabled: true },
-  { id: 'sms', title: 'SMS Alerts', desc: 'Get SMS for urgent notifications', enabled: true },
-  { id: 'push', title: 'Push Notifications', desc: 'Browser push for real-time alerts', enabled: false },
-  { id: 'digest', title: 'Weekly Report Digest', desc: 'Summary of weekly activity', enabled: false },
-])
-
 const loading = ref(true)
 
 onMounted(async () => {
@@ -69,11 +62,6 @@ function handleProfileSave(data: { firstName: string; lastName: string; email: s
       (authStore.user as any).companyName = data.company
     }
   }
-}
-
-function toggleNotification(id: string) {
-  const n = notifications.value.find(n => n.id === id)
-  if (n) n.enabled = !n.enabled
 }
 
 const passwordLoading = ref(false)
@@ -219,26 +207,9 @@ async function handlePasswordChange() {
           </div>
         </div>
 
-        <!-- Notification Preferences -->
-        <div class="bg-card border border-border rounded-lg p-7 flex flex-col gap-5">
-          <h2 class="font-mono text-base font-semibold text-foreground">Notification Preferences</h2>
-
-          <div class="flex flex-col">
-            <div v-for="(notif, index) in notifications" :key="notif.id" class="flex items-center justify-between py-3.5" :class="index < notifications.length - 1 ? 'border-b border-border' : ''">
-              <div class="flex flex-col gap-0.5">
-                <span class="font-sans text-sm font-medium text-foreground">{{ notif.title }}</span>
-                <span class="font-sans text-[12px] text-muted-foreground">{{ notif.desc }}</span>
-              </div>
-              <button
-                class="w-10 h-[22px] rounded-full p-0.5 transition-colors flex-shrink-0"
-                :class="notif.enabled ? 'bg-primary' : 'bg-border'"
-                @click="toggleNotification(notif.id)"
-              >
-                <div class="w-[18px] h-[18px] rounded-full bg-card transition-transform" :class="notif.enabled ? 'translate-x-[18px]' : ''" />
-              </button>
-            </div>
-          </div>
-        </div>
+        <!-- Notification preferences are not shown: there is no endpoint to
+             persist them, so the toggles only ever changed local state and
+             silently reset on reload. -->
       </div>
     </div>
     <DashboardEditProfileModal v-model="showEditProfile" :profile="profile" @save="handleProfileSave" />

@@ -176,7 +176,7 @@ function getStatusInfo(status: string) {
       </div>
 
       <!-- Error -->
-      <div v-if="error" class="bg-red-50 border border-red-200 text-red-700 text-sm font-sans px-4 py-3">
+      <div v-if="error" class="bg-st-red-bg border border-st-red-text/20 text-st-red-text text-sm font-sans px-4 py-3">
         {{ error }}
       </div>
 

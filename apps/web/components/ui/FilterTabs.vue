@@ -28,11 +28,11 @@ const emit = defineEmits<{
         'text-[13px] px-3 py-1.5 transition-colors whitespace-nowrap',
         props.variant === 'underline'
           ? modelValue === tab.value
-            ? 'border-b-2 border-[#FF8400] text-[#111111] font-medium'
-            : 'text-[#666666] hover:text-[#111111]'
+            ? 'border-b-2 border-primary text-foreground font-medium'
+            : 'text-muted-foreground hover:text-foreground'
           : modelValue === tab.value
-            ? 'bg-[#111111] text-white rounded-full'
-            : 'bg-white border border-[#CBCCC9] text-[#666666] hover:border-[#111111]/20 rounded-full',
+            ? 'bg-foreground text-background rounded-full'
+            : 'bg-card border border-border text-muted-foreground hover:border-foreground/20 rounded-full',
       ]"
       @click="emit('update:modelValue', tab.value)"
     >

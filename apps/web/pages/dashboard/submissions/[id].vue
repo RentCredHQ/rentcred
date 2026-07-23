@@ -227,7 +227,7 @@ onMounted(async () => {
             <span class="font-sans text-sm text-foreground">{{ caseData.scheduledDate }}</span>
           </div>
           <div class="flex items-center gap-2">
-            <span class="w-2 h-2 rounded-full" :class="caseData.rawStatus === 'field_visit' ? 'bg-blue-500' : 'bg-st-green-text'" />
+            <span class="w-2 h-2 rounded-full" :class="caseData.rawStatus === 'field_visit' ? 'bg-st-blue-text' : 'bg-st-green-text'" />
             <span class="font-sans text-[13px] text-muted-foreground">{{ caseData.rawStatus === 'field_visit' ? 'Visit in progress' : 'Agent assigned' }}</span>
           </div>
         </div>

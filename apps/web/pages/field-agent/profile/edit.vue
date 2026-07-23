@@ -162,7 +162,7 @@ async function handleSave() {
       </div>
 
       <!-- Error -->
-      <div v-if="saveError" class="flex items-start gap-2.5 bg-red-50 border border-red-200 p-3.5 rounded-xl">
+      <div v-if="saveError" class="flex items-start gap-2.5 bg-st-red-bg border border-st-red-text/20 p-3.5 rounded-xl">
         <span class="material-symbols-rounded text-[18px] text-red-600 mt-0.5">error</span>
         <span class="font-sans text-[13px] text-red-600">{{ saveError }}</span>
       </div>

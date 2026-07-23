@@ -21,7 +21,7 @@ const form = reactive({
 function statusBadgeClasses(status: string) {
   switch (status) {
     case 'resolved': case 'closed': return 'bg-st-green-bg text-st-green-text'
-    case 'under_review': return 'bg-blue-50 text-blue-600'
+    case 'under_review': return 'bg-st-blue-bg text-st-blue-text'
     default: return 'bg-st-amber-bg text-st-amber-text'
   }
 }
