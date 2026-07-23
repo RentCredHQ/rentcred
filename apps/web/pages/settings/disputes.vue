@@ -35,7 +35,7 @@ function getStatusStyle(status: string) {
   }
 }
 
-onMounted(async () => {
+async function fetchDisputes() {
   try {
     const res = await getDisputes() as any
     const rawDisputes = res?.data ?? []
@@ -69,7 +69,9 @@ onMounted(async () => {
     ]
   } catch { /* empty */ }
   finally { loading.value = false }
-})
+}
+
+onMounted(fetchDisputes)
 
 const statusTabs = [
   { label: 'All', value: 'all' },
@@ -203,6 +205,6 @@ const { searchQuery, activeFilter, filtered, resultCount } = useFilter({
     </div>
 
     <!-- New Dispute Modal -->
-    <OpsNewDisputeModal v-model="showNewDispute" />
+    <OpsNewDisputeModal v-model="showNewDispute" @created="fetchDisputes" />
   </div>
 </template>

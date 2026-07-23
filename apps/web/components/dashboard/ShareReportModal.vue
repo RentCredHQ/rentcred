@@ -6,39 +6,48 @@ const close = () => emit('update:modelValue', false)
 const { shareReport } = useReports()
 
 const shareLink = ref('')
-const email = ref('')
-const permission = ref('View only')
-const requireAuth = ref(true)
-const sending = ref(false)
 const linkLoading = ref(false)
+const error = ref('')
+const copied = ref(false)
 
 watch(() => props.modelValue, async (open) => {
-  if (open && props.reportId) {
-    linkLoading.value = true
-    try {
-      const res = await shareReport(props.reportId)
-      shareLink.value = res.shareUrl || `https://app.rentcred.ng/report/${props.reportId}`
-    } catch {
-      shareLink.value = `https://app.rentcred.ng/report/${props.reportId}`
-    } finally {
-      linkLoading.value = false
-    }
+  if (!open) {
+    error.value = ''
+    copied.value = false
+    return
+  }
+
+  // No report id means the parent has nothing to share — say so rather than
+  // showing an empty box with a Copy button that copies nothing.
+  if (!props.reportId) {
+    error.value = 'No report is available for this case yet.'
+    shareLink.value = ''
+    return
+  }
+
+  linkLoading.value = true
+  error.value = ''
+  try {
+    const res = await shareReport(props.reportId)
+    shareLink.value = res.shareUrl || ''
+    if (!shareLink.value) error.value = 'Could not create a share link.'
+  } catch (e: any) {
+    shareLink.value = ''
+    error.value = e.data?.message || 'Could not create a share link.'
+  } finally {
+    linkLoading.value = false
   }
 })
 
-function copyLink() {
-  navigator.clipboard.writeText(shareLink.value)
-}
-
-async function sendEmail() {
-  if (!email.value || !props.reportId) return
-  sending.value = true
+async function copyLink() {
+  if (!shareLink.value) return
   try {
-    await shareReport(props.reportId, { email: email.value })
-    email.value = ''
-    close()
-  } catch { /* empty */ }
-  finally { sending.value = false }
+    await navigator.clipboard.writeText(shareLink.value)
+    copied.value = true
+    setTimeout(() => { copied.value = false }, 2000)
+  } catch {
+    error.value = 'Copy failed — select the link and copy it manually.'
+  }
 }
 </script>
 
@@ -59,77 +68,38 @@ async function sendEmail() {
 
           <!-- Body -->
           <div class="flex flex-col gap-6 p-6 overflow-y-auto">
-            <!-- Share via link -->
+            <div v-if="error" class="bg-st-red-bg text-st-red-text font-sans text-[13px] px-4 py-3 rounded-lg">
+              {{ error }}
+            </div>
+
             <div class="flex flex-col gap-2.5">
               <label class="font-sans text-sm font-semibold text-foreground">Share via link</label>
               <div class="flex items-center gap-2">
                 <div class="flex-1 h-10 px-3 flex items-center rounded-lg bg-surface border border-border overflow-hidden">
-                  <span class="font-sans text-xs text-muted-foreground truncate">{{ shareLink }}</span>
+                  <span class="font-sans text-xs text-muted-foreground truncate">
+                    {{ linkLoading ? 'Creating link…' : (shareLink || '—') }}
+                  </span>
                 </div>
-                <button @click="copyLink" class="h-10 px-4 flex items-center gap-1.5 rounded-lg bg-foreground text-background font-sans text-[13px] font-medium hover:bg-foreground/90 transition-colors flex-shrink-0">
-                  <span class="material-symbols-rounded text-[16px]">content_copy</span>
-                  Copy
-                </button>
-              </div>
-            </div>
-
-            <!-- Share via email -->
-            <div class="flex flex-col gap-2.5">
-              <label class="font-sans text-sm font-semibold text-foreground">Share via email</label>
-              <div class="flex items-center gap-2">
-                <input
-                  v-model="email"
-                  type="email"
-                  placeholder="Enter email address"
-                  class="flex-1 h-10 px-3 rounded-lg border border-border bg-transparent font-sans text-[13px] text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary"
-                />
-                <button @click="sendEmail" class="h-10 px-4 flex items-center gap-1.5 rounded-lg bg-primary text-white font-sans text-[13px] font-medium hover:bg-primary/90 transition-colors flex-shrink-0">
-                  <span class="material-symbols-rounded text-[16px]">send</span>
-                  Send
-                </button>
-              </div>
-            </div>
-
-            <!-- Permissions -->
-            <div class="flex flex-col gap-2.5">
-              <label class="font-sans text-sm font-semibold text-foreground">Permissions</label>
-              <div class="relative">
-                <select
-                  v-model="permission"
-                  class="w-full h-10 px-3 pr-8 rounded-lg border border-border bg-transparent font-sans text-[13px] text-foreground appearance-none focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary"
+                <button
+                  @click="copyLink"
+                  :disabled="!shareLink || linkLoading"
+                  class="h-10 px-4 flex items-center gap-1.5 rounded-lg bg-foreground text-background font-sans text-[13px] font-medium hover:bg-foreground/90 transition-colors flex-shrink-0 disabled:opacity-40 disabled:cursor-not-allowed"
                 >
-                  <option>View only</option>
-                  <option>Can download</option>
-                  <option>Full access</option>
-                </select>
-                <span class="material-symbols-rounded text-[18px] text-muted-foreground absolute right-3 top-1/2 -translate-y-1/2 pointer-events-none">keyboard_arrow_down</span>
+                  <span class="material-symbols-rounded text-[16px]">{{ copied ? 'check' : 'content_copy' }}</span>
+                  {{ copied ? 'Copied' : 'Copy' }}
+                </button>
               </div>
-            </div>
-
-            <!-- Auth toggle -->
-            <div class="flex items-center justify-between">
-              <span class="font-sans text-[13px] text-foreground">Require authentication</span>
-              <button
-                @click="requireAuth = !requireAuth"
-                class="w-11 h-6 rounded-full transition-colors relative"
-                :class="requireAuth ? 'bg-primary' : 'bg-border'"
-              >
-                <div
-                  class="w-5 h-5 rounded-full bg-card shadow-sm absolute top-0.5 transition-transform"
-                  :class="requireAuth ? 'translate-x-[22px]' : 'translate-x-0.5'"
-                />
-              </button>
+              <p class="font-sans text-xs text-muted-foreground">
+                Anyone with this link can view the verification outcome. Personal contact
+                details and field visit photos are not included.
+              </p>
             </div>
           </div>
 
           <!-- Footer -->
           <div class="flex items-center justify-end gap-3 px-6 py-5 border-t border-border">
-            <button @click="close" class="h-10 px-5 rounded-lg border border-border font-sans text-[13px] font-medium text-foreground hover:bg-background transition-colors">
-              Cancel
-            </button>
-            <button class="h-10 px-5 flex items-center gap-1.5 rounded-lg bg-primary text-white font-sans text-[13px] font-medium hover:bg-primary/90 transition-colors">
-              <span class="material-symbols-rounded text-[16px]">share</span>
-              Share
+            <button @click="close" class="h-10 px-5 rounded-lg bg-primary text-foreground font-sans text-[13px] font-medium hover:opacity-90 transition-opacity">
+              Done
             </button>
           </div>
         </div>

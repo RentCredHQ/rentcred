@@ -7,6 +7,12 @@ useSeoMeta({ title: 'My Submissions — RentCred' })
 const { getSubmissions } = useSubmissions()
 
 const showShare = ref(false)
+const shareTarget = ref('')
+
+function openShare(reportId: string) {
+  shareTarget.value = reportId
+  showShare.value = true
+}
 const loading = ref(true)
 const totalCount = ref(0)
 
@@ -25,6 +31,8 @@ const mappedSubmissions = computed(() =>
     return {
       name: s.tenantName,
       caseId: s.id,
+      // Sharing targets the report; only approved reports can be shared.
+      shareableReportId: s.report?.status === 'approved' ? s.report.id : '',
       package: s.propertyType || 'Standard',
       rawStatus: s.status,
       status: label,
@@ -137,7 +145,11 @@ onMounted(async () => {
         <div class="w-[120px] flex-shrink-0"><span class="font-sans text-[13px] text-muted-foreground">{{ sub.date }}</span></div>
         <div class="flex-1 flex items-center gap-2" @click.prevent.stop>
           <NuxtLink :to="`/dashboard/submissions/${sub.caseId}`" class="material-symbols-rounded text-[18px] text-muted-foreground hover:text-foreground cursor-pointer">visibility</NuxtLink>
-          <button @click="showShare = true" class="material-symbols-rounded text-[18px] text-muted-foreground hover:text-foreground cursor-pointer">share</button>
+          <button
+            v-if="sub.shareableReportId"
+            @click="openShare(sub.shareableReportId)"
+            class="material-symbols-rounded text-[18px] text-muted-foreground hover:text-foreground cursor-pointer"
+          >share</button>
           <button class="material-symbols-rounded text-[18px] text-muted-foreground hover:text-foreground cursor-pointer">more_vert</button>
         </div>
       </NuxtLink>
@@ -176,7 +188,7 @@ onMounted(async () => {
         </div>
       </NuxtLink>
     </div>
-    <DashboardShareReportModal v-model="showShare" />
+    <DashboardShareReportModal v-model="showShare" :report-id="shareTarget" />
     </template>
   </div>
 </template>

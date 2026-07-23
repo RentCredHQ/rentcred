@@ -1,6 +1,11 @@
 <script setup lang="ts">
-const props = defineProps<{ modelValue: boolean }>()
-const emit = defineEmits<{ (e: 'update:modelValue', val: boolean): void }>()
+// bundleId lets the parent preselect whichever bundle card was clicked; it was
+// being passed already but never declared, so the selection was ignored.
+const props = defineProps<{ modelValue: boolean; bundleId?: string }>()
+const emit = defineEmits<{
+  (e: 'update:modelValue', val: boolean): void
+  (e: 'purchase-complete'): void
+}>()
 const close = () => emit('update:modelValue', false)
 
 const { getBundles, purchaseBundle } = usePayments()
@@ -26,8 +31,20 @@ const paymentMethod = ref<'bank' | 'card'>('bank')
 
 const total = computed(() => packages.value[selectedPkg.value]?.price ?? '₦0')
 
+/** Selects the bundle the parent asked for, falling back to the popular one. */
+function applyPreselection() {
+  const requested = props.bundleId
+    ? packages.value.findIndex((p: CreditPackage) => p.id === props.bundleId)
+    : -1
+  selectedPkg.value = requested >= 0 ? requested : (packages.value.length > 1 ? 1 : 0)
+}
+
 watch(() => props.modelValue, async (open: boolean) => {
-  if (open && packages.value.length === 0) {
+  if (!open) return
+
+  error.value = null
+
+  if (packages.value.length === 0) {
     loadingBundles.value = true
     try {
       const res = await getBundles()
@@ -41,11 +58,12 @@ watch(() => props.modelValue, async (open: boolean) => {
         features: b.features || ['Verification credits'],
         popular: i === 1,
       }))
-      if (packages.value.length > 1) selectedPkg.value = 1
     } catch (e: any) {
       error.value = e.data?.message || 'Failed to load bundles.'
     } finally { loadingBundles.value = false }
   }
+
+  applyPreselection()
 })
 
 async function handlePurchase() {
@@ -54,8 +72,15 @@ async function handlePurchase() {
   purchasing.value = true
   error.value = null
   try {
-    await purchaseBundle(pkg.id)
-    close()
+    const res = await purchaseBundle(pkg.id)
+    // The response carries the Paystack checkout URL. It was previously
+    // discarded, so the modal simply closed and no payment ever happened.
+    if (res?.authorizationUrl) {
+      emit('purchase-complete')
+      window.location.href = res.authorizationUrl
+      return
+    }
+    error.value = 'Could not start checkout. Please try again.'
   } catch (e: any) {
     error.value = e.data?.message || 'Purchase failed. Please try again.'
   } finally { purchasing.value = false }

@@ -49,6 +49,8 @@ const reports = computed(() =>
     return {
       tenant: r.submission?.tenantName || r.content?.tenant?.name || r.content?.tenantInfo?.name || '',
       caseId: r.submissionId || r.id,
+      // The share endpoint keys off the report, not the submission.
+      reportId: r.id,
       rawStatus: r.status,
       status: getReportStatusLabel(r.status),
       recommendation: rec.label,
@@ -125,7 +127,11 @@ onMounted(async () => {
         <div class="w-[110px]"><span class="font-sans text-[13px] text-muted-foreground">{{ report.generated }}</span></div>
         <div class="flex-1 flex items-center gap-2" @click.stop>
           <NuxtLink :to="`/dashboard/reports/${report.caseId}`" class="material-symbols-rounded text-[18px] text-muted-foreground hover:text-foreground cursor-pointer">visibility</NuxtLink>
-          <button @click="openShare(report.caseId)" class="material-symbols-rounded text-[18px] text-muted-foreground hover:text-foreground cursor-pointer">share</button>
+          <button
+              v-if="report.rawStatus === 'approved'"
+              @click="openShare(report.reportId)"
+              class="material-symbols-rounded text-[18px] text-muted-foreground hover:text-foreground cursor-pointer"
+            >share</button>
           <button class="material-symbols-rounded text-[18px] text-muted-foreground hover:text-foreground cursor-pointer">download</button>
         </div>
       </NuxtLink>
@@ -155,12 +161,16 @@ onMounted(async () => {
           <span class="font-sans text-[12px] text-muted-foreground">{{ report.generated }}</span>
           <div class="flex gap-3">
             <NuxtLink :to="`/dashboard/reports/${report.caseId}`" class="material-symbols-rounded text-[18px] text-muted-foreground">visibility</NuxtLink>
-            <button @click="openShare(report.caseId)" class="material-symbols-rounded text-[18px] text-muted-foreground">share</button>
+            <button
+              v-if="report.rawStatus === 'approved'"
+              @click="openShare(report.reportId)"
+              class="material-symbols-rounded text-[18px] text-muted-foreground"
+            >share</button>
           </div>
         </div>
       </NuxtLink>
     </div>
-    <DashboardShareReportModal v-model="showShare" />
+    <DashboardShareReportModal v-model="showShare" :report-id="shareTarget" />
     </template>
   </div>
 </template>

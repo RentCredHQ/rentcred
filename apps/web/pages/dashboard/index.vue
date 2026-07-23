@@ -31,6 +31,12 @@ const stats = ref({
 
 const submissions = ref<any[]>([])
 const showShare = ref(false)
+const shareTarget = ref('')
+
+function openShare(reportId: string) {
+  shareTarget.value = reportId
+  showShare.value = true
+}
 const searchQuery = ref('')
 const currentPage = ref(1)
 const totalSubmissions = ref(0)
@@ -59,6 +65,8 @@ const mappedSubmissions = computed(() => {
         status: SUBMISSION_STATUS_LABELS[s.status] || s.status,
         date: formatDate(s.createdAt),
         action: getAction(s.status),
+        // Sharing targets the report, and only an approved one can be shared.
+        shareableReportId: s.report?.status === 'approved' ? s.report.id : '',
       }
     })
     .filter((sub) => {
@@ -253,8 +261,8 @@ onMounted(async () => {
         <div class="w-[100px] px-4 py-3"><span class="font-sans text-[13px] text-muted-foreground">{{ sub.date }}</span></div>
         <div class="w-[120px] px-4 py-3">
           <button
-            v-if="sub.action === 'share'"
-            @click="showShare = true"
+            v-if="sub.action === 'share' && sub.shareableReportId"
+            @click="openShare(sub.shareableReportId)"
             class="flex items-center gap-1.5 px-3 py-1.5 bg-primary rounded text-[12px] font-medium font-sans text-foreground hover:opacity-90 transition-opacity"
           >
             <span class="material-symbols-rounded text-[14px]">share</span>
@@ -315,7 +323,7 @@ onMounted(async () => {
         </div>
       </div>
     </div>
-    <DashboardShareReportModal v-model="showShare" />
+    <DashboardShareReportModal v-model="showShare" :report-id="shareTarget" />
     </template>
   </div>
 </template>

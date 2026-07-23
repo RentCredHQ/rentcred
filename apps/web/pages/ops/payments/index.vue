@@ -5,6 +5,12 @@ useSeoMeta({ title: 'Payments Management — RentCred Ops' })
 const { getTransactionHistory, getPaymentStats } = usePayments()
 
 const showTransaction = ref(false)
+const selectedTransaction = ref<any>(null)
+
+function openTransaction(txn: any) {
+  selectedTransaction.value = txn
+  showTransaction.value = true
+}
 
 const statusTabs = [
   { label: 'All', value: 'all' },
@@ -173,7 +179,7 @@ const { searchQuery, activeFilter, filtered, resultCount } = useFilter({
           </div>
           <div class="w-[90px]"><span class="font-sans text-[13px] text-foreground">{{ txn.date }}</span></div>
           <div class="flex-1">
-            <span @click="showTransaction = true" class="material-symbols-rounded text-[18px] text-muted-foreground hover:text-foreground cursor-pointer">visibility</span>
+            <span @click="openTransaction(txn)" class="material-symbols-rounded text-[18px] text-muted-foreground hover:text-foreground cursor-pointer">visibility</span>
           </div>
         </div>
       </div>
@@ -218,6 +224,6 @@ const { searchQuery, activeFilter, filtered, resultCount } = useFilter({
       </div>
     </div>
     <!-- Transaction Detail Modal -->
-    <OpsTransactionDetailModal v-model="showTransaction" />
+    <OpsTransactionDetailModal v-model="showTransaction" :transaction="selectedTransaction" />
   </div>
 </template>

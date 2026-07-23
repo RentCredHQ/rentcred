@@ -1,11 +1,9 @@
 <script setup lang="ts">
 const show = defineModel<boolean>({ default: false })
-const props = defineProps<{ transactionId?: string | null }>()
-
-const { api } = useApi()
-
-const loading = ref(false)
-const error = ref<string | null>(null)
+// The transaction row is passed in whole. There is no GET /payments/:id
+// endpoint — the modal used to fetch one, and since the parent also never
+// passed an id, it always opened blank.
+const props = defineProps<{ transaction?: Record<string, any> | null }>()
 
 const txn = ref({
   id: '',
@@ -30,33 +28,29 @@ const statusStyleMap: Record<string, { bg: string; text: string; label: string }
   failed: { bg: 'bg-st-red-bg', text: 'text-st-red-text', label: 'Failed' },
 }
 
-watch(() => show.value, async (open) => {
-  if (!open || !props.transactionId) return
-  loading.value = true
-  error.value = null
-  try {
-    const res = await api<any>(`/payments/${props.transactionId}`)
-    const t = res.data ?? res
-    const style = statusStyleMap[t.status] ?? statusStyleMap.pending
-    txn.value = {
-      id: t.id ?? '',
-      date: t.createdAt ? new Date(t.createdAt).toLocaleString('en-NG', { month: 'short', day: 'numeric', year: 'numeric', hour: '2-digit', minute: '2-digit' }) : '',
-      amount: `${t.amount ?? 0} credits`,
-      status: style.label,
-      statusBg: style.bg,
-      statusText: style.text,
-      type: t.type ?? '',
-      caseId: '',
-      tenant: '',
-      agent: t.agentId ?? '',
-      method: t.paystackRef ? 'Paystack' : '—',
-      reference: t.paystackRef ?? t.id ?? '',
-      commission: '',
-    }
-  } catch (e: any) {
-    error.value = e.data?.message || 'Failed to load transaction details.'
-  } finally { loading.value = false }
-})
+watch([() => show.value, () => props.transaction], ([open]: [boolean, any]) => {
+  const t = props.transaction
+  if (!open || !t) return
+
+  const style = statusStyleMap[t.rawStatus ?? t.status] ?? statusStyleMap.pending
+  txn.value = {
+    id: t.id ?? '',
+    date: t.createdAt
+      ? new Date(t.createdAt).toLocaleString('en-NG', { month: 'short', day: 'numeric', year: 'numeric', hour: '2-digit', minute: '2-digit' })
+      : (t.date ?? ''),
+    amount: t.priceNgn ? `₦${Number(t.priceNgn).toLocaleString()}` : `${t.amount ?? 0} credits`,
+    status: style.label,
+    statusBg: style.bg,
+    statusText: style.text,
+    type: t.type ?? '',
+    caseId: t.submissionId ?? '',
+    tenant: t.tenant ?? '',
+    agent: t.agent ?? t.agentId ?? '',
+    method: t.paystackRef ? 'Paystack' : '—',
+    reference: t.paystackRef ?? t.id ?? '',
+    commission: '',
+  }
+}, { immediate: true })
 </script>
 
 <template>
@@ -76,17 +70,7 @@ watch(() => show.value, async (open) => {
             </button>
           </div>
 
-          <!-- Loading -->
-          <div v-if="loading" class="flex items-center justify-center py-12">
-            <span class="material-symbols-rounded text-[24px] text-muted-foreground animate-spin">progress_activity</span>
-          </div>
-
-          <!-- Error -->
-          <div v-else-if="error" class="p-6">
-            <div class="font-sans text-[13px] text-st-red-text">{{ error }}</div>
-          </div>
-
-          <div v-else class="flex flex-col gap-5 p-6">
+          <div class="flex flex-col gap-5 p-6">
             <!-- Amount & Status -->
             <div class="flex items-center justify-between">
               <span class="font-mono text-2xl font-bold text-foreground">{{ txn.amount }}</span>
@@ -126,11 +110,7 @@ watch(() => show.value, async (open) => {
             </div>
 
             <!-- Actions -->
-            <div class="flex flex-col sm:flex-row items-center gap-3 pt-2">
-              <button class="flex-1 px-4 py-2.5 border border-border rounded-lg text-[13px] font-sans text-foreground hover:bg-surface transition-colors flex items-center justify-center gap-2">
-                <span class="material-symbols-rounded text-[16px]">receipt_long</span>
-                Download Receipt
-              </button>
+            <div class="flex items-center justify-end gap-3 pt-2">
               <button @click="show = false" class="px-4 py-2.5 border border-border rounded-lg text-[13px] font-sans text-foreground hover:bg-surface transition-colors">
                 Close
               </button>

@@ -14,11 +14,6 @@ export default defineNuxtRouteMiddleware((to) => {
     return
   }
 
-  // Tenant invite routes are public
-  if (to.path.startsWith('/tenant/invite/')) {
-    return
-  }
-
   // Shared report routes are public
   if (to.path.startsWith('/reports/shared/')) {
     return
@@ -45,7 +40,7 @@ export default defineNuxtRouteMiddleware((to) => {
     return navigateTo('/auth/login')
   }
 
-  if (to.path.startsWith('/tenant') && !to.path.startsWith('/tenant/invite/') && !authStore.isTenant) {
+  if (to.path.startsWith('/tenant') && !authStore.isTenant) {
     return navigateTo('/auth/login')
   }
 })

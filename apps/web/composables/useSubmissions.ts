@@ -28,10 +28,21 @@ export function useSubmissions() {
     })
   }
 
-  async function updateSubmissionStatus(id: string, status: string) {
+  async function updateSubmissionStatus(id: string, status: string, notes?: string) {
     return api<{ data: Submission }>(`/submissions/${id}/status`, {
       method: 'PATCH',
-      body: { status },
+      body: { status, ...(notes ? { notes } : {}) },
+    })
+  }
+
+  /**
+   * Agent-initiated cancellation of a pending submission. Returns whether the
+   * credit was refunded — status changes go through the ops-only route above,
+   * which an agent cannot call.
+   */
+  async function cancelSubmission(id: string) {
+    return api<{ id: string; status: string; refunded: boolean }>(`/submissions/${id}/cancel`, {
+      method: 'PATCH',
     })
   }
 
@@ -51,6 +62,7 @@ export function useSubmissions() {
     getSubmissions,
     createSubmission,
     updateSubmissionStatus,
+    cancelSubmission,
     assignFieldAgent,
     reassignCase,
   }

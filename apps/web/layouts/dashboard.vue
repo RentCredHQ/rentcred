@@ -8,6 +8,30 @@ const notificationsOpen = ref(false)
 const colorMode = useColorMode()
 const logoVariant = computed(() => (colorMode.value === 'dark' ? 'dark' : 'light'))
 
+// Email verification is not enforced at login, so an unverified account still
+// works — this nudges rather than blocks.
+const { api } = useApi()
+const verifySending = ref(false)
+const verifySent = ref(false)
+const showVerifyBanner = computed(() => authStore.user?.isVerified === false)
+
+async function resendVerification() {
+  if (!authStore.user?.email || verifySending.value) return
+  verifySending.value = true
+  try {
+    await api('/auth/resend-verification', {
+      method: 'POST',
+      body: { email: authStore.user.email },
+    })
+  } catch {
+    // The endpoint always reports success to avoid leaking which addresses
+    // exist; a transport failure is reported the same way.
+  } finally {
+    verifySending.value = false
+    verifySent.value = true
+  }
+}
+
 const user = computed(() => {
   if (!authStore.user) return null
   const name = authStore.user.name || 'User'
@@ -215,6 +239,25 @@ watch(() => route.path, () => {
       <!-- Page Content -->
       <main class="flex-1 overflow-y-auto">
         <div class="p-5 lg:p-8 pt-20 lg:pt-8 pb-28 lg:pb-8">
+          <!-- Verification is not enforced at login, so this is a prompt rather
+               than a block. -->
+          <div
+            v-if="showVerifyBanner"
+            class="flex flex-wrap items-center gap-3 px-4 py-3 mb-5 rounded-lg bg-st-amber-bg text-st-amber-text font-sans text-sm"
+          >
+            <span class="material-symbols-rounded text-[20px]">mark_email_unread</span>
+            <span class="flex-1 min-w-[200px]">Verify your email address to secure your account.</span>
+            <button
+              v-if="!verifySent"
+              :disabled="verifySending"
+              class="font-semibold underline underline-offset-2 disabled:opacity-50"
+              @click="resendVerification"
+            >
+              {{ verifySending ? 'Sending…' : 'Resend link' }}
+            </button>
+            <span v-else class="font-semibold">Link sent</span>
+          </div>
+
           <slot />
         </div>
       </main>

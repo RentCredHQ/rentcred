@@ -24,6 +24,8 @@ const loading = ref(true)
 const hasFieldAgent = ref(false)
 const rawStatus = ref('')
 
+// Mirrors VALID_TRANSITIONS in apps/api submissions.service.ts. 'cancelled' is
+// agent-initiated and terminal, so ops has no transition into or out of it.
 const VALID_TRANSITIONS: Record<string, string[]> = {
   pending: ['in_progress', 'rejected'],
   in_progress: ['field_visit', 'report_building', 'rejected'],
@@ -31,6 +33,7 @@ const VALID_TRANSITIONS: Record<string, string[]> = {
   report_building: ['completed', 'rejected'],
   completed: [],
   rejected: ['pending'],
+  cancelled: [],
 }
 
 const availableTransitions = computed(() => {
@@ -97,10 +100,11 @@ async function toggleCheck(check: any) {
 const statusStyleMap: Record<string, { bg: string; text: string }> = {
   pending: { bg: 'bg-st-amber-bg', text: 'text-st-amber-text' },
   in_progress: { bg: 'bg-st-amber-bg', text: 'text-st-amber-text' },
-  field_visit: { bg: 'bg-blue-50', text: 'text-blue-600' },
+  field_visit: { bg: 'bg-st-blue-bg', text: 'text-st-blue-text' },
   report_building: { bg: 'bg-st-amber-bg', text: 'text-st-amber-text' },
   completed: { bg: 'bg-st-green-bg', text: 'text-st-green-text' },
   rejected: { bg: 'bg-st-red-bg', text: 'text-st-red-text' },
+  cancelled: { bg: 'bg-st-neutral-bg', text: 'text-st-neutral-text' },
 }
 
 const caseData = ref({

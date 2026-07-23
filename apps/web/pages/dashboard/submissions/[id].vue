@@ -7,7 +7,7 @@ const caseId = computed(() => route.params.id as string)
 
 useSeoMeta({ title: `Case ${caseId.value} — RentCred` })
 
-const { getSubmission, updateSubmissionStatus } = useSubmissions()
+const { getSubmission, cancelSubmission } = useSubmissions()
 const { shareReport } = useReports()
 const { success, error: showError, info } = useToast()
 
@@ -23,6 +23,7 @@ function getStatusStyle(status: string) {
     field_visit: { bg: 'bg-st-blue-bg', text: 'text-st-blue-text' },
     report_building: { bg: 'bg-st-amber-bg', text: 'text-st-amber-text' },
     rejected: { bg: 'bg-st-red-bg', text: 'text-st-red-text' },
+    cancelled: { bg: 'bg-st-neutral-bg', text: 'text-st-neutral-text' },
   }
   return map[status] || { bg: 'bg-surface', text: 'text-foreground' }
 }
@@ -97,10 +98,11 @@ function handleResendInvite() {
 }
 
 async function handleCancelCase() {
-  if (!confirm('Are you sure you want to cancel this case? This action cannot be undone.')) return
+  if (!confirm('Cancel this case? Your credit will be returned. This cannot be undone.')) return
   try {
-    await updateSubmissionStatus(caseId.value, 'rejected')
-    success('Case cancelled')
+    // This used to call the ops-only status route, so it always failed with 403.
+    const res = await cancelSubmission(caseId.value)
+    success(res?.refunded ? 'Case cancelled — your credit has been refunded' : 'Case cancelled')
     navigateTo('/dashboard/submissions')
   } catch (e: any) {
     showError(e.data?.message || 'Failed to cancel case')
@@ -279,7 +281,15 @@ onMounted(async () => {
             <span class="material-symbols-rounded text-[18px]">mail</span>
             Resend Invite
           </button>
-          <button @click="handleCancelCase" class="font-sans text-sm font-medium text-st-red-text text-center hover:underline">Cancel Case</button>
+          <!-- Only pending cases can be cancelled; once ops starts work the
+               credit is spent, and the backend refuses anything later. -->
+          <button
+            v-if="caseData.rawStatus === 'pending'"
+            @click="handleCancelCase"
+            class="font-sans text-sm font-medium text-st-red-text text-center hover:underline"
+          >
+            Cancel Case
+          </button>
         </div>
       </div>
     </div>

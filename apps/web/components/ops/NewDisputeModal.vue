@@ -1,10 +1,14 @@
 <script setup lang="ts">
 const props = defineProps<{ modelValue: boolean }>()
-const emit = defineEmits<{ (e: 'update:modelValue', val: boolean): void }>()
+const emit = defineEmits<{
+  (e: 'update:modelValue', val: boolean): void
+  (e: 'created'): void
+}>()
 
 const close = () => emit('update:modelValue', false)
 
 const { createDispute } = useDisputes()
+const { getSubmissions } = useSubmissions()
 
 const form = ref({
   caseId: '',
@@ -20,11 +24,43 @@ const priorities = ['Low', 'Medium', 'High', 'Critical']
 const submitting = ref(false)
 const error = ref<string | null>(null)
 
-const canSubmit = computed(() => form.value.subject && form.value.description)
+// The case used to be a free-text box whose value was sent straight through as
+// submissionId, so anything typed in it produced an invalid dispute — and it
+// wasn't even required.
+const cases = ref<Array<{ id: string; label: string }>>([])
+const loadingCases = ref(false)
 
-watch(() => props.modelValue, (val) => {
-  if (val) {
-    error.value = null
+const canSubmit = computed(() =>
+  !!form.value.caseId && !!form.value.subject && !!form.value.description,
+)
+
+function resetForm() {
+  form.value = {
+    caseId: '',
+    category: 'Data Accuracy',
+    priority: 'High',
+    subject: '',
+    description: '',
+  }
+}
+
+watch(() => props.modelValue, async (val: boolean) => {
+  if (!val) return
+  error.value = null
+
+  if (cases.value.length === 0) {
+    loadingCases.value = true
+    try {
+      const res = await getSubmissions({ limit: 100 })
+      cases.value = (res.data ?? []).map((s: any) => ({
+        id: s.id,
+        label: `${s.tenantName} — ${s.propertyAddress ?? ''}`.trim(),
+      }))
+    } catch {
+      error.value = 'Could not load your cases.'
+    } finally {
+      loadingCases.value = false
+    }
   }
 })
 
@@ -38,6 +74,8 @@ async function submit() {
       reason: `[${form.value.category}] ${form.value.subject}`,
       description: form.value.description,
     })
+    emit('created')
+    resetForm()
     close()
   } catch (e: any) {
     error.value = e.data?.message || 'Failed to submit dispute. Please try again.'
@@ -66,15 +104,22 @@ async function submit() {
 
           <!-- Body -->
           <div class="flex-1 overflow-y-auto px-5 py-5 flex flex-col gap-5">
-            <!-- Case ID -->
+            <!-- Related case — must be one of the user's own submissions -->
             <div class="flex flex-col gap-1.5">
-              <label class="font-sans text-[13px] font-medium text-foreground">Related Case ID</label>
-              <input
+              <label class="font-sans text-[13px] font-medium text-foreground">Related Case</label>
+              <select
                 v-model="form.caseId"
-                type="text"
-                placeholder="e.g. RC-2026-00389"
-                class="w-full h-11 px-3.5 border border-border rounded-lg bg-card text-[13px] font-sans text-foreground placeholder:text-muted-foreground outline-none focus:ring-1 focus:ring-primary"
-              />
+                :disabled="loadingCases"
+                class="w-full h-11 px-3.5 border border-border rounded-lg bg-card text-[13px] font-sans text-foreground outline-none focus:ring-1 focus:ring-primary appearance-none cursor-pointer disabled:opacity-50"
+              >
+                <option value="" disabled>
+                  {{ loadingCases ? 'Loading your cases…' : 'Select a case' }}
+                </option>
+                <option v-for="c in cases" :key="c.id" :value="c.id">{{ c.label }}</option>
+              </select>
+              <span v-if="!loadingCases && cases.length === 0" class="font-sans text-[12px] text-muted-foreground">
+                You have no cases to raise a dispute against yet.
+              </span>
             </div>
 
             <!-- Category -->
@@ -120,15 +165,6 @@ async function submit() {
               />
             </div>
 
-            <!-- Attachments -->
-            <div class="flex flex-col gap-1.5">
-              <label class="font-sans text-[13px] font-medium text-foreground">Attachments</label>
-              <div class="w-full h-[100px] border border-dashed border-border rounded-lg bg-card flex flex-col items-center justify-center gap-2 cursor-pointer hover:bg-background transition-colors">
-                <span class="material-symbols-rounded text-[28px] text-muted-foreground">cloud_upload</span>
-                <span class="font-sans text-[13px] text-muted-foreground">Click to upload files</span>
-                <span class="font-sans text-[11px] text-muted-foreground/60">PNG, JPG, PDF up to 10MB</span>
-              </div>
-            </div>
           </div>
 
           <!-- Error -->

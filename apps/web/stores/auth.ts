@@ -5,7 +5,11 @@ interface User {
   email: string
   name: string
   role: 'admin' | 'agent' | 'tenant' | 'ops' | 'field_agent'
+  phone?: string
   avatarUrl?: string
+  // Returned by both /auth/login and /auth/me; drives the "verify your email"
+  // banner in the dashboard layouts.
+  isVerified?: boolean
   kybStatus?: 'pending' | 'submitted' | 'approved' | 'rejected'
   creditBalance?: number
 }

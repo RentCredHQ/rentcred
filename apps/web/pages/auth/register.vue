@@ -3,10 +3,17 @@ definePageMeta({ colorMode: 'light', layout: 'auth' })
 
 const authStore = useAuthStore()
 const router = useRouter()
+const route = useRoute()
+
+// Tenant invitation emails link here with ?email=…&role=tenant. Both were
+// ignored and the role was hardcoded to 'agent', so every invited tenant was
+// signed up as an agent, sent into KYB, and could never see their verification.
+const isTenantInvite = computed(() => route.query.role === 'tenant')
+const invitedEmail = computed(() => (route.query.email as string) || '')
 
 const form = reactive({
   name: '',
-  email: '',
+  email: invitedEmail.value,
   phone: '',
   password: '',
   agreeTerms: false,
@@ -34,9 +41,9 @@ async function handleRegister() {
       email: form.email,
       phone: form.phone || undefined,
       password: form.password,
-      role: 'agent',
+      role: isTenantInvite.value ? 'tenant' : 'agent',
     })
-    // Redirect agents to KYB, tenants to their dashboard
+    // Tenants go to their portal; agents still have KYB to complete.
     if (authStore.user?.role === 'tenant') {
       router.push('/tenant')
     } else {
@@ -50,10 +57,16 @@ async function handleRegister() {
 
 <template>
   <div>
-    <h1 class="font-mono text-[28px] font-bold text-foreground mb-2">Create your account</h1>
-    <p class="font-sans text-[15px] text-muted-foreground mb-8">Create your profile to start verifying tenants with confidence.</p>
+    <h1 class="font-mono text-[28px] font-bold text-foreground mb-2">
+      {{ isTenantInvite ? 'Complete your tenant profile' : 'Create your account' }}
+    </h1>
+    <p class="font-sans text-[15px] text-muted-foreground mb-8">
+      {{ isTenantInvite
+        ? 'Your agent has started a verification for you. Create your account to track it and view your report.'
+        : 'Create your profile to start verifying tenants with confidence.' }}
+    </p>
 
-    <div v-if="error" class="bg-red-50 border border-red-200 text-red-700 text-sm font-sans px-4 py-3 mb-6">
+    <div v-if="error" class="bg-st-red-bg border border-st-red-text/20 text-st-red-text text-sm font-sans px-4 py-3 mb-6">
       {{ error }}
     </div>
 
@@ -76,8 +89,13 @@ async function handleRegister() {
           type="email"
           placeholder="you@company.com"
           required
-          class="w-full px-4 py-3 border border-border bg-background text-foreground font-sans text-sm placeholder:text-muted-foreground focus:outline-none focus:border-[#FF8400] transition-colors"
+          :readonly="isTenantInvite && !!invitedEmail"
+          class="w-full px-4 py-3 border border-border bg-background text-foreground font-sans text-sm placeholder:text-muted-foreground focus:outline-none focus:border-[#FF8400] transition-colors read-only:bg-surface read-only:text-muted-foreground"
         />
+        <!-- The verification is keyed to this address, so it must not be edited. -->
+        <p v-if="isTenantInvite && invitedEmail" class="mt-2 text-xs font-sans text-muted-foreground">
+          This is the address your verification was sent to.
+        </p>
       </div>
 
       <div>

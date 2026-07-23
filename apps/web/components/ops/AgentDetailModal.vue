@@ -3,6 +3,9 @@ import { SUBMISSION_STATUS_LABELS } from '@rentcred/shared'
 
 const props = defineProps<{ agentId?: string | null }>()
 const show = defineModel<boolean>({ default: false })
+// Lets the parent list refresh after a suspend/reactivate, instead of showing
+// stale status until the page is reloaded.
+const emit = defineEmits<{ (e: 'updated'): void }>()
 
 const { api } = useApi()
 
@@ -15,7 +18,7 @@ const actionLoading = ref(false)
 const statusStyleMap: Record<string, { bg: string; text: string }> = {
   pending: { bg: 'bg-st-amber-bg', text: 'text-st-amber-text' },
   in_progress: { bg: 'bg-st-amber-bg', text: 'text-st-amber-text' },
-  field_visit: { bg: 'bg-blue-50', text: 'text-blue-600' },
+  field_visit: { bg: 'bg-st-blue-bg', text: 'text-st-blue-text' },
   report_building: { bg: 'bg-st-amber-bg', text: 'text-st-amber-text' },
   completed: { bg: 'bg-st-green-bg', text: 'text-st-green-text' },
   rejected: { bg: 'bg-st-red-bg', text: 'text-st-red-text' },
@@ -47,25 +50,45 @@ watch(() => show.value, async (open) => {
   } finally { loading.value = false }
 })
 
-const suspendLabel = computed(() => {
-  if (!agent.value) return 'Suspend Agent'
-  return agent.value.status === 'suspended' ? 'Reactivate Agent' : 'Suspend Agent'
-})
+// Accounts are enabled/disabled via isActive on the user record.
+const isSuspended = computed(() => agent.value?.isActive === false)
+const suspendLabel = computed(() => (isSuspended.value ? 'Reactivate Agent' : 'Suspend Agent'))
+
+const confirmingSuspend = ref(false)
 
 async function handleSuspendToggle() {
   if (!props.agentId || !agent.value) return
+
+  // Suspension cuts the agent off mid-shift, so make it a deliberate action.
+  if (!confirmingSuspend.value) {
+    confirmingSuspend.value = true
+    return
+  }
+
+  const nextActive = isSuspended.value
   actionLoading.value = true
   error.value = null
-  const newStatus = agent.value.status === 'suspended' ? 'active' : 'suspended'
   try {
-    await api(`/field-agents/${props.agentId}/status`, { method: 'PATCH', body: { status: newStatus } })
-    agent.value.status = newStatus
+    await api(`/field-agents/${props.agentId}/status`, {
+      method: 'PATCH',
+      body: { isActive: nextActive },
+    })
+    agent.value.isActive = nextActive
+    confirmingSuspend.value = false
+    emit('updated')
   } catch (e: any) {
-    error.value = e.data?.message || `Failed to ${newStatus === 'suspended' ? 'suspend' : 'reactivate'} agent.`
+    error.value = e.data?.message || `Failed to ${nextActive ? 'reactivate' : 'suspend'} agent.`
   } finally {
     actionLoading.value = false
   }
 }
+
+watch(() => show.value, (open) => {
+  if (!open) {
+    confirmingSuspend.value = false
+    error.value = null
+  }
+})
 </script>
 
 <template>
@@ -93,7 +116,10 @@ async function handleSuspendToggle() {
           <div v-if="agent" class="flex flex-col gap-5 p-6">
             <!-- Status & Rating -->
             <div class="flex flex-wrap items-center gap-3">
-              <span class="inline-flex px-2.5 py-0.5 rounded-full text-[11px] font-semibold bg-st-green-bg text-st-green-text">{{ agent.status === 'active' ? 'Active' : agent.status === 'suspended' ? 'Suspended' : 'Inactive' }}</span>
+              <span
+                class="inline-flex px-2.5 py-0.5 rounded-full text-[11px] font-semibold"
+                :class="isSuspended ? 'bg-st-red-bg text-st-red-text' : 'bg-st-green-bg text-st-green-text'"
+              >{{ isSuspended ? 'Suspended' : 'Active' }}</span>
               <div class="flex items-center gap-1">
                 <span class="material-symbols-rounded text-[16px] text-primary">star</span>
                 <span class="font-mono text-[13px] font-semibold text-foreground">{{ agent.rating ?? '—' }}</span>
@@ -171,9 +197,13 @@ async function handleSuspendToggle() {
                 @click="handleSuspendToggle"
                 :disabled="actionLoading"
                 class="flex-1 px-4 py-2.5 rounded-lg text-[13px] font-mono font-semibold hover:opacity-90 transition-opacity disabled:opacity-50 disabled:cursor-not-allowed"
-                :class="agent.status === 'suspended' ? 'bg-st-green-text text-white' : 'bg-st-red-text text-white'"
+                :class="isSuspended ? 'bg-st-green-text text-white' : 'bg-st-red-text text-white'"
               >
-                {{ actionLoading ? 'Processing...' : suspendLabel }}
+                {{ actionLoading
+                  ? 'Processing...'
+                  : confirmingSuspend
+                    ? (isSuspended ? 'Confirm reactivate' : 'Confirm suspend')
+                    : suspendLabel }}
               </button>
               <button @click="show = false" class="flex-1 px-4 py-2.5 border border-border rounded-lg text-[13px] font-sans text-foreground hover:bg-surface transition-colors">
                 Close

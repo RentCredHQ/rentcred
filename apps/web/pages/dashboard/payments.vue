@@ -2,9 +2,44 @@
 definePageMeta({ layout: 'dashboard' })
 useSeoMeta({ title: 'Payment History — RentCred' })
 
-const { getPaymentStats, getTransactionHistory } = usePayments()
+const { getPaymentStats, getTransactionHistory, verifyTransaction } = usePayments()
+const route = useRoute()
+const router = useRouter()
+const authStore = useAuthStore()
 
 const loading = ref(true)
+
+// Paystack sends the buyer back here with ?ref=<transaction id> after checkout.
+// Nothing consumed it, so a successful payment looked like nothing happened
+// until the webhook landed and the page was reloaded by hand.
+const paymentNotice = ref<{ tone: 'success' | 'pending' | 'error'; message: string } | null>(null)
+
+async function handlePaystackReturn() {
+  const reference = route.query.ref as string | undefined
+  if (!reference) return
+
+  try {
+    const res = await verifyTransaction(reference)
+    if (res?.verified) {
+      paymentNotice.value = { tone: 'success', message: 'Payment confirmed — your credits have been added.' }
+      // Refresh the balance shown in the layout header.
+      await authStore.fetchUser()
+    } else {
+      paymentNotice.value = {
+        tone: 'pending',
+        message: res?.message || 'Payment is still processing. Your credits will appear shortly.',
+      }
+    }
+  } catch (e: any) {
+    paymentNotice.value = {
+      tone: 'error',
+      message: e.data?.message || 'We could not confirm this payment. Contact support if you were charged.',
+    }
+  } finally {
+    // Drop the query so a refresh does not re-run verification.
+    router.replace({ query: {} })
+  }
+}
 
 const statusTabs = [
   { label: 'All', value: 'all' },
@@ -76,6 +111,7 @@ async function fetchTransactions() {
 }
 
 onMounted(async () => {
+  await handlePaystackReturn()
   try {
     const [statsRes, historyRes] = await Promise.all([
       getPaymentStats(),
@@ -104,6 +140,22 @@ onMounted(async () => {
     </div>
 
     <template v-else>
+    <!-- Outcome of a Paystack checkout the buyer was just redirected back from -->
+    <div
+      v-if="paymentNotice"
+      class="flex items-center gap-3 px-4 py-3 rounded-lg font-sans text-sm"
+      :class="{
+        'bg-st-green-bg text-st-green-text': paymentNotice.tone === 'success',
+        'bg-st-amber-bg text-st-amber-text': paymentNotice.tone === 'pending',
+        'bg-st-red-bg text-st-red-text': paymentNotice.tone === 'error',
+      }"
+    >
+      <span class="material-symbols-rounded text-[20px]">
+        {{ paymentNotice.tone === 'success' ? 'check_circle' : paymentNotice.tone === 'pending' ? 'schedule' : 'error' }}
+      </span>
+      <span>{{ paymentNotice.message }}</span>
+    </div>
+
     <!-- Header -->
     <div class="flex flex-col gap-0.5">
       <h1 class="font-sans text-xl font-semibold text-foreground">Payment History</h1>

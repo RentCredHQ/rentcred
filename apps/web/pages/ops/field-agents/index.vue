@@ -223,10 +223,11 @@ const { searchQuery, activeFilter, filtered, resultCount } = useFilter({
         </div>
       </div>
     </div>
-    <!-- Add Agent Modal -->
-    <OpsAddAgentModal v-model="showAddAgent" />
+    <!-- Add Agent Modal — both modals emit so the list reflects the change
+         without a manual page reload. -->
+    <OpsAddAgentModal v-model="showAddAgent" @added="fetchAgents" />
 
     <!-- Agent Detail Modal -->
-    <OpsAgentDetailModal v-model="showAgentDetail" :agent-id="selectedAgentId" />
+    <OpsAgentDetailModal v-model="showAgentDetail" :agent-id="selectedAgentId" @updated="fetchAgents" />
   </div>
 </template>

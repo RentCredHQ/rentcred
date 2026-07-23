@@ -5,12 +5,15 @@ useSeoMeta({ title: 'Kanban Board — RentCred Ops' })
 const { getSubmissions } = useSubmissions()
 const loading = ref(true)
 
+// Every status needs a home here: cards whose status matches no column are
+// dropped from the board entirely, which silently hid rejected cases.
 const columnDefs = [
-  { status: 'pending', title: 'Pending Assignment', color: 'bg-st-amber-bg', textColor: 'text-st-amber-text' },
-  { status: 'in_progress', title: 'In Progress', color: 'bg-blue-50', textColor: 'text-blue-600' },
-  { status: 'field_visit', title: 'Field Visit', color: 'bg-st-amber-bg', textColor: 'text-st-amber-text' },
-  { status: 'report_building', title: 'Pending Review', color: 'bg-st-amber-bg', textColor: 'text-st-amber-text' },
-  { status: 'completed', title: 'Completed', color: 'bg-st-green-bg', textColor: 'text-st-green-text' },
+  { status: 'pending', statuses: ['pending'], title: 'Pending Assignment', color: 'bg-st-amber-bg', textColor: 'text-st-amber-text' },
+  { status: 'in_progress', statuses: ['in_progress'], title: 'In Progress', color: 'bg-st-blue-bg', textColor: 'text-st-blue-text' },
+  { status: 'field_visit', statuses: ['field_visit'], title: 'Field Visit', color: 'bg-st-amber-bg', textColor: 'text-st-amber-text' },
+  { status: 'report_building', statuses: ['report_building'], title: 'Pending Review', color: 'bg-st-amber-bg', textColor: 'text-st-amber-text' },
+  { status: 'completed', statuses: ['completed'], title: 'Completed', color: 'bg-st-green-bg', textColor: 'text-st-green-text' },
+  { status: 'closed', statuses: ['rejected', 'cancelled'], title: 'Rejected / Cancelled', color: 'bg-st-red-bg', textColor: 'text-st-red-text' },
 ]
 
 const columns = ref<any[]>(columnDefs.map(c => ({ ...c, cards: [] })))
@@ -33,8 +36,14 @@ onMounted(async () => {
     const grouped: Record<string, any[]> = {}
     for (const col of columnDefs) grouped[col.status] = []
 
+    // Map each status to the column that owns it, so nothing is dropped.
+    const columnForStatus: Record<string, string> = {}
+    for (const col of columnDefs) {
+      for (const status of col.statuses) columnForStatus[status] = col.status
+    }
+
     for (const s of items) {
-      const bucket = grouped[s.status]
+      const bucket = grouped[columnForStatus[s.status]]
       if (!bucket) continue
       bucket.push({
         id: s.id,

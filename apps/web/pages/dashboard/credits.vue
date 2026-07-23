@@ -193,7 +193,9 @@ onMounted(async () => {
       </div>
     </div>
     <!-- Purchase Credits Modal -->
-    <DashboardPurchaseCreditsModal v-model="showPurchase" :bundle-id="selectedBundleId" @purchase-complete="$router.go(0)" />
+    <!-- No reload on purchase-complete: the modal redirects straight to Paystack,
+         and the callback lands on /dashboard/payments which refreshes the balance. -->
+    <DashboardPurchaseCreditsModal v-model="showPurchase" :bundle-id="selectedBundleId" />
     </template>
   </div>
 </template>
